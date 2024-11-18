@@ -1,10 +1,12 @@
 class Game
   def initialize
-    # @white_player = Player.new()
-    # @black_player = Player.new()
-    # @current_player = white_player
-    #
     # @board = Board.new()
+    # @rules = Rules
+    # @interface = Interface
+    #
+    # @white_player = Player.new(@interface)
+    # @black_player = Player.new(@interface)
+    # @current_player = @white_player
   end
 
   def play
