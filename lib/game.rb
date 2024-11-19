@@ -1,6 +1,6 @@
 class Game
   def initialize
-    # @board = Board.new()
+    # @chess_set = ChessKit.new()
     # @rules = Rules
     # @interface = Interface
     #
@@ -17,10 +17,10 @@ class Game
 end
 
 # Chess is a Game
-# This game is basically 2 Player 1 Board 1 set of Rules and a Interface for the terminal.
+# This game is basically 2 Player 1 ChessKit 1 set of Rules and a Interface for the terminal.
 #   The Player is a simple object with a name.
-#   The Board is basically:
-#     1 Grid of 8x8
+#   The ChessKit is basically:
+#     1 Board of 8x8
 #     and 32 Pieces
 #       this pieces are either white or black
 #       there is 6 different types of pieces
