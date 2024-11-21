@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Game
   def initialize
     # @chess_set = ChessKit.new()
