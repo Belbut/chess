@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative '../lib/chess_kit/chess_kit'
+require_relative '../lib/chess_kit'
 
 describe ChessKit do
   context 'a chess kit is made of' do
@@ -18,6 +18,7 @@ describe ChessKit do
     end
 
     describe 'pieces' do
+      let(:rook_dbl) { instance_double(Rook,"random rook") }
       xit 'is expected to empty board' do
         expect(true).to eq(true)
       end

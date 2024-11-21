@@ -3,6 +3,8 @@
 class ChessKit
   attr_reader :board
 
+
+
   # rows = height
   # columns = width
   BOARD_SIZE = { rows: 8, columns: 8 }.freeze
