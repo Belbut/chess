@@ -38,4 +38,10 @@ module MovePattern
 
   CASTLE_ACTION_KING_PATTERN = [[-2,0],[2,0]].freeze
   CASTLE_ACTION_ROOK_PATTERN = [[3,0],[-2,0]].freeze
+
+  MOVE_FACTORY = {rook:MovePattern::ROOK_MOVE_PATTERN,
+                    knight:MovePattern::KNIGHT_MOVE_PATTERN,
+                    bishop:MovePattern::BISHOP_MOVE_PATTERN,
+                    queen:MovePattern::QUEEN_MOVE_PATTERN,
+                    king:MovePattern::KING_MOVE_PATTERN}.freeze
 end

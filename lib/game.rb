@@ -12,6 +12,7 @@ class Game
   def play
     # setup game Interface.setup
     # loop game logic until we have game result
+    #   one step of the loop is to change pawn status from rushed to moved on beginning of turn
     # present game result
   end
 end
@@ -27,6 +28,7 @@ end
 #         rook, knight, bishop, queen, king, pawn
 #   The set of Rules were we need to define
 #      how pieces move
+#        on move event change move state unmoved -> moved // pawn : unmoved -> rushed/moved
 #        each one moves differently
 #          only knights are not obstructed by other pieces
 #          king and rook - have a special move (castle)
