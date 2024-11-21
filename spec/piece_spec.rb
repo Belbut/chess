@@ -3,7 +3,7 @@
 require_relative '../lib/chess_kit/piece'
 
 describe ChessPiece::Unit do
-  subject(:new_piece) { described_class.new(color_dbl, type_dbl) }
+  subject(:a_unit) { described_class.new(color_dbl, type_dbl) }
   let(:color_dbl) { double('random color') }
   let(:type_dbl) { double('random type') }
 
@@ -11,17 +11,20 @@ describe ChessPiece::Unit do
     context 'for a general piece' do
       context 'when the piece hasn\'t been moved' do
         it 'is expected to return :unmoved' do
-          expect(new_piece.move_status).to eq(:unmoved)
+          expect(a_unit.move_status).to eq(:unmoved)
         end
       end
       context 'when the piece has made some moves' do
-        let(:moved_piece) { new_piece }
-        before do
-          moved_piece.instance_variable_set(:@moves_number, rand(20))
-        end
+          context '#mark_as_moved' do
+          let(:moved_piece) { a_unit }
+          
+          before do
+            moved_piece.mark_as_moved
+          end
 
-        it 'is expected to return :moved' do
-          expect(moved_piece.move_status).to eq(:moved)
+          it 'is expected to return :moved' do
+            expect(moved_piece.move_status).to eq(:moved)
+          end
         end
       end
     end
@@ -41,22 +44,39 @@ describe ChessPiece::Unit do
     end
 
     describe '#move_pattern' do
-      context 'when the pawn hasn\'t moved ' do
-        before do
-          allow(pawn).to receive(:move_status).and_return(:unmoved)
-        end
+      context 'when the pawn hasn\'t moved before' do
         it 'is expected to have the possibility to rush' do
           expect(pawn.move_pattern.sort).to eq UNMOVED_PAWN_MOVE_PATTERN.sort
         end
       end
-      context 'when the pawn has moved'do
+      
+      context 'when the pawn has moved before'do
         before do
-          allow(pawn).to receive(:move_status).and_return(:moved)
+          pawn.mark_as_moved        
         end
+
         it 'is expected to only move one square' do
           expect(pawn.move_pattern.sort).to eq MOVED_PAWN_MOVE_PATTERN.sort
         end
       end
+
+      describe '#mark_as_rushed' do
+        context 'when the pawn was unmoved before' do
+          it 'is expected to change status to :rushed' do
+            expect{pawn.mark_as_rushed}.to change{pawn.move_status}.from(:unmoved).to(:rushed)
+          end
+        end
+
+        context 'when the pawn has already moved before' do
+          before do
+            pawn.mark_as_moved
+          end
+
+          it 'is expected to raise a error' do
+            expect{pawn.mark_as_rushed}.to raise_error(Exception)
+          end
+        end
+      end      
     end
 
     describe '#capture_pattern' do

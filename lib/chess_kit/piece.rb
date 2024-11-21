@@ -3,7 +3,7 @@ module ChessPiece
   class Unit
     require_relative '../rules/move_patterns'
 
-    attr_reader :color, :type, :move_pattern, :capture_pattern
+    attr_reader :color, :type, :move_pattern, :capture_pattern, :move_status
 
 
     def initialize(color, type)
@@ -11,18 +11,18 @@ module ChessPiece
       @type = type
       @move_pattern = MovePattern::MOVE_FACTORY[type]
       @capture_pattern = @move_pattern
-      @moves_number = 0
+      @move_status = :unmoved
     end
 
-    #TODO: refactor move_status to an event and instance variable
-    def move_status
-      @moves_number.zero? ? :unmoved : :moved
+    def mark_as_moved
+      @move_status = :moved
     end
   end
 
     class Pawn < Unit
       def initialize(color)
         type = :pawn
+
         super(color,type)
       end
 
@@ -36,6 +36,12 @@ module ChessPiece
 
       def capture_pattern
         MovePattern::PAWN_CAPTURE_PATTERN
+      end
+
+      def mark_as_rushed
+        raise Exception.new 'This pawn was already moved before' if @move_status == :moved
+
+        @move_status = :rushed
       end
     end
 
