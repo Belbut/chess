@@ -9,15 +9,15 @@ describe ChessPiece::Unit do
 
   describe '#move_status' do
     context 'for a general piece' do
-      context 'when the piece hasn\'t been moved' do
+      context "when the piece hasn't been moved" do
         it 'is expected to return :unmoved' do
           expect(a_unit.move_status).to eq(:unmoved)
         end
       end
       context 'when the piece has made some moves' do
-          context '#mark_as_moved' do
+        context '#mark_as_moved' do
           let(:moved_piece) { a_unit }
-          
+
           before do
             moved_piece.mark_as_moved
           end
@@ -32,10 +32,10 @@ describe ChessPiece::Unit do
 
   describe ChessPiece::Pawn do
     subject(:pawn) { described_class.new(color_dbl) }
-    
-    MOVED_PAWN_MOVE_PATTERN = [[0,1]].freeze
-    UNMOVED_PAWN_MOVE_PATTERN = [[0,1],[0,2]].freeze
-    PAWN_CAPTURE_PATTERN = [[-1,1],[1,1]].freeze
+
+    MOVED_PAWN_MOVE_PATTERN = [[0, 1]].freeze
+    UNMOVED_PAWN_MOVE_PATTERN = [[0, 1], [0, 2]].freeze
+    PAWN_CAPTURE_PATTERN = [[-1, 1], [1, 1]].freeze
 
     describe '#type' do
       it do
@@ -44,15 +44,15 @@ describe ChessPiece::Unit do
     end
 
     describe '#move_pattern' do
-      context 'when the pawn hasn\'t moved before' do
+      context "when the pawn hasn't moved before" do
         it 'is expected to have the possibility to rush' do
           expect(pawn.move_pattern.sort).to eq UNMOVED_PAWN_MOVE_PATTERN.sort
         end
       end
-      
-      context 'when the pawn has moved before'do
+
+      context 'when the pawn has moved before' do
         before do
-          pawn.mark_as_moved        
+          pawn.mark_as_moved
         end
 
         it 'is expected to only move one square' do
@@ -63,7 +63,9 @@ describe ChessPiece::Unit do
       describe '#mark_as_rushed' do
         context 'when the pawn was unmoved before' do
           it 'is expected to change status to :rushed' do
-            expect{pawn.mark_as_rushed}.to change{pawn.move_status}.from(:unmoved).to(:rushed)
+            expect { pawn.mark_as_rushed }.to change {
+              pawn.move_status
+            }.from(:unmoved).to(:rushed)
           end
         end
 
@@ -73,10 +75,10 @@ describe ChessPiece::Unit do
           end
 
           it 'is expected to raise a error' do
-            expect{pawn.mark_as_rushed}.to raise_error(Exception)
+            expect { pawn.mark_as_rushed }.to raise_error(Exception)
           end
         end
-      end      
+      end
     end
 
     describe '#capture_pattern' do
@@ -117,7 +119,7 @@ describe ChessPiece::Unit do
     subject(:knight) { described_class.new(color_dbl) }
 
     KNIGHT_MOVE_PATTERN = [[+2, 1], [+2, -1], [+1, +2], [+1, -2],
-                     [-1, +2], [-1, -2], [-2, 1], [-2, -1]].freeze
+                           [-1, +2], [-1, -2], [-2, 1], [-2, -1]].freeze
 
     describe '#type' do
       it do
@@ -142,9 +144,9 @@ describe ChessPiece::Unit do
     subject(:bishop) { described_class.new(color_dbl) }
 
     BISHOP_MOVE_PATTERN = [[-7, -7], [7, -7], [-6, -6], [6, -6], [-5, -5], [5, -5],
-                           [-4, -4],[4, -4],[-3, -3],[3, -3],[-2, -2],[2, -2],[-1, -1],
-                           [1, -1],[1, 1],[-1, 1],[2, 2],[-2, 2],[3, 3],[-3, 3],[4, 4],
-                           [-4, 4],[5, 5],[-5, 5],[6, 6],[-6, 6],[7, 7],[-7, 7]].freeze
+                           [-4, -4], [4, -4], [-3, -3], [3, -3], [-2, -2], [2, -2], [-1, -1],
+                           [1, -1], [1, 1], [-1, 1], [2, 2], [-2, 2], [3, 3], [-3, 3], [4, 4],
+                           [-4, 4], [5, 5], [-5, 5], [6, 6], [-6, 6], [7, 7], [-7, 7]].freeze
 
     describe '#type' do
       it do
@@ -168,13 +170,13 @@ describe ChessPiece::Unit do
   describe ChessPiece::Queen do
     subject(:queen) { described_class.new(color_dbl) }
 
-    QUEEN_MOVE_PATTERN = [[-7, -7], [7, -7], [-6, -6], [6, -6], [-5, -5], [5, -5],
-                           [-4, -4],[4, -4],[-3, -3],[3, -3],[-2, -2],[2, -2],[-1, -1],
-                           [1, -1],[1, 1],[-1, 1],[2, 2],[-2, 2],[3, 3],[-3, 3],[4, 4],
-                           [-4, 4],[5, 5],[-5, 5],[6, 6],[-6, 6],[7, 7],[-7, 7],[-7, 0], [-6, 0], [-5, 0], [-4, 0], [-3, 0], [-2, 0], [-1, 0],
-                           [0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [0, 7],
-                           [0, -7], [0, -6], [0, -5], [0, -4], [0, -3], [0, -2], [0, -1],
-                           [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0]].freeze
+    QUEEN_MOVE_PATTERN = [[-7, -7], [7, -7], [-6, -6], [6, -6], [-5, -5], [5, -5], [-4, -4],
+                          [4, -4], [-3, -3], [3, -3], [-2, -2], [2, -2], [-1, -1], [1, -1],
+                          [1, 1], [-1, 1], [2, 2], [-2, 2], [3, 3], [-3, 3], [4, 4], [-4, 4],
+                          [5, 5], [-5, 5], [6, 6], [-6, 6], [7, 7], [-7, 7], [-7, 0], [-6, 0],
+                          [-5, 0], [-4, 0], [-3, 0], [-2, 0], [-1, 0], [0, 1], [0, 2], [0, 3],
+                          [0, 4], [0, 5], [0, 6], [0, 7], [0, -7], [0, -6], [0, -5], [0, -4],
+                          [0, -3], [0, -2], [0, -1], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0]].freeze
 
     describe '#type' do
       it do
@@ -198,8 +200,8 @@ describe ChessPiece::Unit do
   describe ChessPiece::King do
     subject(:king) { described_class.new(color_dbl) }
 
-    KING_MOVE_PATTERN = [[-1, -1],[1, -1],[1, 1],[-1, 1],
-                         [-1, 0],[0, 1],[0, -1],[1, 0]].freeze
+    KING_MOVE_PATTERN = [[-1, -1], [1, -1], [1, 1], [-1, 1],
+                         [-1, 0], [0, 1], [0, -1], [1, 0]].freeze
 
     describe '#type' do
       it do
@@ -219,5 +221,4 @@ describe ChessPiece::Unit do
       end
     end
   end
-
 end
