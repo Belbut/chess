@@ -17,11 +17,7 @@ describe ChessKit do
       end
     end
 
-    describe 'pieces' do
-      let(:rook_dbl) { instance_double(Rook,"random rook") }
-      xit 'is expected to empty board' do
-        expect(true).to eq(true)
-      end
+    describe '#' do
     end
   end
 end
