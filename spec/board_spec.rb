@@ -3,6 +3,8 @@
 require_relative '../lib/chess_kit/board'
 require_relative '../lib/chess_kit/coordinate'
 
+RSpec::Matchers.define_negated_matcher :not_change, :change
+
 KNOWN_BOARD = [%w[A1 A2 A3 A4 A5],
                %w[B1 B2 B3 B4 B5],
                %w[C1 C2 C3 C4 C5],
@@ -50,8 +52,8 @@ describe Board do
     let(:outbound_coord4) { instance_double(Coordinate, x: -2, y: -2) }
     let(:outbound_coord5) { instance_double(Coordinate, x: 5, y: 5) }
 
-    let(:not_a_coord1) { double('random argument') }
-    let(:not_a_coord2) { instance_double(Coordinate, x: 'a', y: 'b') }
+    let(:invalid_coord1) { double('random argument') }
+    let(:invalid_coord2) { instance_double(Coordinate, x: 'a', y: 'b') }
     context 'when checking a VALID cell ' do
       it '' do
         expect(known_board.check_coord(coord_A1)).to be nil
@@ -62,8 +64,8 @@ describe Board do
       context 'should raise a Error when' do
         context ' the argument doesn\'t act has a coordinate' do
           it '' do
-            expect { known_board.check_coord(not_a_coord1) }.to raise_error(ArgumentError)
-            expect { known_board.check_coord(not_a_coord2) }.to raise_error(ArgumentError)
+            expect { known_board.check_coord(invalid_coord1) }.to raise_error(ArgumentError)
+            expect { known_board.check_coord(invalid_coord2) }.to raise_error(ArgumentError)
           end
         end
 
@@ -99,34 +101,29 @@ describe Board do
   describe '#add_to_cell' do
     let(:rand_obj) { double('random_object') }
 
-    let(:total_cells) { empty_board.cells.flatten.count }
-    let(:total_obj_cells) { -> { empty_board.cells.flatten.tally[rand_obj] } }
-    let(:total_empty_cells) { -> { empty_board.cells.flatten.count(nil) } }
-
     context 'when targeting a empty cell' do
       it 'is expected to add one object to the cell selected' do
-        expect { empty_board.add_to_cell(coord_A1, rand_obj) }.to(change do
-          empty_board.lookup_cell(coord_A1)
-        end.from(nil).to(rand_obj))
+        expect { empty_board.add_to_cell(coord_A1, rand_obj) }
+          .to change { empty_board.lookup_cell(coord_A1) }.from(nil).to(rand_obj)
       end
 
-      it 'is expected not to change any other cells' do
-        empty_board.add_to_cell(coord_A1, rand_obj)
-        expect(total_empty_cells.call).to eq(total_cells - 1)
+      it 'is expected not to change any other cell' do
+        expect { empty_board.add_to_cell(coord_A1, rand_obj) }
+          .to(not_change { all_cells_except.call(empty_board, coord_A1) })
       end
 
       it 'when doing multiples additions in a roll' do
-        empty_board.add_to_cell(coord_A1, rand_obj)
-        expect(total_obj_cells.call).to eq(1)
-        expect(total_empty_cells.call).to eq(total_cells - 1)
+        expect { empty_board.add_to_cell(coord_A1, rand_obj) }
+          .to change { empty_board.lookup_cell(coord_A1) }.from(nil).to(rand_obj)
+          .and(not_change { all_cells_except.call(empty_board, coord_A1) })
 
-        empty_board.add_to_cell(coord_B4, rand_obj)
-        expect(total_obj_cells.call).to eq(2)
-        expect(total_empty_cells.call).to eq(total_cells - 2)
+        expect { empty_board.add_to_cell(coord_B4, rand_obj) }
+          .to change { empty_board.lookup_cell(coord_B4) }.from(nil).to(rand_obj)
+          .and(not_change { all_cells_except.call(empty_board, coord_B4) })
 
-        empty_board.add_to_cell(coord_D4, rand_obj)
-        expect(total_obj_cells.call).to eq(3)
-        expect(total_empty_cells.call).to eq(total_cells - 3)
+        expect { empty_board.add_to_cell(coord_D4, rand_obj) }
+          .to change { empty_board.lookup_cell(coord_D4) }.from(nil).to(rand_obj)
+          .and(not_change { all_cells_except.call(empty_board, coord_D4) })
       end
     end
   end
@@ -137,15 +134,13 @@ describe Board do
       let!(:cell_content) { known_board.lookup_cell(cell_coord) }
 
       it 'is expected to change cell content to nil' do
-        expect { known_board.clear_cell(cell_coord) }.to(change do
-          known_board.lookup_cell(cell_coord)
-        end.from(cell_content).to(nil))
+        expect { known_board.clear_cell(cell_coord) }
+          .to(change { known_board.lookup_cell(cell_coord) }.from(cell_content).to(nil))
       end
 
       it 'is expected not to change any other cell content' do
-        expect { known_board.clear_cell(cell_coord) }.to_not(change do
-          all_cells_except.call(known_board, cell_coord)
-        end)
+        expect { known_board.clear_cell(cell_coord) }
+          .to(not_change { all_cells_except.call(known_board, cell_coord) })
       end
 
       it 'it returns the content of the cell that was deleted' do
@@ -157,16 +152,14 @@ describe Board do
       let(:cell_coord) { coord_A1 }
       let!(:cell_content) { empty_board.lookup_cell(cell_coord) }
 
-      it 'is expected not keep cell nil' do
-        expect { empty_board.clear_cell(cell_coord) }.to_not(change do
-          empty_board.lookup_cell(cell_coord)
-        end)
+      it 'is expected to keep cell nil' do
+        expect { empty_board.clear_cell(cell_coord) }
+          .to(not_change { empty_board.lookup_cell(cell_coord) })
       end
 
-      it 'is expected not to change any other cell content' do
-        expect { empty_board.clear_cell(cell_coord) }.to_not(change do
-          all_cells_except.call(empty_board, cell_coord)
-        end)
+      it 'is expected not to change any other cell' do
+        expect { empty_board.clear_cell(cell_coord) }
+          .to(not_change { all_cells_except.call(empty_board, cell_coord) })
       end
 
       it 'is expected to return nil' do
