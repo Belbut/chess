@@ -16,7 +16,16 @@ describe Board do
 
   subject(:known_board) { described_class.new(5, 5) }
   before do
-    known_board.instance_variable_set(:@tiles, KNOWN_BOARD)
+    known_board.instance_variable_set(:@cells, KNOWN_BOARD)
+  end
+
+  let(:all_cells_except) do
+    lambda { |board, coord|
+      initial_cells = board.cells.map(&:dup)
+
+      initial_cells[coord.x].delete_at(coord.y)
+      initial_cells
+    }
   end
 
   let(:coord_A1) { instance_double(Coordinate, x: 0, y: 0) }
@@ -24,11 +33,11 @@ describe Board do
   let(:coord_D4) { instance_double(Coordinate, x: 3, y: 3) }
   let(:coord_E5) { instance_double(Coordinate, x: 4, y: 4) }
 
-  describe '#tiles' do
+  describe '#cells' do
     it 'is expected to be a 2 dimensional Array' do
-      expect(empty_board.tiles).to be_a(Array)
+      expect(empty_board.cells).to be_a(Array)
 
-      empty_board.tiles.each do |column|
+      empty_board.cells.each do |column|
         expect(column).to be_a(Array)
       end
     end
@@ -43,13 +52,13 @@ describe Board do
 
     let(:not_a_coord1) { double('random argument') }
     let(:not_a_coord2) { instance_double(Coordinate, x: 'a', y: 'b') }
-    context 'when checking a VALID tile ' do
+    context 'when checking a VALID cell ' do
       it '' do
         expect(known_board.check_coord(coord_A1)).to be nil
       end
     end
 
-    context 'when checking a INVALID tile ' do
+    context 'when checking a INVALID cell ' do
       context 'should raise a Error when' do
         context ' the argument doesn\'t act has a coordinate' do
           it '' do
@@ -71,52 +80,97 @@ describe Board do
     end
   end
 
-  describe '#lookup_tile' do
-    context 'when checking a tile ' do
+  describe '#lookup_cell' do
+    context 'when checking a cell ' do
       it 'is expected to check if the coordinate is valid' do
         expect(known_board).to receive(:check_coord).and_return(nil)
-        known_board.lookup_tile(coord_A1)
+        known_board.lookup_cell(coord_A1)
       end
 
-      it 'is expected to return the object on the board tile' do
-        expect(known_board.lookup_tile(coord_A1)).to eq 'A1'
-        expect(known_board.lookup_tile(coord_B4)).to eq 'B4'
-        expect(known_board.lookup_tile(coord_D4)).to eq 'D4'
-        expect(known_board.lookup_tile(coord_E5)).to eq 'E5'
+      it 'is expected to return the object on the board cell' do
+        expect(known_board.lookup_cell(coord_A1)).to eq 'A1'
+        expect(known_board.lookup_cell(coord_B4)).to eq 'B4'
+        expect(known_board.lookup_cell(coord_D4)).to eq 'D4'
+        expect(known_board.lookup_cell(coord_E5)).to eq 'E5'
       end
     end
   end
 
-  describe '#add_to_tile' do
+  describe '#add_to_cell' do
     let(:rand_obj) { double('random_object') }
 
-    let(:total_cells) { empty_board.tiles.flatten.count }
-    let(:total_obj_cells) { -> { empty_board.tiles.flatten.tally[rand_obj] } }
-    let(:total_empty_cells) { -> { empty_board.tiles.flatten.count(nil) } }
+    let(:total_cells) { empty_board.cells.flatten.count }
+    let(:total_obj_cells) { -> { empty_board.cells.flatten.tally[rand_obj] } }
+    let(:total_empty_cells) { -> { empty_board.cells.flatten.count(nil) } }
 
     context 'when targeting a empty cell' do
-      it 'is expected to add one object to the tile selected' do
-        expect { empty_board.add_to_tile(coord_A1, rand_obj) }.to(change { empty_board.lookup_tile(coord_A1) })
-        expect(total_obj_cells.call).to eq 1
+      it 'is expected to add one object to the cell selected' do
+        expect { empty_board.add_to_cell(coord_A1, rand_obj) }.to(change do
+          empty_board.lookup_cell(coord_A1)
+        end.from(nil).to(rand_obj))
       end
 
-      it 'is expected not to change any other tiles' do
-        empty_board.add_to_tile(coord_A1, rand_obj)
+      it 'is expected not to change any other cells' do
+        empty_board.add_to_cell(coord_A1, rand_obj)
         expect(total_empty_cells.call).to eq(total_cells - 1)
       end
 
       it 'when doing multiples additions in a roll' do
-        empty_board.add_to_tile(coord_A1, rand_obj)
+        empty_board.add_to_cell(coord_A1, rand_obj)
         expect(total_obj_cells.call).to eq(1)
         expect(total_empty_cells.call).to eq(total_cells - 1)
 
-        empty_board.add_to_tile(coord_B4, rand_obj)
+        empty_board.add_to_cell(coord_B4, rand_obj)
         expect(total_obj_cells.call).to eq(2)
         expect(total_empty_cells.call).to eq(total_cells - 2)
 
-        empty_board.add_to_tile(coord_D4, rand_obj)
+        empty_board.add_to_cell(coord_D4, rand_obj)
         expect(total_obj_cells.call).to eq(3)
         expect(total_empty_cells.call).to eq(total_cells - 3)
+      end
+    end
+  end
+
+  describe '#clear_cell' do
+    context 'when targeting a occupied cell' do
+      let(:cell_coord) { coord_A1 }
+      let!(:cell_content) { known_board.lookup_cell(cell_coord) }
+
+      it 'is expected to change cell content to nil' do
+        expect { known_board.clear_cell(cell_coord) }.to(change do
+          known_board.lookup_cell(cell_coord)
+        end.from(cell_content).to(nil))
+      end
+
+      it 'is expected not to change any other cell content' do
+        expect { known_board.clear_cell(cell_coord) }.to_not(change do
+          all_cells_except.call(known_board, cell_coord)
+        end)
+      end
+
+      it 'it returns the content of the cell that was deleted' do
+        expect(known_board.clear_cell(cell_coord)).to eq cell_content
+      end
+    end
+
+    context 'when targeting a occupied cell' do
+      let(:cell_coord) { coord_A1 }
+      let!(:cell_content) { empty_board.lookup_cell(cell_coord) }
+
+      it 'is expected not keep cell nil' do
+        expect { empty_board.clear_cell(cell_coord) }.to_not(change do
+          empty_board.lookup_cell(cell_coord)
+        end)
+      end
+
+      it 'is expected not to change any other cell content' do
+        expect { empty_board.clear_cell(cell_coord) }.to_not(change do
+          all_cells_except.call(empty_board, cell_coord)
+        end)
+      end
+
+      it 'is expected to return nil' do
+        expect(empty_board.clear_cell(cell_coord)).to eq nil
       end
     end
   end
