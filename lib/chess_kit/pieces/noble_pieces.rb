@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require_relative './unit'
-module ChessPiece
+module Pieces
   class Rook < Unit
     def initialize(color)
       type = :rook

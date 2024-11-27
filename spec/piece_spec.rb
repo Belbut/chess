@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-require_relative '../lib/chess_kit/chess_piece'
-require_relative '../lib/chess_kit/pawn'
+require_relative '../lib/chess_kit/pieces/pawn'
+require_relative '../lib/chess_kit/pieces/noble_pieces'
 
-describe ChessPiece do
+describe Pieces do
   let(:color_dbl) { double('random color') }
 
-  describe ChessPiece::Pawn do
+  describe Pieces::Pawn do
     subject(:pawn) { described_class.new(color_dbl) }
 
     MOVED_PAWN_MOVE_PATTERN = [[0, 1]].freeze
@@ -64,7 +64,7 @@ describe ChessPiece do
     end
   end
 
-  describe ChessPiece::Rook do
+  describe Pieces::Rook do
     subject(:rook) { described_class.new(color_dbl) }
 
     ROOK_MOVE_PATTERN = [[-7, 0], [-6, 0], [-5, 0], [-4, 0], [-3, 0], [-2, 0], [-1, 0],
@@ -91,7 +91,7 @@ describe ChessPiece do
     end
   end
 
-  describe ChessPiece::Knight do
+  describe Pieces::Knight do
     subject(:knight) { described_class.new(color_dbl) }
 
     KNIGHT_MOVE_PATTERN = [[+2, 1], [+2, -1], [+1, +2], [+1, -2],
@@ -116,7 +116,7 @@ describe ChessPiece do
     end
   end
 
-  describe ChessPiece::Bishop do
+  describe Pieces::Bishop do
     subject(:bishop) { described_class.new(color_dbl) }
 
     BISHOP_MOVE_PATTERN = [[-7, -7], [7, -7], [-6, -6], [6, -6], [-5, -5], [5, -5],
@@ -143,7 +143,7 @@ describe ChessPiece do
     end
   end
 
-  describe ChessPiece::Queen do
+  describe Pieces::Queen do
     subject(:queen) { described_class.new(color_dbl) }
 
     QUEEN_MOVE_PATTERN = [[-7, -7], [7, -7], [-6, -6], [6, -6], [-5, -5], [5, -5], [-4, -4],
@@ -173,7 +173,7 @@ describe ChessPiece do
     end
   end
 
-  describe ChessPiece::King do
+  describe Pieces::King do
     subject(:king) { described_class.new(color_dbl) }
 
     KING_MOVE_PATTERN = [[-1, -1], [1, -1], [1, 1], [-1, 1],

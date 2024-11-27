@@ -1,6 +1,6 @@
-require_relative './chess_piece'
+require_relative './unit'
 
-module ChessPiece
+module Pieces
   class Pawn < Unit
     def initialize(color)
       type = :pawn

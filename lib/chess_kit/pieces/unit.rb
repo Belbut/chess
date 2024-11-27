@@ -1,5 +1,5 @@
 class Unit
-  require_relative '../rules/move_patterns'
+  require_relative '../../rules/move_patterns'
 
   attr_reader :color, :type, :move_pattern, :capture_pattern, :move_status
 

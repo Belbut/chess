@@ -1,4 +1,4 @@
-require_relative '../lib/chess_kit/unit'
+require_relative '../lib/chess_kit/pieces/unit'
 
 describe Unit do
   subject(:a_unit) { described_class.new(color_dbl, type_dbl) }
