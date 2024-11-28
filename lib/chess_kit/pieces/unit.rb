@@ -14,4 +14,12 @@ class Unit
   def mark_as_moved
     @move_status = :moved
   end
+
+  def black?
+    @color == :black
+  end
+
+  def white?
+    @color == :white
+  end
 end
