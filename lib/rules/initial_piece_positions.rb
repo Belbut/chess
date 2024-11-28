@@ -1,26 +1,22 @@
 require_relative '../chess_kit/coordinate'
 
 module InitialPiecePositions
-  def self.coordinate_from_array(positions)
-    positions.map { |position| Coordinate.from_array(position) }
-  end
-
   WHITE_POSITIONS = {
-    pawn: coordinate_from_array([[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1]]),
-    rook: coordinate_from_array([[0, 0], [7, 0]]),
-    knight: coordinate_from_array([[1, 0], [6, 0]]),
-    bishop: coordinate_from_array([[2, 0], [5, 0]]),
-    queen: coordinate_from_array([[3, 0]]),
-    king: coordinate_from_array([[4, 0]])
+    pawn: %w[A2 B2 C2 D2 E2 F2 G2 H2],
+    rook: %w[A1 H1],
+    knight: %w[B1 G1],
+    bishop: %w[C1 F1],
+    queen: %w[D1],
+    king: %w[E1]
   }.freeze
 
   BLACK_POSITIONS = {
-    pawn: coordinate_from_array([[0, 6], [1, 6], [2, 6], [3, 6], [4, 6], [5, 6], [6, 6], [7, 6]]),
-    rook: coordinate_from_array([[0, 7], [7, 7]]),
-    knight: coordinate_from_array([[1, 7], [6, 7]]),
-    bishop: coordinate_from_array([[2, 7], [5, 7]]),
-    queen: coordinate_from_array([[3, 7]]),
-    king: coordinate_from_array([[4, 7]])
+    pawn: %w[A7 B7 C7 D7 E7 F7 G7 H7],
+    rook: %w[A8 H8],
+    knight: %w[B8 G8],
+    bishop: %w[C8 F8],
+    queen: %w[D8],
+    king: %w[E8]
   }.freeze
 
   PIECE_POSITIONS = {
