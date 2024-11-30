@@ -4,4 +4,5 @@ source 'https://rubygems.org'
 
 # gem "rails"
 
+gem 'rainbow'
 gem 'rspec', '~> 3.13'
