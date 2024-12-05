@@ -1,8 +1,22 @@
-# frozen_string_lxiteral: true
+# frozen_string_literal: true
 
 require_relative '../lib/interface'
 require_relative '../lib/chess_kit/pieces/unit'
 require_relative '../lib/chess_kit/board'
+
+PIECE_RENDERED = { white: { pawn: "\e[38;5;231m ♟ \e[0m",
+                            rook: "\e[38;5;231m ♜ \e[0m",
+                            knight: "\e[38;5;231m ♞ \e[0m",
+                            bishop: "\e[38;5;231m ♝ \e[0m",
+                            queen: "\e[38;5;231m ♛ \e[0m",
+                            king: "\e[38;5;231m ♚ \e[0m" },
+
+                   black: { pawn: "\e[30m ♟ \e[0m",
+                            rook: "\e[30m ♜ \e[0m",
+                            knight: "\e[30m ♞ \e[0m",
+                            bishop: "\e[30m ♝ \e[0m",
+                            queen: "\e[30m ♛ \e[0m",
+                            king: "\e[30m ♚ \e[0m" } }.freeze
 
 describe Interface do
   describe Interface::Output do
@@ -12,20 +26,6 @@ describe Interface do
         allow(unit_dbl).to receive(:color).and_return(context_color)
         allow(unit_dbl).to receive(:type).and_return(context_type)
       end
-
-      PIECE_RENDERED = { white: { pawn: "\e[38;5;231m ♟ \e[0m",
-                                  rook: "\e[38;5;231m ♜ \e[0m",
-                                  knight: "\e[38;5;231m ♞ \e[0m",
-                                  bishop: "\e[38;5;231m ♝ \e[0m",
-                                  queen: "\e[38;5;231m ♛ \e[0m",
-                                  king: "\e[38;5;231m ♚ \e[0m" },
-
-                         black: { pawn: "\e[30m ♟ \e[0m",
-                                  rook: "\e[30m ♜ \e[0m",
-                                  knight: "\e[30m ♞ \e[0m",
-                                  bishop: "\e[30m ♝ \e[0m",
-                                  queen: "\e[30m ♛ \e[0m",
-                                  king: "\e[30m ♚ \e[0m" } }
 
       context 'when the piece is a' do
         context 'white' do
@@ -146,9 +146,9 @@ describe Interface do
       end
     end
 
-    describe '.render_board' do
+    describe '.render_game' do
       let(:board_dbl) { instance_double(Board) }
-      subject(:board_render) { described_class.render_board(board_dbl) }
+      subject(:board_render) { described_class.render_game(board_dbl) }
 
       let(:head_label) { board_render.lines.first }
       let(:board_render_body) { board_render.lines[1...-1] }
@@ -169,7 +169,7 @@ describe Interface do
 
           context 'top column labels' do
             before do
-              allow(described_class).to receive(:render_body).and_return("empty body \n")
+              allow(described_class).to receive(:render_board).and_return("empty body \n")
             end
             it '' do
               expect(head_label).to eq label_8_columns
@@ -234,7 +234,7 @@ describe Interface do
 
           context 'bottom column labels' do
             before do
-              allow(described_class).to receive(:render_body).and_return("empty body \n")
+              allow(described_class).to receive(:render_board).and_return("empty body \n")
             end
             it '' do
               expect(bottom_label).to eq label_8_columns
@@ -253,7 +253,7 @@ describe Interface do
 
           context 'top column labels' do
             before do
-              allow(described_class).to receive(:render_body).and_return("empty body \n")
+              allow(described_class).to receive(:render_board).and_return("empty body \n")
             end
             it '' do
               expect(head_label).to eq label_5_columns
@@ -318,7 +318,7 @@ describe Interface do
 
           context 'bottom column labels' do
             before do
-              allow(described_class).to receive(:render_body).and_return("empty body \n")
+              allow(described_class).to receive(:render_board).and_return("empty body \n")
             end
             it '' do
               expect(bottom_label).to eq label_5_columns
@@ -337,7 +337,7 @@ describe Interface do
 
           context 'top column labels' do
             before do
-              allow(described_class).to receive(:render_body).and_return("empty body \n")
+              allow(described_class).to receive(:render_board).and_return("empty body \n")
             end
             it '' do
               expect(head_label).to eq label_8_columns
@@ -402,7 +402,7 @@ describe Interface do
 
           context 'bottom column labels' do
             before do
-              allow(described_class).to receive(:render_body).and_return("empty body \n")
+              allow(described_class).to receive(:render_board).and_return("empty body \n")
             end
             it '' do
               expect(bottom_label).to eq label_8_columns

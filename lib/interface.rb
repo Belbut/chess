@@ -23,9 +23,9 @@ module Interface
       unit_canvas.color(COLOR_PALETTE[unit.color])
     end
 
-    def self.render_board(board)
+    def self.render_game(board)
       head_label = columns_label(board)
-      body = render_body(board)
+      body = render_board(board)
       bottom_label = head_label
 
       head_label + body + bottom_label
@@ -48,26 +48,31 @@ module Interface
       empty_display_block + label + empty_display_block + "\n"
     end
 
-    def self.render_body(board)
-      body = []
-      board_by_row = board.cells
-      board_by_row.each_with_index do |row, index|
-        row_label = padded_content(board.board_height - index)
-        row_display = []
-        row.each_with_index do |cell_content, index2|
-          content_blueprint = padded_content(cell_content)
-          content_canvas = Rainbow(content_blueprint)
+    def self.render_board(board)
+      rows = []
 
-          background_color = (index + index2).odd? ? COLOR_PALETTE[:dark] : COLOR_PALETTE[:light]
-          content_with_tile_color = content_canvas.bg(background_color)
-          row_display.append(content_with_tile_color)
-        end
-        body_line = "#{row_label}#{row_display.join}#{row_label}\n"
-        body.append(body_line)
+      board.cells.each_with_index do |row, row_index|
+        row_label = padded_content(board.board_height - row_index)
+        row_cells = render_row_cells(row, row_index)
+
+        row_full_line = "#{row_label}#{row_cells}#{row_label}\n"
+        rows.append(row_full_line)
       end
-      body.join
+      rows.join
+    end
+
+    def self.render_row_cells(row, row_index)
+      row_cells = []
+
+      row.each_with_index do |cell_content, cell_number|
+        content_blueprint = padded_content(cell_content)
+        content_canvas = Rainbow(content_blueprint)
+        background_color = (row_index + cell_number).odd? ? COLOR_PALETTE[:dark] : COLOR_PALETTE[:light]
+        content_with_tile_color = content_canvas.bg(background_color)
+
+        row_cells.append(content_with_tile_color)
+      end
+      row_cells.join
     end
   end
 end
-
-# " 8 \e[48;5;137m   \e[0m\e[48;5;59m   \e[0m\e[48;5;137m   \e[0m\e[48;5;59m   \e[0m\e[48;5;137m   \e[0m\e[48;5;59m   \e[0m\e[48;5;137m   \e[0m\e[48;5;59m   \e[0m 8 \n 7 \e[48;5;59m   \e[0m\e[48;5;137m   \e[0m\e[48;5;59m   \e[0m\e[48;5;137m   \e[0m\e[48;5;59m   \e[0m\e[48;5;137m   \e[0m\e[48;5;59m   \e[0m\e[48;5;137m   \e[0m 7 \n 6 \e[48;5;137m   \e[0m\e[48;5;59m   \e[0m\e[48;5;137m   \e[0m\e[48;5;59m   \e[0m\e[48;5;137m   \e[0m\e[48;5;59m   \e[0m\e[48;5;137m   \e[0m\e[48;5;59m   \e[0m 6 \n 5 \e[48;5;59m   \e[0m\e[48;5;137m   \e[0m\e[48;5;59m   \e[0m\e[48;5;137m   \e[0m\e[48;5;59m   \e[0m\e[48;5;137m   \e[0m\e[48;5;59m   \e[0m\e[48;5;137m   \e[0m 5 \n 4 \e[48;5;137m   \e[0m\e[48;5;59m   \e[0m\e[48;5;137m   \e[0m\e[48;5;59m   \e[0m\e[48;5;137m   \e[0m\e[48;5;59m   \e[0m\e[48;5;137m   \e[0m\e[48;5;59m   \e[0m 4 \n 3 \e[48;5;59m   \e[0m\e[48;5;137m   \e[0m\e[48;5;59m   \e[0m\e[48;5;137m   \e[0m\e[48;5;59m   \e[0m\e[48;5;137m   \e[0m\e[48;5;59m   \e[0m\e[48;5;137m   \e[0m 3 \n 2 \e[48;5;137m   \e[0m\e[48;5;59m   \e[0m\e[48;5;137m   \e[0m\e[48;5;59m   \e[0m\e[48;5;137m   \e[0m\e[48;5;59m   \e[0m\e[48;5;137m   \e[0m\e[48;5;59m   \e[0m 2 \n 1 \e[48;5;59m   \e[0m\e[48;5;137m   \e[0m\e[48;5;59m   \e[0m\e[48;5;137m   \e[0m\e[48;5;59m   \e[0m\e[48;5;137m   \e[0m\e[48;5;59m   \e[0m\e[48;5;137m   \e[0m 1 \n"
