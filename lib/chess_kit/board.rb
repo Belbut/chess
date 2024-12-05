@@ -32,6 +32,14 @@ class Board
     old_obj
   end
 
+  def board_height
+    @cells.size
+  end
+
+  def board_width
+    @cells.transpose.size
+  end
+
   private
 
   def valid_coord?(coord)
@@ -40,13 +48,5 @@ class Board
 
   def inside_board?(coord)
     coord.x.between?(0, (board_height - 1)) && coord.y.between?(0, (board_width - 1))
-  end
-
-  def board_height
-    @cells.size
-  end
-
-  def board_width
-    @cells.first.size
   end
 end
