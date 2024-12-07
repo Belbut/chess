@@ -62,6 +62,19 @@ describe Pieces do
         expect(pawn.capture_pattern.sort).to eq PAWN_CAPTURE_PATTERN.sort
       end
     end
+
+    describe '#to_s' do
+      it 'of white piece' do
+        allow(pawn).to receive(:color).and_return(:white)
+        puts "#{' ' * 5}#{pawn}"
+        expect(pawn.to_s).to eq "\e[38;5;231m ♟ \e[0m"
+      end
+      it 'of black piece' do
+        allow(pawn).to receive(:color).and_return(:black)
+        puts "#{' ' * 5}#{pawn}"
+        expect(pawn.to_s).to eq "\e[30m ♟ \e[0m"
+      end
+    end
   end
 
   describe Pieces::Rook do
@@ -89,6 +102,20 @@ describe Pieces do
         expect(rook.capture_pattern).to eq rook.move_pattern
       end
     end
+
+    describe '#to_s' do
+      it 'of white piece' do
+        allow(rook).to receive(:color).and_return(:white)
+        puts "#{' ' * 5}#{rook}"
+        expect(rook.to_s).to eq "\e[38;5;231m ♜ \e[0m"
+      end
+
+      it 'of black piece' do
+        allow(rook).to receive(:color).and_return(:black)
+        puts "#{' ' * 5}#{rook}"
+        expect(rook.to_s).to eq "\e[30m ♜ \e[0m"
+      end
+    end
   end
 
   describe Pieces::Knight do
@@ -112,6 +139,20 @@ describe Pieces do
     describe '#capture_pattern' do
       it 'is expected to be the same as @move_pattern' do
         expect(knight.capture_pattern).to eq knight.move_pattern
+      end
+    end
+
+    describe '#to_s' do
+      it 'of white piece' do
+        allow(knight).to receive(:color).and_return(:white)
+        puts "#{' ' * 5}#{knight}"
+        expect(knight.to_s).to eq "\e[38;5;231m ♞ \e[0m"
+      end
+
+      it 'of black piece' do
+        allow(knight).to receive(:color).and_return(:black)
+        puts "#{' ' * 5}#{knight}"
+        expect(knight.to_s).to eq "\e[30m ♞ \e[0m"
       end
     end
   end
@@ -139,6 +180,20 @@ describe Pieces do
     describe '#capture_pattern' do
       it 'is expected to be the same as @move_pattern' do
         expect(bishop.capture_pattern).to eq bishop.move_pattern
+      end
+    end
+
+    describe '#to_s' do
+      it 'of white piece' do
+        allow(bishop).to receive(:color).and_return(:white)
+        puts "#{' ' * 5}#{bishop}"
+        expect(bishop.to_s).to eq "\e[38;5;231m ♝ \e[0m"
+      end
+
+      it 'of black piece' do
+        allow(bishop).to receive(:color).and_return(:black)
+        puts "#{' ' * 5}#{bishop}"
+        expect(bishop.to_s).to eq "\e[30m ♝ \e[0m"
       end
     end
   end
@@ -171,6 +226,20 @@ describe Pieces do
         expect(queen.capture_pattern).to eq queen.move_pattern
       end
     end
+
+    describe '#to_s' do
+      it 'of white piece' do
+        allow(queen).to receive(:color).and_return(:white)
+        puts "#{' ' * 5}#{queen}"
+        expect(queen.to_s).to eq "\e[38;5;231m ♛ \e[0m"
+      end
+
+      it 'of black piece' do
+        allow(queen).to receive(:color).and_return(:black)
+        puts "#{' ' * 5}#{queen}"
+        expect(queen.to_s).to eq "\e[30m ♛ \e[0m"
+      end
+    end
   end
 
   describe Pieces::King do
@@ -194,6 +263,20 @@ describe Pieces do
     describe '#capture_pattern' do
       it 'is expected to be the same as @move_pattern' do
         expect(king.capture_pattern).to eq king.move_pattern
+      end
+    end
+
+    describe '#to_s' do
+      it 'of white piece' do
+        allow(king).to receive(:color).and_return(:white)
+        puts "#{' ' * 5}#{king}"
+        expect(king.to_s).to eq "\e[38;5;231m ♚ \e[0m"
+      end
+
+      it 'of black piece' do
+        allow(king).to receive(:color).and_return(:black)
+        puts "#{' ' * 5}#{king}"
+        expect(king.to_s).to eq "\e[30m ♚ \e[0m"
       end
     end
   end

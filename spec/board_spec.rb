@@ -13,8 +13,8 @@ KNOWN_BOARD = [%w[A1 A2 A3 A4 A5],
 
 describe Board do
   subject(:empty_board) { described_class.new(height, width) }
-  let(:height) { 42 }
-  let(:width) { 42 }
+  let(:height) { 11 }
+  let(:width) { 11 }
 
   subject(:known_board) { described_class.new(5, 5) }
   before do
@@ -42,6 +42,12 @@ describe Board do
       empty_board.cells.each do |column|
         expect(column).to be_a(Array)
       end
+    end
+  end
+
+  describe '#to_s' do
+    it '' do
+      puts empty_board
     end
   end
 

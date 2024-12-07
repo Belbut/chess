@@ -1,8 +1,14 @@
 class Board
+  require_relative '../interface'
+
   attr_reader :cells
 
   def initialize(rows, columns)
     @cells = Array.new(rows) { Array.new(columns) }
+  end
+
+  def to_s
+    Interface::Output.render_game(self)
   end
 
   def check_coord(coord)
