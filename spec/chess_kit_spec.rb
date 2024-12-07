@@ -7,6 +7,11 @@ describe ChessKit do
   context 'is composed by' do
     subject(:chess_kit) { described_class.new }
     let(:board) { chess_kit.board }
+    context do
+      it ' ' do
+        puts chess_kit.board
+      end
+    end
     context 'A Board' do
       it 'expected to be sized 8x8' do
         height = board.cells.size

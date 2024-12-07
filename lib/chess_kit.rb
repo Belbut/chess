@@ -15,6 +15,10 @@ class ChessKit
     place_initial_pieces
   end
 
+  def to_s
+    Interface::Output.render_game(board)
+  end
+
   private
 
   def place_initial_pieces
