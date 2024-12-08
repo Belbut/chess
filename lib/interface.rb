@@ -52,13 +52,13 @@ module Interface
       rows = []
 
       board.cells.each_with_index do |row, row_index|
-        row_label = padded_content(board.board_height - row_index)
+        row_label = padded_content(row_index + 1)
         row_cells = render_row_cells(row, row_index)
 
         row_full_line = "#{row_label}#{row_cells}#{row_label}\n"
         rows.append(row_full_line)
       end
-      rows.join
+      rows.reverse.join # reverse because the boards depth is from closest to furthest
     end
 
     def self.render_row_cells(row, row_index)
@@ -67,7 +67,7 @@ module Interface
       row.each_with_index do |cell_content, cell_number|
         content_blueprint = padded_content(cell_content)
         content_canvas = Rainbow(content_blueprint)
-        background_color = (row_index + cell_number).odd? ? COLOR_PALETTE[:dark] : COLOR_PALETTE[:light]
+        background_color = (row_index + cell_number).even? ? COLOR_PALETTE[:dark] : COLOR_PALETTE[:light]
         content_with_tile_color = content_canvas.bg(background_color)
 
         row_cells.append(content_with_tile_color)

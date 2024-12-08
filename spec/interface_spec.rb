@@ -196,7 +196,8 @@ describe Interface do
 
                 board_render_body.each_with_index do |row_content, index|
                   board_row_content = row_content.chomp[3...-3] # removes line break and row label
-                  bg_color = index.even? ? :light_bg : :dark_bg
+                  # inverted to reflect that the (0,0) on board is the top left of the matrix and on the display is the bottom left
+                  bg_color = (height - index).odd? ? :dark_bg : :light_bg
 
                   expected_row = ''
                   width.times do
@@ -280,7 +281,8 @@ describe Interface do
 
                 board_render_body.each_with_index do |row_content, index|
                   board_row_content = row_content.chomp[3...-3] # removes line break and row label
-                  bg_color = index.even? ? :light_bg : :dark_bg
+                  # inverted to reflect that the (0,0) on board is the top left of the matrix and on the display is the bottom left
+                  bg_color = (height - index).odd? ? :dark_bg : :light_bg
 
                   expected_row = ''
                   width.times do
@@ -364,7 +366,8 @@ describe Interface do
 
                 board_render_body.each_with_index do |row_content, index|
                   board_row_content = row_content.chomp[3...-3] # removes line break and row label
-                  bg_color = index.even? ? :light_bg : :dark_bg
+                  # inverted to reflect that the (0,0) on board is the top left of the matrix and on the display is the bottom left
+                  bg_color = (height - index).odd? ? :dark_bg : :light_bg
 
                   expected_row = ''
                   width.times do
