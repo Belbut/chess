@@ -19,21 +19,21 @@ class Board
   def lookup_cell(coord)
     check_coord(coord)
 
-    @cells[coord.x][coord.y]
+    @cells[coord.y][coord.x]
   end
 
   def add_to_cell(coord, object)
     check_coord(coord) # redundant but makes it explicit
     raise ArgumentError, "Cell already occupied at #{coord}" unless lookup_cell(coord).nil?
 
-    @cells[coord.x][coord.y] = object if lookup_cell(coord).nil?
+    @cells[coord.y][coord.x] = object if lookup_cell(coord).nil?
   end
 
   def clear_cell(coord)
     check_coord(coord)
 
     old_obj = @cells[coord.x][coord.y]
-    @cells[coord.x][coord.y] = nil
+    @cells[coord.y][coord.x] = nil
 
     old_obj
   end

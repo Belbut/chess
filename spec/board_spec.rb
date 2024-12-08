@@ -5,11 +5,11 @@ require_relative '../lib/chess_kit/coordinate'
 
 RSpec::Matchers.define_negated_matcher :not_change, :change
 
-KNOWN_BOARD = [%w[A1 A2 A3 A4 A5],
-               %w[B1 B2 B3 B4 B5],
-               %w[C1 C2 C3 C4 C5],
-               %w[D1 D2 D3 D4 D5],
-               %w[E1 E2 E3 E4 E5]].freeze
+KNOWN_BOARD = [%w[A1 B1 C1 D1 E1],
+               %w[A2 B2 C2 D2 E2],
+               %w[A3 B3 C3 D3 E3],
+               %w[A4 B4 C4 D4 E4],
+               %w[A5 B5 C5 D5 E5]].freeze
 
 describe Board do
   subject(:empty_board) { described_class.new(height, width) }
@@ -25,7 +25,7 @@ describe Board do
     lambda { |board, coord|
       initial_cells = board.cells.map(&:dup)
 
-      initial_cells[coord.x].delete_at(coord.y)
+      initial_cells[coord.y].delete_at(coord.x)
       initial_cells
     }
   end
