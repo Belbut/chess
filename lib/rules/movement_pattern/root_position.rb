@@ -10,31 +10,43 @@ class RootPosition
   private
 
   def create_child_move_nodes
-    possible_move_nodes = []
-    movement_pattern.pattern.each do |pattern|
-      if pattern.include?(:n)
-        if pattern.include?(:nn)
-          possible_move_nodes.append([1, -1])
-          possible_move_nodes.append([-1, 1])
-        else
-          positive_direction = pattern.map { |direction| direction == :n ? 1 : direction }
-          negative_direction = pattern.map { |direction| direction == :n ? -1 : direction }
-          possible_move_nodes.append(positive_direction, negative_direction)
-        end
-      else
-        possible_move_nodes.append(pattern)
-      end
-    end
-    possible_move_nodes.map! do |move_node|
-      [move_node.first + coordinate.x, move_node.last + coordinate.y]
-    end
+    possible_move_nodes = possible_move_nodes(movement_pattern, coordinate)
 
-    result = []
+    actual_move_nodes = []
     possible_move_nodes.each do |possible_position|
       # add requirement compliment here
       # not complete only prove focus on green test
-      result.append(MovePositionNode.new(possible_position, :nil, :nil))
+      actual_move_nodes.append(MovePositionNode.new(possible_position, :nil, :nil))
     end
-    result
+    actual_move_nodes
+  end
+
+  def pattern_matching(pattern)
+    case pattern
+    in [0, 0]
+      nil
+    in [Integer, Integer]
+      pattern
+    in [:nn, :n]|[:n, :nn]
+      [[1, -1], [-1, 1]]
+    in [:n, int]
+      [[1, int], [-1, int]]
+    in [int, :n]
+      [[int, 1], [int, -1]]
+    end
+  end
+
+  def possible_move_nodes(parent_movement_pattern, parent_coordinate)
+    possible_move_nodes = []
+
+    parent_movement_pattern.pattern.each do |pattern|
+      possible_move_nodes += pattern_matching(pattern)
+    end
+
+    possible_move_nodes.map! do |move_node|
+      [move_node.first + parent_coordinate.x, move_node.last + parent_coordinate.y]
+    end
+
+    possible_move_nodes
   end
 end
