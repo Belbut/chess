@@ -1,9 +1,9 @@
 class MovePositionNode
-  attr_reader :coordinate, :parent_move_pattern, :direction
+  attr_reader :coordinate, :node_move_pattern, :direction
 
-  def initialize(coordinate, parent_move_pattern, direction)
+  def initialize(coordinate, node_move_pattern, direction = nil)
     @coordinate = coordinate
-    @parent_move_pattern = parent_move_pattern
+    @node_move_pattern = node_move_pattern
     @direction = direction
   end
 end

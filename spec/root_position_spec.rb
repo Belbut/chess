@@ -88,6 +88,62 @@ describe RootPosition do
         end
       end
     end
+
+    context 'when testing a knight_L movement pattern' do
+      let(:knight_L_movement_pattern_dbl) { movement_pattern_dbl }
+      before do
+        allow(knight_L_movement_pattern_dbl).to receive(:pattern).and_return([[+2, 1], [+2, -1], [+1, +2], [+1, -2],
+                                                                              [-1, +2], [-1, -2], [-2, 1], [-2, -1]])
+        allow(knight_L_movement_pattern_dbl).to receive(:requirement).and_return(true)
+      end
+
+      subject(:root_position) { described_class.new(coord_dbl, knight_L_movement_pattern_dbl) }
+
+      it 'the @child_move_nodes is expected to be a kind of MovePositionNode' do
+        root_position.child_move_nodes.each do |child_move_node|
+          expect(child_move_node).to be_a(MovePositionNode)
+        end
+      end
+      context 'when there is no requirements restrictions' do
+        it 'is expected to have 8 possible child move nodes' do
+          expect(root_position.child_move_nodes.size).to eq(8)
+        end
+
+        context 'were the coordinates are expected to be' do
+          subject(:root_position_A1) { described_class.new(coord_A1, knight_L_movement_pattern_dbl) }
+          it '' do
+            coordinates = root_position_A1.child_move_nodes.map(&:coordinate)
+            expected_coordinates = [[-2, -1], [-2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2], [2, -1], [2, 1]]
+
+            expect(coordinates.sort).to eq expected_coordinates.sort
+          end
+
+          subject(:root_position_B4) { described_class.new(coord_B4, knight_L_movement_pattern_dbl) }
+          it '' do
+            coordinates = root_position_B4.child_move_nodes.map(&:coordinate)
+            expected_coordinates = [[-1, 2], [-1, 4], [0, 1], [0, 5], [2, 1], [2, 5], [3, 2], [3, 4]]
+
+            expect(coordinates.sort).to eq expected_coordinates.sort
+          end
+
+          subject(:root_position_D4) { described_class.new(coord_D4, knight_L_movement_pattern_dbl) }
+          it '' do
+            coordinates = root_position_D4.child_move_nodes.map(&:coordinate)
+            expected_coordinates = [[1, 2], [1, 4], [2, 1], [2, 5], [4, 1], [4, 5], [5, 2], [5, 4]]
+
+            expect(coordinates.sort).to eq expected_coordinates.sort
+          end
+
+          subject(:root_position_E5) { described_class.new(coord_E5, knight_L_movement_pattern_dbl) }
+          it '' do
+            coordinates = root_position_E5.child_move_nodes.map(&:coordinate)
+            expected_coordinates = [[2, 3], [2, 5], [3, 2], [3, 6], [5, 2], [5, 6], [6, 3], [6, 5]]
+
+            expect(coordinates.sort).to eq expected_coordinates.sort
+          end
+        end
+      end
+    end
   end
 
   # allow(:diagonals_movement_pattern).to receive(:pattern).and_return([%i[n n], %i[n nn]])
