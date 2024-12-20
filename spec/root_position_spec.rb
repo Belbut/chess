@@ -49,7 +49,7 @@ describe RootPosition do
 
       context 'when there is no requirements restrictions' do
         before do
-          allow(root_position).to receive(:comply_with_restrictions).and_return(true)
+          allow(MovementUtil).to receive(:comply_with_restrictions).and_return(true)
         end
 
         it 'is expected to have 4 possible child move nodes' do
@@ -90,32 +90,6 @@ describe RootPosition do
           end
         end
       end
-
-      # context 'when adding requirements restriction for move' do
-      #   context 'for restriction:' do
-      #     context 'keep pieces inside of board' do
-      #       before do
-      #         allow(orthogonals_movement_pattern_dbl).to receive(:requirements).and_return([Requirement.inside_board])
-      #       end
-
-      #       subject(:root_position_A1) { described_class.new(coord_A1, orthogonals_movement_pattern_dbl) }
-      #       xit '' do
-      #         coordinates = root_position_A1.child_move_nodes.map(&:coordinate)
-      #         expected_coordinates = [[1, 0], [0, 1]]
-
-      #         expect(coordinates.sort).to eq expected_coordinates.sort
-      #       end
-
-      #       subject(:root_position_E5) { described_class.new(coord_E5, orthogonals_movement_pattern_dbl) }
-      #       xit '' do
-      #         coordinates = root_position_E5.child_move_nodes.map(&:coordinate)
-      #         expected_coordinates = [[3, 4], [4, 3]]
-
-      #         expect(coordinates.sort).to eq expected_coordinates.sort
-      #       end
-      #     end
-      #   end
-      # end
     end
 
     context 'when testing a diagonal movement pattern' do
@@ -135,7 +109,7 @@ describe RootPosition do
 
       context 'when there is no requirements restrictions' do
         before do
-          allow(root_position).to receive(:comply_with_restrictions).and_return(true)
+          allow(MovementUtil).to receive(:comply_with_restrictions).and_return(true)
         end
 
         it 'is expected to have 4 possible child move nodes' do
@@ -195,7 +169,7 @@ describe RootPosition do
 
       context 'when there is no requirements restrictions' do
         before do
-          allow(root_position).to receive(:comply_with_restrictions).and_return(true)
+          allow(MovementUtil).to receive(:comply_with_restrictions).and_return(true)
         end
 
         it 'is expected to have 8 possible child move nodes' do
@@ -255,7 +229,7 @@ describe RootPosition do
 
       context 'when there is no requirements restrictions' do
         before do
-          allow(root_position).to receive(:comply_with_restrictions).and_return(true)
+          allow(MovementUtil).to receive(:comply_with_restrictions).and_return(true)
         end
 
         it 'is expected to have 8 possible child move nodes' do
@@ -298,14 +272,4 @@ describe RootPosition do
       end
     end
   end
-
-  # allow(:diagonals_movement_pattern).to receive(:pattern).and_return([%i[n n], %i[n nn]])
-  # allow(:diagonals_movement_pattern).to receive(:requirement).and_return(true)
-
-  # allow(:omnidirectional_movement_pattern).to receive(:pattern).and_return([[:n, 0], [0, :n], %i[n n], %i[n nn]])
-  # allow(:omnidirectional_movement_pattern).to receive(:requirement).and_return(true)
-
-  # allow(:short_movement_pattern_L).to receive(:pattern).and_return([[+2, 1], [+2, -1], [+1, +2], [+1, -2],
-  #                                                                   [-1, +2], [-1, -2], [-2, 1], [-2, -1]])
-  # allow(:short_movement_pattern_L).to receive(:requirement).and_return(true)
 end
