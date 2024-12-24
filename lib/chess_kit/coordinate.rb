@@ -10,6 +10,20 @@ class Coordinate
     "(#{x}, #{y})c"
   end
 
+  def ==(other)
+    x == other.x && y == other.y
+  end
+
+  def to_array
+    [x, y]
+  end
+
+  def to_notation
+    xx = ('A'..'Z').to_a[x]
+
+    "#{xx}#{y + 1}"
+  end
+
   def self.from_array(position)
     unless position.size == 2
       raise ArgumentError,

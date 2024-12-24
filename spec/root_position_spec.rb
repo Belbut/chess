@@ -15,6 +15,10 @@ describe RootPosition do
   let(:coord_dbl) { coord_A1 }
   let(:movement_pattern_dbl) { instance_double(PatternRules, requirements: []) }
 
+  before do
+    allow_any_instance_of(MovePositionNode).to receive(:one_direction_child_move_node).and_return(nil)
+  end
+
   describe '#coordinate' do
     it '' do
       expect(true).to eq(true)
@@ -59,15 +63,14 @@ describe RootPosition do
         context 'were the coordinates are expected to be' do
           subject(:root_position_A1) { described_class.new(coord_A1, orthogonals_movement_pattern_dbl) }
           it '' do
-            coordinates = root_position_A1.child_move_nodes.map(&:coordinate)
+            coordinates = root_position_A1.child_move_nodes.map(&:coordinate).map(&:to_array)
             expected_coordinates = [[1, 0], [-1, 0], [0, 1], [0, -1]]
-
             expect(coordinates.sort).to eq expected_coordinates.sort
           end
 
           subject(:root_position_B4) { described_class.new(coord_B4, orthogonals_movement_pattern_dbl) }
           it '' do
-            coordinates = root_position_B4.child_move_nodes.map(&:coordinate)
+            coordinates = root_position_B4.child_move_nodes.map(&:coordinate).map(&:to_array)
             expected_coordinates = [[2, 3], [0, 3], [1, 4], [1, 2]]
 
             expect(coordinates.sort).to eq expected_coordinates.sort
@@ -75,7 +78,7 @@ describe RootPosition do
 
           subject(:root_position_D4) { described_class.new(coord_D4, orthogonals_movement_pattern_dbl) }
           it '' do
-            coordinates = root_position_D4.child_move_nodes.map(&:coordinate)
+            coordinates = root_position_D4.child_move_nodes.map(&:coordinate).map(&:to_array)
             expected_coordinates = [[4, 3], [2, 3], [3, 4], [3, 2]]
 
             expect(coordinates.sort).to eq expected_coordinates.sort
@@ -83,7 +86,7 @@ describe RootPosition do
 
           subject(:root_position_E5) { described_class.new(coord_E5, orthogonals_movement_pattern_dbl) }
           it '' do
-            coordinates = root_position_E5.child_move_nodes.map(&:coordinate)
+            coordinates = root_position_E5.child_move_nodes.map(&:coordinate).map(&:to_array)
             expected_coordinates = [[5, 4], [3, 4], [4, 5], [4, 3]]
 
             expect(coordinates.sort).to eq expected_coordinates.sort
@@ -119,7 +122,7 @@ describe RootPosition do
         context 'were the coordinates are expected to be' do
           subject(:root_position_A1) { described_class.new(coord_A1, diagonals_movement_pattern_dbl) }
           it '' do
-            coordinates = root_position_A1.child_move_nodes.map(&:coordinate)
+            coordinates = root_position_A1.child_move_nodes.map(&:coordinate).map(&:to_array)
             expected_coordinates = [[-1, -1], [-1, 1], [1, -1], [1, 1]]
 
             expect(coordinates.sort).to eq expected_coordinates.sort
@@ -127,7 +130,7 @@ describe RootPosition do
 
           subject(:root_position_B4) { described_class.new(coord_B4, diagonals_movement_pattern_dbl) }
           it '' do
-            coordinates = root_position_B4.child_move_nodes.map(&:coordinate)
+            coordinates = root_position_B4.child_move_nodes.map(&:coordinate).map(&:to_array)
             expected_coordinates = [[0, 2], [0, 4], [2, 2], [2, 4]]
 
             expect(coordinates.sort).to eq expected_coordinates.sort
@@ -135,7 +138,7 @@ describe RootPosition do
 
           subject(:root_position_D4) { described_class.new(coord_D4, diagonals_movement_pattern_dbl) }
           it '' do
-            coordinates = root_position_D4.child_move_nodes.map(&:coordinate)
+            coordinates = root_position_D4.child_move_nodes.map(&:coordinate).map(&:to_array)
             expected_coordinates = [[2, 2], [2, 4], [4, 2], [4, 4]]
 
             expect(coordinates.sort).to eq expected_coordinates.sort
@@ -143,7 +146,7 @@ describe RootPosition do
 
           subject(:root_position_E5) { described_class.new(coord_E5, diagonals_movement_pattern_dbl) }
           it '' do
-            coordinates = root_position_E5.child_move_nodes.map(&:coordinate)
+            coordinates = root_position_E5.child_move_nodes.map(&:coordinate).map(&:to_array)
             expected_coordinates = [[3, 3], [3, 5], [5, 3], [5, 5]]
 
             expect(coordinates.sort).to eq expected_coordinates.sort
@@ -179,7 +182,7 @@ describe RootPosition do
         context 'were the coordinates are expected to be' do
           subject(:root_position_A1) { described_class.new(coord_A1, omnidirectional_movement_pattern_dbl) }
           it '' do
-            coordinates = root_position_A1.child_move_nodes.map(&:coordinate)
+            coordinates = root_position_A1.child_move_nodes.map(&:coordinate).map(&:to_array)
             expected_coordinates = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]]
 
             expect(coordinates.sort).to eq expected_coordinates.sort
@@ -187,7 +190,7 @@ describe RootPosition do
 
           subject(:root_position_B4) { described_class.new(coord_B4, omnidirectional_movement_pattern_dbl) }
           it '' do
-            coordinates = root_position_B4.child_move_nodes.map(&:coordinate)
+            coordinates = root_position_B4.child_move_nodes.map(&:coordinate).map(&:to_array)
             expected_coordinates = [[0, 2], [0, 3], [0, 4], [1, 2], [1, 4], [2, 2], [2, 3], [2, 4]]
 
             expect(coordinates.sort).to eq expected_coordinates.sort
@@ -195,7 +198,7 @@ describe RootPosition do
 
           subject(:root_position_D4) { described_class.new(coord_D4, omnidirectional_movement_pattern_dbl) }
           it '' do
-            coordinates = root_position_D4.child_move_nodes.map(&:coordinate)
+            coordinates = root_position_D4.child_move_nodes.map(&:coordinate).map(&:to_array)
             expected_coordinates = [[2, 2], [2, 3], [2, 4], [3, 2], [3, 4], [4, 2], [4, 3], [4, 4]]
 
             expect(coordinates.sort).to eq expected_coordinates.sort
@@ -203,7 +206,7 @@ describe RootPosition do
 
           subject(:root_position_E5) { described_class.new(coord_E5, omnidirectional_movement_pattern_dbl) }
           it '' do
-            coordinates = root_position_E5.child_move_nodes.map(&:coordinate)
+            coordinates = root_position_E5.child_move_nodes.map(&:coordinate).map(&:to_array)
             expected_coordinates = [[3, 3], [3, 4], [3, 5], [4, 3], [4, 5], [5, 3], [5, 4], [5, 5]]
 
             expect(coordinates.sort).to eq expected_coordinates.sort
@@ -239,7 +242,7 @@ describe RootPosition do
         context 'were the coordinates are expected to be' do
           subject(:root_position_A1) { described_class.new(coord_A1, knight_L_movement_pattern_dbl) }
           it '' do
-            coordinates = root_position_A1.child_move_nodes.map(&:coordinate)
+            coordinates = root_position_A1.child_move_nodes.map(&:coordinate).map(&:to_array)
             expected_coordinates = [[-2, -1], [-2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2], [2, -1], [2, 1]]
 
             expect(coordinates.sort).to eq expected_coordinates.sort
@@ -247,7 +250,7 @@ describe RootPosition do
 
           subject(:root_position_B4) { described_class.new(coord_B4, knight_L_movement_pattern_dbl) }
           it '' do
-            coordinates = root_position_B4.child_move_nodes.map(&:coordinate)
+            coordinates = root_position_B4.child_move_nodes.map(&:coordinate).map(&:to_array)
             expected_coordinates = [[-1, 2], [-1, 4], [0, 1], [0, 5], [2, 1], [2, 5], [3, 2], [3, 4]]
 
             expect(coordinates.sort).to eq expected_coordinates.sort
@@ -255,7 +258,7 @@ describe RootPosition do
 
           subject(:root_position_D4) { described_class.new(coord_D4, knight_L_movement_pattern_dbl) }
           it '' do
-            coordinates = root_position_D4.child_move_nodes.map(&:coordinate)
+            coordinates = root_position_D4.child_move_nodes.map(&:coordinate).map(&:to_array)
             expected_coordinates = [[1, 2], [1, 4], [2, 1], [2, 5], [4, 1], [4, 5], [5, 2], [5, 4]]
 
             expect(coordinates.sort).to eq expected_coordinates.sort
@@ -263,7 +266,7 @@ describe RootPosition do
 
           subject(:root_position_E5) { described_class.new(coord_E5, knight_L_movement_pattern_dbl) }
           it '' do
-            coordinates = root_position_E5.child_move_nodes.map(&:coordinate)
+            coordinates = root_position_E5.child_move_nodes.map(&:coordinate).map(&:to_array)
             expected_coordinates = [[2, 3], [2, 5], [3, 2], [3, 6], [5, 2], [5, 6], [6, 3], [6, 5]]
 
             expect(coordinates.sort).to eq expected_coordinates.sort

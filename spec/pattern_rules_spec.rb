@@ -3,7 +3,7 @@ require_relative '../lib/rules/movement_pattern/pattern_rules'
 # frozen_string_literal: true
 
 describe PatternRules do
-  subject(:move_pattern) { described_class.new(pattern_dbl, requirement_dbl) }
+  subject(:pattern_rules) { described_class.new(pattern_dbl, requirement_dbl) }
   let(:pattern_dbl) { double('pattern') }
   # let(:requirement_dbl) { class_double(Requirement) }
 

@@ -46,13 +46,13 @@ class Board
     @cells.transpose.size
   end
 
+  def inside_board?(coord)
+    coord.x.between?(0, (board_height - 1)) && coord.y.between?(0, (board_width - 1))
+  end
+
   private
 
   def valid_coord?(coord)
     coord.respond_to?(:x) && coord.respond_to?(:y)
-  end
-
-  def inside_board?(coord)
-    coord.x.between?(0, (board_height - 1)) && coord.y.between?(0, (board_width - 1))
   end
 end

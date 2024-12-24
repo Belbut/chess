@@ -2,18 +2,18 @@ class PatternRules
   attr_reader :pattern, :requirements
 
   def initialize(pattern, *requirements)
-    @pattern = pattern
-    @requirements = *requirements
+    puts '-'
+    @pattern = pattern # [array]
+    @requirements = requirements
   end
 end
 
 module Requirement
   # require_relative '../../chess_kit/board'
   # all
-  def self.inside_board
-    proc { |_target|
-      # puts target
-      true
+  def self.inside_board(board)
+    proc { |target_cord|
+      board.inside_board?(target_cord)
     }
   end
 
