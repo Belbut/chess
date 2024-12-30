@@ -5,7 +5,9 @@ module MovementUtil
     Coordinate.new(direction.first + parent_coordinate.x, direction.last + parent_coordinate.y)
   end
 
-  def self.comply_with_restrictions(target_coordinate, requirements)
-    requirements.all? { |individual_requirement| individual_requirement.call(target_coordinate) == true }
+  def self.comply_with_restrictions(parent_coordinate, target_coordinate, requirements)
+    requirements.all? do |individual_requirement|
+      individual_requirement.call(parent_coordinate, target_coordinate) == true
+    end
   end
 end

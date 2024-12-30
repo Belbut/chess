@@ -29,7 +29,7 @@ class RootPosition
 
     possible_nodes = next_node_properties.filter do |single_node_property|
       target_coordinate = MovementUtil.child_coordinate(single_node_property[:move_step], parent_coordinate)
-      MovementUtil.comply_with_restrictions(target_coordinate, requirements)
+      MovementUtil.comply_with_restrictions(parent_coordinate, target_coordinate, requirements)
     end
 
     possible_nodes.map do |node_data|

@@ -23,7 +23,7 @@ class MovePositionNode
     next_step = transform_pattern_to_step(pattern, propagation_inertia)
     target_coordinate = MovementUtil.child_coordinate(next_step, parent_coordinate)
 
-    return nil unless MovementUtil.comply_with_restrictions(target_coordinate, requirements)
+    return nil unless MovementUtil.comply_with_restrictions(parent_coordinate, target_coordinate, requirements)
 
     MovePositionNode.new(target_coordinate, pattern, requirements, propagation_inertia)
   end
