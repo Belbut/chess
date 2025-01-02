@@ -15,10 +15,6 @@ describe RootPosition do
   let(:coord_dbl) { coord_A1 }
   let(:movement_pattern_dbl) { instance_double(PatternRules, requirements: []) }
 
-  before do
-    allow_any_instance_of(MovePositionNode).to receive(:one_direction_child_move_node).and_return(nil)
-  end
-
   describe '#coordinate' do
     it '' do
       expect(true).to eq(true)
@@ -32,6 +28,10 @@ describe RootPosition do
   end
 
   describe '#child_move_nodes' do
+    before do
+      allow_any_instance_of(MovePositionNode).to receive(:one_direction_child_move_node).and_return(nil)
+    end
+
     it '' do
       allow(movement_pattern_dbl).to receive(:pattern).and_return([])
       expect(root_position.child_move_nodes).to be_a(Array)
@@ -272,6 +272,66 @@ describe RootPosition do
             expect(coordinates.sort).to eq expected_coordinates.sort
           end
         end
+      end
+    end
+  end
+
+  describe '#show_all_possible_moves' do
+    subject(:root_position) { described_class.new(coord_dbl, movement_pattern_dbl) }
+
+    context 'when testing a movement like orthogonal movement pattern' do
+      before do
+        allow(movement_pattern_dbl).to receive(:pattern).and_return([[:n, 0], [0, :n]])
+        allow(movement_pattern_dbl).to receive(:requirements).and_return([])
+
+        # This part is challenging to test due to the tree-building algorithm.
+        # To simplify future understanding, here's the key concept:
+        # For each pattern, the algorithm builds a separate tree using breadth-first traversal.
+        # It starts by creating the root of each path and continues expanding the path until reaching nil.
+        # Once all open paths for the current pattern are handled, it repeats the process for the next pattern.
+        allow(MovementUtil).to receive(:comply_with_restrictions).and_return(
+          true, # root of the first pattern tree to the positive direction can be made
+          true, # root of the first pattern tree to the negative direction can be made
+          true, true, false, # first pattern positive direction path
+          true, true, false, # first pattern negative direction path
+          true, # root of the second pattern tree to the positive direction can be made
+          true, # root of the second pattern tree to the negative direction can be made
+          true, true, false, # second pattern positive direction path
+          true, true, false  # second pattern positive direction path
+        )
+      end
+
+      it '' do
+        expect(root_position.find_all_paths.map(&:inspect)).to eq ['[(1, 0)c, (2, 0)c, (3, 0)c]',
+                                                                   '[(-1, 0)c, (-2, 0)c, (-3, 0)c]', '[(0, 1)c, (0, 2)c, (0, 3)c]', '[(0, -1)c, (0, -2)c, (0, -3)c]']
+      end
+    end
+
+    context 'when testing movement like diagonal movement pattern' do
+      before do
+        allow(movement_pattern_dbl).to receive(:pattern).and_return([%i[n n], %i[n nn]])
+        allow(movement_pattern_dbl).to receive(:requirements).and_return([])
+
+        # This part is challenging to test due to the tree-building algorithm.
+        # To simplify future understanding, here's the key concept:
+        # For each pattern, the algorithm builds a separate tree using breadth-first traversal.
+        # It starts by creating the root of each path and continues expanding the path until reaching nil.
+        # Once all open paths for the current pattern are handled, it repeats the process for the next pattern.
+        allow(MovementUtil).to receive(:comply_with_restrictions).and_return(
+          true, # root of the first pattern tree to the positive direction can be made
+          true, # root of the first pattern tree to the negative direction can be made
+          true, true, false, # first pattern positive direction path
+          true, true, false, # first pattern negative direction path
+          true, # root of the second pattern tree to the positive direction can be made
+          true, # root of the second pattern tree to the negative direction can be made
+          true, true, false, # second pattern positive direction path
+          true, true, false  # second pattern positive direction path
+        )
+      end
+
+      it '' do
+        expect(root_position.find_all_paths.map(&:inspect)).to eq ['[(1, 1)c, (2, 2)c, (3, 3)c]',
+                                                                   '[(-1, -1)c, (-2, -2)c, (-3, -3)c]', '[(1, -1)c, (2, -2)c, (3, -3)c]', '[(-1, 1)c, (-2, 2)c, (-3, 3)c]']
       end
     end
   end

@@ -11,6 +11,10 @@ class RootPosition
     @child_move_nodes = multidirectional_child_move_nodes(coordinate, pattern_rules)
   end
 
+  def find_all_paths
+    child_move_nodes.map(&:traverse_path)
+  end
+
   private
 
   def multidirectional_child_move_nodes(parent_coordinate, pattern_rules)

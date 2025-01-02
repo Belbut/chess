@@ -11,6 +11,14 @@ class MovePositionNode
     @child_move_node = one_direction_child_move_node(coordinate, pattern, requirements, propagation_inertia)
   end
 
+  def traverse_path
+    if child_move_node.nil?
+      [coordinate]
+    else
+      [coordinate] + child_move_node.traverse_path
+    end
+  end
+
   private
 
   def one_direction_child_move_node(parent_coordinate, pattern, requirements, propagation_inertia)
