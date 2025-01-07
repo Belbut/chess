@@ -1,14 +1,21 @@
 # frozen_string_literal: true
 
+require_relative 'player'
+require_relative 'chess_kit'
+require_relative 'rules'
+
+require_relative './rules/movement_pattern/root_position' # remove this
+
 class Game
+  attr_reader :chess_kit, :game_rules
+
   def initialize
-    # @chess_set = ChessKit.new()
-    # @rules = Rules
-    # @interface = Interface
-    #
-    # @white_player = Player.new(@interface)
-    # @black_player = Player.new(@interface)
-    # @current_player = @white_player
+    @white_player = Player.new(Interface)
+    @black_player = Player.new(Interface)
+    @current_player = @white_player
+
+    @chess_kit = ChessKit.new
+    @game_rules = GameRules.new(@chess_kit)
   end
 
   def play
@@ -17,6 +24,16 @@ class Game
     #   one step of the loop is to change pawn status from rushed to moved on beginning of turn
     # present game result
   end
+
+  def paths_of_picked_piece(from)
+    piece = chess_kit.board.lookup_cell(from)
+
+    game_rules.piece_pattern_rules(piece).reduce([]) do |reduce_memory, same_requirement_pattern_rules|
+      reduce_memory + RootPosition.new(from, same_requirement_pattern_rules).find_all_paths
+    end
+  end
+
+  # def make_move(from_coord, to_coord); end
 end
 
 # Chess is a Game

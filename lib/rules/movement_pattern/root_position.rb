@@ -1,5 +1,6 @@
 require_relative './movement_util'
 require_relative './pattern_rules'
+require_relative './move_position_node'
 class RootPosition
   attr_reader :coordinate, :pattern_rules, :child_move_nodes
 
