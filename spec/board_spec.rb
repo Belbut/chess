@@ -104,6 +104,41 @@ describe Board do
     end
   end
 
+  describe '#find_position_of' do
+    context 'when checking a object' do
+      it 'is expected to return nil if the object is not on the board' do
+        expect(known_board.find_position_of(:not_on_the_board)).to eq nil
+      end
+
+      it 'is expected to return an array of position' do
+        expect(known_board.find_position_of('A1').to_notation).to eq 'A1'
+        expect(known_board.find_position_of('B4').to_notation).to eq 'B4'
+        expect(known_board.find_position_of('E5').to_notation).to eq 'E5'
+      end
+    end
+  end
+
+  describe '#find_all_positions_of' do
+    BOARD41 = [%w[41 B1 C1 D1 E1],
+               %w[A2 B2 C2 D2 E2],
+               %w[41 B3 41 D3 E3],
+               %w[A4 41 C4 D4 E4],
+               %w[41 B5 C5 D5 41]].freeze
+
+    before do
+      allow(known_board).to receive(:cells).and_return BOARD41
+    end
+    context 'when checking a object' do
+      it 'is expected to return nil if the object is not on the board' do
+        expect(known_board.find_all_positions_of(:not_on_the_board)).to eq []
+      end
+
+      it 'is expected to return an array of position' do
+        expect(known_board.find_all_positions_of('41').map(&:to_notation)).to eq %w[A1 A3 C3 B4 A5 E5]
+      end
+    end
+  end
+
   describe '#add_to_cell' do
     let(:rand_obj) { double('random_object') }
 

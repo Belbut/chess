@@ -16,6 +16,10 @@ class Unit
     Interface::Output.render_piece(self)
   end
 
+  def ==(other)
+    color == other.color && type == other.type
+  end
+
   def mark_as_moved
     @move_status = :moved
   end
