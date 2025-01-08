@@ -10,8 +10,8 @@ class Game
   attr_reader :chess_kit, :game_rules
 
   def initialize
-    @white_player = Player.new(Interface)
-    @black_player = Player.new(Interface)
+    @white_player = Player.new(:white, Interface)
+    @black_player = Player.new(:black, Interface)
     @current_player = @white_player
 
     @chess_kit = ChessKit.new

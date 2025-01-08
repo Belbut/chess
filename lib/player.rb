@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
 class Player
-  attr_reader :name
+  attr_reader :color, :name
 
-  def initialize(interface)
+  def initialize(color, interface)
+    @color = color
     @name = interface.prompt_for_name
   end
 end
