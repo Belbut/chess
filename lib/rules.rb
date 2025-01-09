@@ -1,5 +1,6 @@
 require_relative './rules/movement_pattern/requirement'
-class GameRules
+require_relative './rules/movement_pattern/root_position'
+class Rules
   attr_reader :chess_kit
 
   def initialize(chess_kit)
@@ -10,7 +11,58 @@ class GameRules
     pattern_rules_factory[piece.color][piece.type]
   end
 
+  def position_under_attack_from(position, team_color)
+    list_all_piece_types = %i[pawn rook knight bishop queen king]
+    list_of_attackers = []
+
+    list_all_piece_types.each do |piece_type|
+      list_of_attackers.append(vulnerable_position_from(position, team_color, piece_type))
+    end
+
+    list_of_attackers.flatten
+  end
+
+  def position_under_attack_from_path(position, team_color)
+    list_all_piece_types = %i[pawn rook knight bishop queen king]
+    list_of_attackers = []
+
+    list_all_piece_types.each do |piece_type|
+      list_of_attackers.append(vulnerable_position_from_path(position, team_color, piece_type))
+    end
+
+    list_of_attackers.flatten
+  end
+
   private
+
+  def vulnerable_position_from(position, piece_color, piece_type)
+    opponent_threat_paths = active_paths_to_position(position, piece_color, piece_type)
+
+    opponent_threat_positions = opponent_threat_paths.map(&:last)
+  end
+
+  def vulnerable_position_from_path(position, piece_color, piece_type)
+    opponent_threat_paths = active_paths_to_position(position, piece_color, piece_type)
+  end
+
+  def all_paths_to_position(position, piece_color, piece_type)
+    piece_pattern_rules = pattern_rules_factory[piece_color][piece_type]
+
+    piece_pattern_rules.map do |same_requirement_pattern_rules|
+      RootPosition.new(position, same_requirement_pattern_rules).find_all_paths
+    end
+  end
+
+  def active_paths_to_position(position, piece_color, piece_type)
+    enemy_piece = Pieces::FACTORY[opposite_color(piece_color)][piece_type]
+    all_paths_to_position(position, piece_color, piece_type).flatten(1).find_all do |possible_path|
+      board.lookup_cell(possible_path.last) == enemy_piece
+    end
+  end
+
+  def opposite_color(team_color)
+    { white: :black, black: :white }[team_color]
+  end
 
   def board
     chess_kit.board

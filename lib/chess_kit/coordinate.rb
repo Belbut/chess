@@ -14,6 +14,10 @@ class Coordinate
     x == other.x && y == other.y
   end
 
+  def <=>(other)
+    to_array <=> other.to_array
+  end
+
   def to_array
     [x, y]
   end

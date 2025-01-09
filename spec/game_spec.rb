@@ -9,13 +9,13 @@ require_relative '../lib/chess_kit/pieces'
 describe Game do
   subject(:game) { described_class.new }
 
+  def notation_of_paths(array_of_paths)
+    array_of_paths.map { |path| path.map(&:to_notation) }
+  end
+
   describe '#paths_of_picked_piece' do
     let(:coord_D4) { Coordinate.from_notation('D4') }
     let(:empty_board) { Board.new(8, 8) }
-
-    def notation_of_paths(array_of_paths)
-      array_of_paths.map { |path| path.map(&:to_notation) }
-    end
 
     context 'picking a rook' do
       let(:black_rook) { Pieces::FACTORY[:black][:rook] }

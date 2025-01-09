@@ -13,4 +13,5 @@ module Pieces
 
   FACTORY = { white: create_piece(:white),
               black: create_piece(:black) }.freeze
+
 end
