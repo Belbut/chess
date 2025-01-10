@@ -36,7 +36,11 @@ module Requirement
     }
   end
 
-  def self.no_suicide_move(board); end
+  def self.no_suicide_move(team_color, rules)
+    lambda { |_, target_cord|
+      rules.position_under_attack_from(target_cord, team_color).empty?
+    }
+  end
 
   # The squares between the king and the rook must be empty.
   def self.empty_row_between(board)

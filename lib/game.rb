@@ -25,14 +25,6 @@ class Game
     # present game result
   end
 
-  def paths_of_picked_piece(from)
-    piece = chess_kit.board.lookup_cell(from)
-
-    game_rules.piece_pattern_rules(piece).reduce([]) do |reduce_memory, same_requirement_pattern_rules|
-      reduce_memory + RootPosition.new(from, same_requirement_pattern_rules).find_all_paths
-    end
-  end
-
   # def make_move(from_coord, to_coord); end
 end
 
