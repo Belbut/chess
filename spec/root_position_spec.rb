@@ -5,11 +5,10 @@ require_relative '../lib/chess_kit/coordinate'
 require_relative '../lib/rules/movement_pattern/pattern_rules'
 require_relative '../lib/rules/movement_pattern/move_position_node'
 
+require_relative './testing_util_spec'
+
 describe RootPosition do
-  let(:coord_A1) { instance_double(Coordinate, x: 0, y: 0) }
-  let(:coord_B4) { instance_double(Coordinate, x: 1, y: 3) }
-  let(:coord_D4) { instance_double(Coordinate, x: 3, y: 3) }
-  let(:coord_E5) { instance_double(Coordinate, x: 4, y: 4) }
+  include TestingUtil
 
   subject(:root_position) { described_class.new(coord_dbl, movement_pattern_dbl) }
   let(:coord_dbl) { coord_A1 }
@@ -302,8 +301,13 @@ describe RootPosition do
       end
 
       it '' do
-        expect(root_position.find_all_paths.map(&:inspect)).to eq ['[(1, 0)c, (2, 0)c, (3, 0)c]',
-                                                                   '[(-1, 0)c, (-2, 0)c, (-3, 0)c]', '[(0, 1)c, (0, 2)c, (0, 3)c]', '[(0, -1)c, (0, -2)c, (0, -3)c]']
+        result = root_position.find_all_paths.map { |path| path.map(&:to_array) }
+        expect(result).to eq([path(coord_B1, coord_C1, coord_D1),
+                              path(Coordinate.new(-1, 0), Coordinate.new(-2, 0),
+                                   Coordinate.new(-3, 0)),
+                              path(coord_A2, coord_A3, coord_A4),
+                              path(Coordinate.new(0, -1), Coordinate.new(0, -2),
+                                   Coordinate.new(0, -3))].map { |path| path.map(&:to_array) })
       end
     end
 
@@ -330,8 +334,12 @@ describe RootPosition do
       end
 
       it '' do
-        expect(root_position.find_all_paths.map(&:inspect)).to eq ['[(1, 1)c, (2, 2)c, (3, 3)c]',
-                                                                   '[(-1, -1)c, (-2, -2)c, (-3, -3)c]', '[(1, -1)c, (2, -2)c, (3, -3)c]', '[(-1, 1)c, (-2, 2)c, (-3, 3)c]']
+        result = root_position.find_all_paths.map { |path| path.map(&:to_array) }
+        expect(result).to eq([path(coord_B2, coord_C3, coord_D4),
+                              path(Coordinate.new(-1, -1), Coordinate.new(-2, -2), Coordinate.new(-3, -3)),
+                              path(Coordinate.new(1, -1), Coordinate.new(2, -2), Coordinate.new(3, -3)),
+                              path(Coordinate.new(-1, 1), Coordinate.new(-2, 2),
+                                   Coordinate.new(-3, 3))].map { |path| path.map(&:to_array) })
       end
     end
   end

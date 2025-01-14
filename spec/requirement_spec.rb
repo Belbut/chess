@@ -7,7 +7,11 @@ require_relative '../lib/chess_kit/coordinate'
 
 require_relative '../lib/rules/movement_pattern/root_position'
 require_relative '../lib/rules/movement_pattern/move_position_node'
+
+require_relative './testing_util_spec'
 describe Requirement do
+  include TestingUtil
+
   let(:empty_board) { Board.new(8, 8) }
   let(:random_coord) { instance_double(Coordinate) }
 
@@ -46,7 +50,7 @@ describe Requirement do
     let(:parent_move_was_not_a_kill_requirement) { Requirement.parent_move_was_not_a_kill(board_with_pieces, :white) }
     let(:board_with_pieces) { empty_board }
 
-    let(:parent_cord) { instance_double(Coordinate, x: 3, y: 3) }
+    let(:testing_position) { instance_double(Coordinate, x: 3, y: 3) }
     let(:target_cord) { instance_double(Coordinate, x: 3, y: 4) }
 
     let(:white_piece) { instance_double(Unit, color: :white) }
@@ -54,27 +58,27 @@ describe Requirement do
 
     context 'when there is no piece at the parent coordinate' do
       it 'returns true' do
-        expect(parent_move_was_not_a_kill_requirement.call(parent_cord, target_cord)).to eq(true)
+        expect(parent_move_was_not_a_kill_requirement.call(testing_position, target_cord)).to eq(true)
       end
     end
 
     context 'when there is a piece of the same team at the parent coordinate' do
       before do
-        board_with_pieces.add_to_cell(parent_cord, white_piece)
+        board_with_pieces.add_to_cell(testing_position, white_piece)
       end
 
       it 'returns true' do
-        expect(parent_move_was_not_a_kill_requirement.call(parent_cord, target_cord)).to eq(true)
+        expect(parent_move_was_not_a_kill_requirement.call(testing_position, target_cord)).to eq(true)
       end
     end
 
     context 'when there is a piece of the opposite team at the parent coordinate' do
       before do
-        board_with_pieces.add_to_cell(parent_cord, black_piece)
+        board_with_pieces.add_to_cell(testing_position, black_piece)
       end
 
       it 'returns false' do
-        expect(parent_move_was_not_a_kill_requirement.call(parent_cord, target_cord)).to eq(false)
+        expect(parent_move_was_not_a_kill_requirement.call(testing_position, target_cord)).to eq(false)
       end
     end
   end
@@ -84,7 +88,6 @@ describe Requirement do
     let(:board_with_pieces) { empty_board }
 
     let(:random_coord) { instance_double(Coordinate) }
-    let(:coord_D5) { instance_double(Coordinate, x: 3, y: 4) }
 
     let(:white_piece) { instance_double(Unit, color: :white) }
     let(:black_piece) { instance_double(Unit, color: :black) }
@@ -126,8 +129,6 @@ describe Requirement do
     let(:parent_piece_not_moved_requirement) { Requirement.parent_piece_not_moved(board_with_piece) }
     let(:board_with_piece) { empty_board }
 
-    let(:test_coord) { instance_double(Coordinate, x: 3, y: 3) }
-
     let(:unmoved_piece) { instance_double(Unit, move_status: :unmoved) }
 
     context 'when the move_status is:' do
@@ -135,11 +136,11 @@ describe Requirement do
         let(:unmoved_piece) { instance_double(Unit, move_status: :unmoved) }
 
         before do
-          board_with_piece.add_to_cell(test_coord, unmoved_piece)
+          board_with_piece.add_to_cell(testing_position, unmoved_piece)
         end
 
         it 'is expected to return false' do
-          expect(parent_piece_not_moved_requirement.call(test_coord)).to eq(true)
+          expect(parent_piece_not_moved_requirement.call(testing_position)).to eq(true)
         end
       end
 
@@ -147,11 +148,11 @@ describe Requirement do
         let(:moved_piece) { instance_double(Unit, move_status: :Symbol) }
 
         before do
-          board_with_piece.add_to_cell(test_coord, moved_piece)
+          board_with_piece.add_to_cell(testing_position, moved_piece)
         end
 
         it 'is expected to return false' do
-          expect(parent_piece_not_moved_requirement.call(test_coord)).to eq(false)
+          expect(parent_piece_not_moved_requirement.call(testing_position)).to eq(false)
         end
       end
     end
@@ -195,14 +196,12 @@ describe Requirement do
     let(:cell_not_under_attack_requirement) { Requirement.cell_not_under_attack(board_with_pieces, :white) }
     let(:board_with_pieces) { empty_board }
 
-    let(:parent_cord) { instance_double(Coordinate, x: 3, y: 3) }
-
     context 'when the cell is not under attack ' do
-      it 'is expected to return true' do
-        # p RootPosition.new(parent_cord,
+      xit 'is expected to return true' do
+        # p RootPosition.new(testing_position,
         #                    PatternRules.new([[:n, 0], [0, :n]],
         #                                     Requirement.standard_requirements(board_with_pieces, :white)))
-        # expect(cell_not_under_attack_requirement.call(parent_cord)).to eq true
+        # expect(cell_not_under_attack_requirement.call(testing_position)).to eq true
       end
     end
   end
@@ -210,9 +209,6 @@ describe Requirement do
   describe '::target_move_is_kill' do
     let(:target_move_is_kill_requirement) { Requirement.target_move_is_kill(board_with_pieces, :white) }
     let(:board_with_pieces) { empty_board }
-
-    let(:coord_D4) { instance_double(Coordinate, x: 3, y: 3) }
-    let(:coord_D5) { instance_double(Coordinate, x: 3, y: 4) }
 
     let(:white_piece) { instance_double(Unit, color: :white) }
     let(:black_piece) { instance_double(Unit, color: :black) }

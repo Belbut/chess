@@ -3,6 +3,8 @@
 require_relative '../lib/chess_kit/board'
 require_relative '../lib/chess_kit/coordinate'
 
+require_relative './testing_util_spec'
+
 RSpec::Matchers.define_negated_matcher :not_change, :change
 
 KNOWN_BOARD = [%w[A1 B1 C1 D1 E1],
@@ -12,6 +14,7 @@ KNOWN_BOARD = [%w[A1 B1 C1 D1 E1],
                %w[A5 B5 C5 D5 E5]].freeze
 
 describe Board do
+  include TestingUtil
   subject(:empty_board) { described_class.new(height, width) }
   let(:height) { 11 }
   let(:width) { 11 }
@@ -52,14 +55,6 @@ describe Board do
   end
 
   describe '#check_coord' do
-    let(:outbound_coord1) { instance_double(Coordinate, x: 42, y: 42) }
-    let(:outbound_coord2) { instance_double(Coordinate, x: 1, y: 42) }
-    let(:outbound_coord3) { instance_double(Coordinate, x: 42, y: 1) }
-    let(:outbound_coord4) { instance_double(Coordinate, x: -2, y: -2) }
-    let(:outbound_coord5) { instance_double(Coordinate, x: 5, y: 5) }
-
-    let(:invalid_coord1) { double('random argument') }
-    let(:invalid_coord2) { instance_double(Coordinate, x: 'a', y: 'b') }
     context 'when checking a VALID cell ' do
       it '' do
         expect(known_board.check_coord(coord_A1)).to be nil
@@ -69,6 +64,8 @@ describe Board do
     context 'when checking a INVALID cell ' do
       context 'should raise a Error when' do
         context ' the argument doesn\'t act has a coordinate' do
+          let(:invalid_coord1) { double('random argument') }
+          let(:invalid_coord2) { instance_double(Coordinate, x: 'a', y: 'b') }
           it '' do
             expect { known_board.check_coord(invalid_coord1) }.to raise_error(ArgumentError)
             expect { known_board.check_coord(invalid_coord2) }.to raise_error(ArgumentError)
@@ -76,6 +73,11 @@ describe Board do
         end
 
         context ' the coordinate points to outside of the known_board' do
+          let(:outbound_coord1) { instance_double(Coordinate, x: 42, y: 42) }
+          let(:outbound_coord2) { instance_double(Coordinate, x: 1, y: 42) }
+          let(:outbound_coord3) { instance_double(Coordinate, x: 42, y: 1) }
+          let(:outbound_coord4) { instance_double(Coordinate, x: -2, y: -2) }
+          let(:outbound_coord5) { instance_double(Coordinate, x: 5, y: 5) }
           it '' do
             expect { known_board.check_coord(outbound_coord1) }.to raise_error(RangeError)
             expect { known_board.check_coord(outbound_coord2) }.to raise_error(RangeError)
