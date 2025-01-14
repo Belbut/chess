@@ -1,14 +1,12 @@
 class Unit
-  require_relative '../../rules/move_patterns'
+  require_relative '../../rules/piece_movements'
   require_relative '../../interface'
 
-  attr_reader :color, :type, :move_pattern, :capture_pattern, :move_status
+  attr_reader :color, :type, :move_status
 
   def initialize(color, type)
     @color = color
     @type = type
-    @move_pattern = MovePattern::MOVE_FACTORY[type]
-    @capture_pattern = @move_pattern
     @move_status = :unmoved
   end
 
