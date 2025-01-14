@@ -11,6 +11,26 @@ module TestingUtil
     end
   end
 
+  def team_piece
+    Pieces::FACTORY[team_color][:king]
+  end
+
+  def enemy_blocking_piece
+    Pieces::FACTORY[enemy_color][:pawn]
+  end
+
+  def friendly_blocking_piece
+    Pieces::FACTORY[team_color][:pawn]
+  end
+
+  def team_color
+    :white
+  end
+
+  def enemy_color
+    :black
+  end
+
   def enemy_pawn
     Pieces::FACTORY[enemy_color][:pawn]
   end
@@ -59,19 +79,11 @@ module TestingUtil
     Pieces::FACTORY[team_color][:king]
   end
 
-  def team_piece
-    Pieces::FACTORY[team_color][:king]
-  end
-
-  def enemy_blocking_piece
-    Pieces::FACTORY[enemy_color][:pawn]
-  end
-
-  def friendly_blocking_piece
-    Pieces::FACTORY[team_color][:pawn]
-  end
-
   def testing_position
     coord_D4
+  end
+
+  def path(*coords)
+    [*coords]
   end
 end
