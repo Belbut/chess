@@ -10,9 +10,14 @@ class ChessKit
   # rows = height // columns = width
   BOARD_SIZE = { rows: 8, columns: 8 }.freeze
 
-  def initialize
-    @board = Board.new(BOARD_SIZE[:rows], BOARD_SIZE[:columns])
-    place_initial_pieces
+  def initialize(board_copy = nil)
+    @board = board_copy || Board.new(BOARD_SIZE[:rows], BOARD_SIZE[:columns])
+    place_initial_pieces if board_copy.nil? 
+  end
+
+  def deep_clone
+    board_cloned = board.deep_clone
+    ChessKit.new(board_cloned)
   end
 
   def to_s

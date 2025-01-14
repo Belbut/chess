@@ -3,9 +3,30 @@ class Board
 
   attr_reader :cells
 
-  def initialize(rows, columns)
-    @cells = Array.new(rows) { Array.new(columns) }
+  def initialize(rows, columns, cells = nil)
+    @cells = cells || Array.new(rows) { Array.new(columns) }
   end
+
+  def deep_clone
+    cells_clone = @cells.map do |row|
+      row.map { |cell| cell.clone }
+    end
+    Board.new(nil, nil, cells_clone)
+  end
+
+  # def deep_clone
+  #   cells_clone = []
+  #   @cells.each do |row|
+  #     row_result = []
+  #     row.each do |cell|
+  #       row_result.append(cell.clone)
+  #     end
+  #     cells_clone.append(row_result)
+  #   end
+  #   k = Board.new(cells_clone.size, cells_clone[0].size)
+  #   k.instance_variable_set(:@cells, cells_clone)
+  #   k
+  # end
 
   def to_s
     Interface::Output.render_game(self)
@@ -50,6 +71,12 @@ class Board
     raise ArgumentError, "Cell already occupied at #{coord}" unless lookup_cell(coord).nil?
 
     cells[coord.y][coord.x] = object if lookup_cell(coord).nil?
+  end
+
+  def add_to_cell!(coord, object)
+    check_coord(coord) # redundant but makes it explicit
+
+    cells[coord.y][coord.x] = object
   end
 
   def clear_cell(coord)

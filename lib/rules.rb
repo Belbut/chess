@@ -7,6 +7,11 @@ class Rules
     @chess_kit = chess_kit
   end
 
+  def deep_clone
+    chess_kit_cloned = chess_kit.deep_clone
+    Rules.new(chess_kit_cloned)
+  end
+
   def piece_pattern_rules(color, type, safe_king:)
     pattern_rules_factory(safe_king)[color][type]
   end
@@ -143,6 +148,14 @@ class Rules
                       Requirement.target_is_inside_board(board),
                       Requirement.parent_move_was_not_a_kill(board, piece_color),
                       Requirement.target_is_no_friendly_kill(board, piece_color))]
+  end
+
+  def rook_moves2(piece_color)
+    [PatternRules.new([[:n, 0], [0, :n]],
+                      Requirement.target_is_inside_board(board),
+                      Requirement.parent_move_was_not_a_kill(board, piece_color),
+                      Requirement.target_is_no_friendly_kill(board, piece_color),
+                      Requirement.move_is_safe_for_king(self, piece_color))]
   end
 
   def knight_moves(piece_color)
