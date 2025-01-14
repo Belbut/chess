@@ -93,10 +93,10 @@ class Rules
 
   def color_pattern_rules_restricted(color)
     { pawn: pawn_moves(color),
-      rook: rook_moves(color),
-      knight: knight_moves(color),
-      bishop: bishop_moves(color),
-      queen: queen_moves(color),
+      rook: rook_moves2(color),
+      knight: knight_moves2(color),
+      bishop: bishop_moves2(color),
+      queen: queen_moves2(color),
       king: king_moves2(color) }
   end
 
@@ -166,6 +166,15 @@ class Rules
                       Requirement.target_is_no_friendly_kill(board, piece_color))]
   end
 
+  def knight_moves2(piece_color)
+    [PatternRules.new([[+2, 1], [+2, -1], [+1, +2], [+1, -2],
+                       [-1, +2], [-1, -2], [-2, 1], [-2, -1]],
+                      Requirement.target_is_inside_board(board),
+                      Requirement.parent_move_was_not_a_kill(board, piece_color),
+                      Requirement.target_is_no_friendly_kill(board, piece_color),
+                      Requirement.move_is_safe_for_king(self, piece_color))]
+  end
+
   def bishop_moves(piece_color)
     [PatternRules.new([%i[n n], %i[n nn]],
                       Requirement.target_is_inside_board(board),
@@ -173,11 +182,27 @@ class Rules
                       Requirement.target_is_no_friendly_kill(board, piece_color))]
   end
 
+  def bishop_moves2(piece_color)
+    [PatternRules.new([%i[n n], %i[n nn]],
+                      Requirement.target_is_inside_board(board),
+                      Requirement.parent_move_was_not_a_kill(board, piece_color),
+                      Requirement.target_is_no_friendly_kill(board, piece_color),
+                      Requirement.move_is_safe_for_king(self, piece_color))]
+  end
+
   def queen_moves(piece_color)
     [PatternRules.new([[:n, 0], [0, :n], %i[n n], %i[n nn]],
                       Requirement.target_is_inside_board(board),
                       Requirement.parent_move_was_not_a_kill(board, piece_color),
                       Requirement.target_is_no_friendly_kill(board, piece_color))]
+  end
+
+  def queen_moves2(piece_color)
+    [PatternRules.new([[:n, 0], [0, :n], %i[n n], %i[n nn]],
+                      Requirement.target_is_inside_board(board),
+                      Requirement.parent_move_was_not_a_kill(board, piece_color),
+                      Requirement.target_is_no_friendly_kill(board, piece_color),
+                      Requirement.move_is_safe_for_king(self, piece_color))]
   end
 
   def king_moves(piece_color)

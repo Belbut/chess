@@ -118,6 +118,10 @@ describe Requirement do
     end
   end
 
+  describe '::move_is_safe_for_king' do
+    # Tested in rules_spec because it requires a integration test due to rules being one of the arguments
+  end
+
   describe '::parent_piece_not_moved' do
     let(:parent_piece_not_moved_requirement) { Requirement.parent_piece_not_moved(board_with_piece) }
     let(:board_with_piece) { empty_board }
@@ -151,6 +155,10 @@ describe Requirement do
         end
       end
     end
+  end
+
+  describe '::no_suicide_move' do
+    # Tested in rules_spec because it requires a integration test due to rules being one of the arguments
   end
 
   describe '::empty_row_between' do

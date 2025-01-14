@@ -7,7 +7,8 @@ class Coordinate
   end
 
   def inspect
-    "(#{x}, #{y})c"
+    # "(#{x}, #{y})c"
+    to_notation
   end
 
   def ==(other)

@@ -24,6 +24,19 @@ module Requirement
     }
   end
 
+  def self.move_is_safe_for_king(rules, team_color)
+    lambda { |parent_cord, target_cord|
+      rules_clone = rules.deep_clone
+
+      moving_piece = rules_clone.chess_kit.board.clear_cell(parent_cord) # problem with this
+      rules_clone.chess_kit.board.add_to_cell!(target_cord, moving_piece)
+      king_cord = rules_clone.chess_kit.board.find_position_of(Pieces::FACTORY[team_color][:king])
+
+      king_is_safe = rules_clone.position_under_attack_from(king_cord, team_color).empty?
+      king_is_safe
+    }
+  end
+
   # king & pawn
   # The king and the rook involved must not have moved before.
   def self.parent_piece_not_moved(board)

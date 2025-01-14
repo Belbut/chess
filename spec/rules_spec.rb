@@ -10,36 +10,27 @@ require_relative './testing_util_spec'
 describe Rules do
   include TestingUtil
 
-  subject(:rules) { described_class.new(chess_kit_dbl) }
-  let(:chess_kit_dbl) { instance_double(ChessKit, board: board) }
+  subject(:rules) { described_class.new(chess_kit) }
+  let(:chess_kit) { ChessKit.new(board) }
   let(:board) { Board.new(8, 8) }
 
-  def path(*coords)
-    [*coords]
+  BOARD_VISUALIZATION = false
+  def board_visualization
+    BOARD_VISUALIZATION && puts(board)
   end
 
   describe '#position_under_attack_from' do
     subject(:position_under_attack_from) { rules.position_under_attack_from(testing_position, team_color).sort }
-    let(:team_color) { :white }
-    let(:enemy_color) { :black }
 
-    let(:testing_position) { coord_D4 }
-    let(:team_piece) { Pieces::FACTORY[team_color][:king] }
     before do
       board.add_to_cell(testing_position, team_piece)
     end
 
-    let(:enemy_pawn) { Pieces::FACTORY[:black][:pawn] }
-    let(:enemy_rook) { Pieces::FACTORY[:black][:rook] }
-    let(:enemy_knight) { Pieces::FACTORY[:black][:knight] }
-    let(:enemy_bishop) { Pieces::FACTORY[:black][:bishop] }
-    let(:enemy_queen) { Pieces::FACTORY[:black][:queen] }
-    let(:enemy_king) { Pieces::FACTORY[:black][:king] }
-
     context 'when no piece is attacking the position' do
       context 'no piece is in a attacking path' do
         it 'is expected to return empty array' do
-          puts board
+          board_visualization
+
           expect(position_under_attack_from).to eq([])
         end
       end
@@ -59,13 +50,13 @@ describe Rules do
           end
 
           it '' do
-            puts board
+            board_visualization
+
             expect(position_under_attack_from).to eq([])
           end
         end
 
         context 'blocked by enemy piece' do
-          let(:enemy_blocking_piece) { Pieces::FACTORY[enemy_color][:pawn] }
           before do
             board.add_to_cell(coord_B6, enemy_blocking_piece)
             board.add_to_cell(coord_F2, enemy_blocking_piece)
@@ -73,7 +64,8 @@ describe Rules do
           end
 
           it '' do
-            puts board
+            board_visualization
+
             expect(position_under_attack_from).to eq([])
           end
         end
@@ -83,40 +75,38 @@ describe Rules do
     context 'when a piece is attacking the position' do
       context 'enemy pawn' do
         context 'by one' do
-          let(:enemy_pawn) { Pieces::FACTORY[:black][:pawn] }
           before do
             board.add_to_cell(coord_E5, enemy_pawn)
           end
 
           it '' do
-            puts board
+            board_visualization
+
             expect(position_under_attack_from).to eq([coord_E5])
           end
 
           context 'one attack position another one blocked' do
-            let(:enemy_pawn) { Pieces::FACTORY[:black][:pawn] }
-
             before do
               board.add_to_cell(coord_D5, enemy_pawn)
             end
 
             it '' do
-              puts board
+              board_visualization
+
               expect(position_under_attack_from).to eq([coord_E5])
             end
           end
         end
 
         context 'by two' do
-          let(:enemy_pawn) { Pieces::FACTORY[:black][:pawn] }
-
           before do
             board.add_to_cell(coord_E5, enemy_pawn)
             board.add_to_cell(coord_C5, enemy_pawn)
           end
 
           it '' do
-            puts board
+            board_visualization
+
             expect(position_under_attack_from).to eq([coord_C5, coord_E5].sort)
           end
         end
@@ -129,7 +119,8 @@ describe Rules do
           end
 
           it '' do
-            puts board
+            board_visualization
+
             expect(position_under_attack_from).to eq([coord_D1])
           end
         end
@@ -141,7 +132,8 @@ describe Rules do
           end
 
           it '' do
-            puts board
+            board_visualization
+
             expect(position_under_attack_from).to eq([coord_H4, coord_A4].sort)
           end
         end
@@ -154,7 +146,8 @@ describe Rules do
           end
 
           it '' do
-            puts board
+            board_visualization
+
             expect(position_under_attack_from).to eq([coord_B5])
           end
         end
@@ -166,7 +159,8 @@ describe Rules do
           end
 
           it '' do
-            puts board
+            board_visualization
+
             expect(position_under_attack_from).to eq([coord_F3, coord_E2].sort)
           end
         end
@@ -179,7 +173,8 @@ describe Rules do
           end
 
           it '' do
-            puts board
+            board_visualization
+
             expect(position_under_attack_from).to eq([coord_G1])
           end
         end
@@ -191,7 +186,8 @@ describe Rules do
           end
 
           it '' do
-            puts board
+            board_visualization
+
             expect(position_under_attack_from).to eq([coord_A1, coord_A7].sort)
           end
         end
@@ -204,7 +200,8 @@ describe Rules do
           end
 
           it '' do
-            puts board
+            board_visualization
+
             expect(position_under_attack_from).to eq([coord_D3])
           end
         end
@@ -216,7 +213,8 @@ describe Rules do
           end
 
           it '' do
-            puts board
+            board_visualization
+
             expect(position_under_attack_from).to eq([coord_D5, coord_E3].sort)
           end
         end
@@ -229,7 +227,8 @@ describe Rules do
           end
 
           it '' do
-            puts board
+            board_visualization
+
             expect(position_under_attack_from).to eq([coord_D3])
           end
         end
@@ -241,7 +240,8 @@ describe Rules do
           end
 
           it '' do
-            puts board
+            board_visualization
+
             expect(position_under_attack_from).to eq([coord_D5, coord_E3].sort)
           end
         end
@@ -253,26 +253,16 @@ describe Rules do
     subject(:position_under_attack_from_path) do
       rules.position_under_attack_from_path(testing_position, team_color)
     end
-    let(:team_color) { :white }
-    let(:enemy_color) { :black }
 
-    let(:testing_position) { coord_D4 }
-    let(:team_piece) { Pieces::FACTORY[team_color][:king] }
     before do
       board.add_to_cell(testing_position, team_piece)
     end
 
-    let(:enemy_pawn) { Pieces::FACTORY[:black][:pawn] }
-    let(:enemy_rook) { Pieces::FACTORY[:black][:rook] }
-    let(:enemy_knight) { Pieces::FACTORY[:black][:knight] }
-    let(:enemy_bishop) { Pieces::FACTORY[:black][:bishop] }
-    let(:enemy_queen) { Pieces::FACTORY[:black][:queen] }
-    let(:enemy_king) { Pieces::FACTORY[:black][:king] }
-
     context 'when no piece is attacking the position' do
       context 'no piece is in a attacking path' do
         it 'is expected to return empty array' do
-          puts board
+          board_visualization
+
           expect(position_under_attack_from_path).to eq([])
         end
       end
@@ -283,8 +273,6 @@ describe Rules do
           board.add_to_cell(coord_A7, enemy_queen)
         end
         context 'blocked by friendly piece' do
-          let(:friendly_blocking_piece) { Pieces::FACTORY[team_color][:pawn] }
-
           before do
             board.add_to_cell(coord_B6, friendly_blocking_piece)
             board.add_to_cell(coord_F2, friendly_blocking_piece)
@@ -292,13 +280,13 @@ describe Rules do
           end
 
           it '' do
-            puts board
+            board_visualization
+
             expect(position_under_attack_from_path).to eq([])
           end
         end
 
         context 'blocked by enemy piece' do
-          let(:enemy_blocking_piece) { Pieces::FACTORY[enemy_color][:pawn] }
           before do
             board.add_to_cell(coord_B6, enemy_blocking_piece)
             board.add_to_cell(coord_F2, enemy_blocking_piece)
@@ -306,7 +294,8 @@ describe Rules do
           end
 
           it '' do
-            puts board
+            board_visualization
+
             expect(position_under_attack_from_path).to eq([])
           end
         end
@@ -316,40 +305,38 @@ describe Rules do
     context 'when a piece is attacking the position' do
       context 'enemy pawn' do
         context 'by one' do
-          let(:enemy_pawn) { Pieces::FACTORY[:black][:pawn] }
           before do
             board.add_to_cell(coord_E5, enemy_pawn)
           end
 
           it '' do
-            puts board
+            board_visualization
+
             expect(position_under_attack_from_path).to eq([path(coord_E5)])
           end
 
           context 'one attack position another one blocked' do
-            let(:enemy_pawn) { Pieces::FACTORY[:black][:pawn] }
-
             before do
               board.add_to_cell(coord_D5, enemy_pawn)
             end
 
             it '' do
-              puts board
+              board_visualization
+
               expect(position_under_attack_from_path).to eq([path(coord_E5)])
             end
           end
         end
 
         context 'by two' do
-          let(:enemy_pawn) { Pieces::FACTORY[:black][:pawn] }
-
           before do
             board.add_to_cell(coord_E5, enemy_pawn)
             board.add_to_cell(coord_C5, enemy_pawn)
           end
 
           it '' do
-            puts board
+            board_visualization
+
             expect(position_under_attack_from_path).to eq([path(coord_C5), path(coord_E5)])
           end
         end
@@ -362,7 +349,8 @@ describe Rules do
           end
 
           it '' do
-            puts board
+            board_visualization
+
             expect(position_under_attack_from_path).to eq([path(coord_D3, coord_D2, coord_D1)])
           end
         end
@@ -374,7 +362,8 @@ describe Rules do
           end
 
           it '' do
-            puts board
+            board_visualization
+
             expect(position_under_attack_from_path).to eq([path(coord_E4, coord_F4, coord_G4, coord_H4),
                                                            path(coord_C4, coord_B4, coord_A4)])
           end
@@ -388,7 +377,8 @@ describe Rules do
           end
 
           it '' do
-            puts board
+            board_visualization
+
             expect(position_under_attack_from_path).to eq([path(coord_B5)])
           end
         end
@@ -400,7 +390,8 @@ describe Rules do
           end
 
           it '' do
-            puts board
+            board_visualization
+
             expect(position_under_attack_from_path).to eq([path(coord_F3), path(coord_E2)])
           end
         end
@@ -413,7 +404,8 @@ describe Rules do
           end
 
           it '' do
-            puts board
+            board_visualization
+
             expect(position_under_attack_from_path).to eq([path(coord_E3, coord_F2, coord_G1)])
           end
         end
@@ -425,7 +417,8 @@ describe Rules do
           end
 
           it '' do
-            puts board
+            board_visualization
+
             expect(position_under_attack_from_path).to eq([path(coord_C3, coord_B2, coord_A1),
                                                            path(coord_C5, coord_B6, coord_A7)])
           end
@@ -439,7 +432,8 @@ describe Rules do
           end
 
           it '' do
-            puts board
+            board_visualization
+
             expect(position_under_attack_from_path).to eq([path(coord_D3)])
           end
         end
@@ -451,7 +445,8 @@ describe Rules do
           end
 
           it '' do
-            puts board
+            board_visualization
+
             expect(position_under_attack_from_path).to eq([path(coord_D5), path(coord_E3)])
           end
         end
@@ -464,7 +459,8 @@ describe Rules do
           end
 
           it '' do
-            puts board
+            board_visualization
+
             expect(position_under_attack_from_path).to eq([path(coord_D3)])
           end
         end
@@ -476,7 +472,8 @@ describe Rules do
           end
 
           it '' do
-            puts board
+            board_visualization
+
             expect(position_under_attack_from_path).to eq([path(coord_D5), path(coord_E3)])
           end
         end
@@ -485,16 +482,19 @@ describe Rules do
   end
 
   describe '#possible_piece_paths_from' do
-    context 'picking a rook' do
-      let(:black_rook) { Pieces::FACTORY[:black][:rook] }
-      context 'from the middle of a empty board' do
-        before do
-          board.add_to_cell(coord_D4, black_rook)
-        end
+    before do
+      allow(Requirement).to receive(:move_is_safe_for_king).and_return(proc { true })
+    end
 
+    context 'picking a rook' do
+      before do
+        board.add_to_cell(testing_position, team_rook)
+      end
+      context 'from the middle of a empty board' do
         it '' do
-          print board
-          possible_paths = rules.possible_piece_paths_from(coord_D4)
+          board_visualization
+
+          possible_paths = rules.possible_piece_paths_from(testing_position)
 
           expect(possible_paths).to eq([path(coord_E4, coord_F4, coord_G4, coord_H4),
                                         path(coord_C4, coord_B4, coord_A4),
@@ -505,57 +505,90 @@ describe Rules do
 
       context 'when the board has other pieces that limit the rook move' do
         context 'other pieces are from the same color' do
-          let(:black_pawn) { Pieces::FACTORY[:black][:pawn] }
-
           before do
-            board.add_to_cell(coord_D4, black_rook)
-            board.add_to_cell(coord_D7, black_pawn)
-            board.add_to_cell(coord_D3, black_pawn)
-            board.add_to_cell(coord_F4, black_pawn)
-            board.add_to_cell(coord_A4, black_pawn)
+            board.add_to_cell(coord_D7, team_pawn)
+            board.add_to_cell(coord_D3, team_pawn)
+            board.add_to_cell(coord_F4, team_pawn)
+            board.add_to_cell(coord_A4, team_pawn)
           end
 
           it '' do
-            print board
-            possible_paths = rules.possible_piece_paths_from(coord_D4)
+            board_visualization
 
-            expect(possible_paths).to eq([path(coord_E4), path(coord_C4, coord_B4),
+            possible_paths = rules.possible_piece_paths_from(testing_position)
+
+            expect(possible_paths).to eq([path(coord_E4),
+                                          path(coord_C4, coord_B4),
                                           path(coord_D5, coord_D6)])
           end
         end
 
         context 'other pieces are from the opposite color' do
-          let(:white_pawn) { Pieces::FACTORY[:white][:pawn] }
-
           before do
-            board.add_to_cell(coord_D4, black_rook)
-            board.add_to_cell(coord_D7, white_pawn)
-            board.add_to_cell(coord_D3, white_pawn)
-            board.add_to_cell(coord_F4, white_pawn)
-            board.add_to_cell(coord_A4, white_pawn)
+            board.add_to_cell(coord_D7, enemy_pawn)
+            board.add_to_cell(coord_D3, enemy_pawn)
+            board.add_to_cell(coord_F4, enemy_pawn)
+            board.add_to_cell(coord_A4, enemy_pawn)
           end
 
           it '' do
-            print board
-            possible_paths = rules.possible_piece_paths_from(coord_D4)
+            board_visualization
+
+            possible_paths = rules.possible_piece_paths_from(testing_position)
 
             expect(possible_paths).to eq([path(coord_E4, coord_F4), path(coord_C4, coord_B4, coord_A4),
                                           path(coord_D5, coord_D6, coord_D7), path(coord_D3)])
+          end
+        end
+
+        context 'other pieces are attacking the king' do
+          before do
+            board.add_to_cell(coord_D1, team_king)
+            allow(Requirement).to receive(:move_is_safe_for_king).and_call_original
+          end
+
+          context 'the piece is already blocking the attack' do
+            before do
+              board.add_to_cell(coord_D8, enemy_rook)
+            end
+
+            it '' do
+              board_visualization
+              puts board
+
+              possible_paths = rules.possible_piece_paths_from(testing_position)
+
+              expect(possible_paths).to eq([path(coord_D5, coord_D6, coord_D7, coord_D8),
+                                            path(coord_D3, coord_D2)])
+            end
+          end
+
+          context 'the piece can move to block the attack' do
+            before do
+              board.add_to_cell(coord_H5, enemy_bishop)
+            end
+            xit '' do
+              board_visualization
+              puts board
+
+              possible_paths = rules.possible_piece_paths_from(testing_position)
+
+              expect(possible_paths).to eq([coord_G4])
+            end
           end
         end
       end
     end
 
     context 'picking a bishop' do
-      let(:black_bishop) { Pieces::FACTORY[:black][:bishop] }
+      before do
+        board.add_to_cell(testing_position, team_bishop)
+      end
       context 'from the middle of a empty board' do
-        before do
-          board.add_to_cell(coord_D4, black_bishop)
-        end
-
         it '' do
-          print board
-          possible_paths = rules.possible_piece_paths_from(coord_D4)
+          board_visualization
+
+          possible_paths = rules.possible_piece_paths_from(testing_position)
 
           expect(possible_paths).to eq([path(coord_E5, coord_F6, coord_G7, coord_H8), path(coord_C3, coord_B2, coord_A1),
                                         path(coord_E3, coord_F2, coord_G1), path(coord_C5, coord_B6, coord_A7)])
@@ -564,19 +597,17 @@ describe Rules do
 
       context 'when the board has other pieces that limit the bishop move' do
         context 'other pieces are from the same color' do
-          let(:black_pawn) { Pieces::FACTORY[:black][:pawn] }
-
           before do
-            board.add_to_cell(coord_D4, black_bishop)
-            board.add_to_cell(coord_G7, black_pawn)
-            board.add_to_cell(coord_C3, black_pawn)
-            board.add_to_cell(coord_F2, black_pawn)
-            board.add_to_cell(coord_A7, black_pawn)
+            board.add_to_cell(coord_G7, team_pawn)
+            board.add_to_cell(coord_C3, team_pawn)
+            board.add_to_cell(coord_F2, team_pawn)
+            board.add_to_cell(coord_A7, team_pawn)
           end
 
           it '' do
-            print board
-            possible_paths = rules.possible_piece_paths_from(coord_D4)
+            board_visualization
+
+            possible_paths = rules.possible_piece_paths_from(testing_position)
 
             expect(possible_paths).to eq([path(coord_E5, coord_F6), path(coord_E3),
                                           path(coord_C5, coord_B6)])
@@ -584,37 +615,71 @@ describe Rules do
         end
 
         context 'other pieces are from opposite came color' do
-          let(:white_pawn) { Pieces::FACTORY[:white][:pawn] }
-
           before do
-            board.add_to_cell(coord_D4, black_bishop)
-            board.add_to_cell(coord_G7, white_pawn)
-            board.add_to_cell(coord_C3, white_pawn)
-            board.add_to_cell(coord_F2, white_pawn)
-            board.add_to_cell(coord_A7, white_pawn)
+            board.add_to_cell(coord_G7, enemy_pawn)
+            board.add_to_cell(coord_C3, enemy_pawn)
+            board.add_to_cell(coord_F2, enemy_pawn)
+            board.add_to_cell(coord_A7, enemy_pawn)
           end
 
           it '' do
-            print board
-            possible_paths = rules.possible_piece_paths_from(coord_D4)
+            board_visualization
+
+            possible_paths = rules.possible_piece_paths_from(testing_position)
 
             expect(possible_paths).to eq([path(coord_E5, coord_F6, coord_G7), path(coord_C3),
                                           path(coord_E3, coord_F2), path(coord_C5, coord_B6, coord_A7)])
+          end
+        end
+
+        context 'other pieces are attacking the king' do
+          before do
+            board.add_to_cell(coord_A1, team_king)
+            allow(Requirement).to receive(:move_is_safe_for_king).and_call_original
+          end
+
+          context 'the piece is already blocking the attack' do
+            before do
+              board.add_to_cell(coord_H8, enemy_queen)
+            end
+
+            it '' do
+              board_visualization
+              puts board
+
+              possible_paths = rules.possible_piece_paths_from(testing_position)
+
+              expect(possible_paths).to eq([path(coord_E5, coord_F6, coord_G7, coord_H8),
+                                            path(coord_C3, coord_B2)])
+            end
+          end
+
+          context 'the piece can move to block the attack' do
+            before do
+              board.add_to_cell(coord_H5, enemy_bishop)
+            end
+            xit '' do
+              board_visualization
+              puts board
+
+              possible_paths = rules.possible_piece_paths_from(testing_position)
+
+              expect(possible_paths).to eq([coord_G4])
+            end
           end
         end
       end
     end
 
     context 'picking a queen' do
-      let(:black_queen) { Pieces::FACTORY[:black][:queen] }
+      before do
+        board.add_to_cell(testing_position, team_queen)
+      end
       context 'from the middle of a empty board' do
-        before do
-          board.add_to_cell(coord_D4, black_queen)
-        end
-
         it '' do
-          print board
-          possible_paths = rules.possible_piece_paths_from(coord_D4)
+          board_visualization
+
+          possible_paths = rules.possible_piece_paths_from(testing_position)
 
           expect(possible_paths).to eq([path(coord_E4, coord_F4, coord_G4, coord_H4), path(coord_C4, coord_B4, coord_A4),
                                         path(coord_D5, coord_D6, coord_D7, coord_D8), path(coord_D3, coord_D2, coord_D1),
@@ -625,24 +690,21 @@ describe Rules do
 
       context 'when the board has other pieces that limit the queen move' do
         context 'other pieces are from the same color' do
-          let(:black_pawn) { Pieces::FACTORY[:black][:pawn] }
-
           before do
-            board.add_to_cell(coord_D4, black_queen)
-
-            board.add_to_cell(coord_D7, black_pawn)
-            board.add_to_cell(coord_D3, black_pawn)
-            board.add_to_cell(coord_F4, black_pawn)
-            board.add_to_cell(coord_A4, black_pawn)
-            board.add_to_cell(coord_G7, black_pawn)
-            board.add_to_cell(coord_C3, black_pawn)
-            board.add_to_cell(coord_F2, black_pawn)
-            board.add_to_cell(coord_A7, black_pawn)
+            board.add_to_cell(coord_D7, team_pawn)
+            board.add_to_cell(coord_D3, team_pawn)
+            board.add_to_cell(coord_F4, team_pawn)
+            board.add_to_cell(coord_A4, team_pawn)
+            board.add_to_cell(coord_G7, team_pawn)
+            board.add_to_cell(coord_C3, team_pawn)
+            board.add_to_cell(coord_F2, team_pawn)
+            board.add_to_cell(coord_A7, team_pawn)
           end
 
           it '' do
-            print board
-            possible_paths = rules.possible_piece_paths_from(coord_D4)
+            board_visualization
+
+            possible_paths = rules.possible_piece_paths_from(testing_position)
 
             expect(possible_paths).to eq([path(coord_E4), path(coord_C4, coord_B4),
                                           path(coord_D5, coord_D6), path(coord_E5, coord_F6), path(coord_E3), path(coord_C5, coord_B6)])
@@ -650,54 +712,87 @@ describe Rules do
         end
 
         context 'other pieces are from opposite came color' do
-          let(:white_pawn) { Pieces::FACTORY[:white][:pawn] }
-
           before do
-            board.add_to_cell(coord_D4, black_queen)
-
-            board.add_to_cell(coord_D7, white_pawn)
-            board.add_to_cell(coord_D3, white_pawn)
-            board.add_to_cell(coord_F4, white_pawn)
-            board.add_to_cell(coord_A4, white_pawn)
-            board.add_to_cell(coord_G7, white_pawn)
-            board.add_to_cell(coord_C3, white_pawn)
-            board.add_to_cell(coord_F2, white_pawn)
-            board.add_to_cell(coord_A7, white_pawn)
+            board.add_to_cell(coord_D7, enemy_pawn)
+            board.add_to_cell(coord_D3, enemy_pawn)
+            board.add_to_cell(coord_F4, enemy_pawn)
+            board.add_to_cell(coord_A4, enemy_pawn)
+            board.add_to_cell(coord_G7, enemy_pawn)
+            board.add_to_cell(coord_C3, enemy_pawn)
+            board.add_to_cell(coord_F2, enemy_pawn)
+            board.add_to_cell(coord_A7, enemy_pawn)
           end
 
           it '' do
-            print board
-            possible_paths = rules.possible_piece_paths_from(coord_D4)
+            board_visualization
+
+            possible_paths = rules.possible_piece_paths_from(testing_position)
 
             expect(possible_paths).to eq([path(coord_E4, coord_F4), path(coord_C4, coord_B4, coord_A4),
                                           path(coord_D5, coord_D6, coord_D7), path(coord_D3), path(coord_E5, coord_F6, coord_G7), path(coord_C3), path(coord_E3, coord_F2), path(coord_C5, coord_B6, coord_A7)])
+          end
+        end
+
+        context 'other pieces are attacking the king' do
+          before do
+            board.add_to_cell(coord_D1, team_king)
+            allow(Requirement).to receive(:move_is_safe_for_king).and_call_original
+          end
+
+          context 'the piece is already blocking the attack' do
+            before do
+              board.add_to_cell(coord_D8, enemy_rook)
+            end
+
+            it '' do
+              board_visualization
+              puts board
+
+              possible_paths = rules.possible_piece_paths_from(testing_position)
+
+              expect(possible_paths).to eq([path(coord_D5, coord_D6, coord_D7, coord_D8),
+                                            path(coord_D3, coord_D2)])
+            end
+          end
+
+          context 'the piece can move to block the attack' do
+            before do
+              board.add_to_cell(coord_H5, enemy_bishop)
+            end
+            xit '' do
+              board_visualization
+              puts board
+
+              possible_paths = rules.possible_piece_paths_from(testing_position)
+
+              expect(possible_paths).to eq([coord_G4])
+            end
           end
         end
       end
     end
 
     context 'picking a knight' do
-      let(:black_knight) { Pieces::FACTORY[:black][:knight] }
+      before do
+        board.add_to_cell(testing_position, team_knight)
+      end
+
       context 'that is boxed in all around' do
-        let(:black_rook) { Pieces::FACTORY[:black][:rook] }
-        let(:white_rook) { Pieces::FACTORY[:white][:rook] }
-
         before do
-          board.add_to_cell(coord_D4, black_knight)
-
-          board.add_to_cell(coord_C3, black_rook)
-          board.add_to_cell(coord_D3, black_rook)
-          board.add_to_cell(coord_E3, black_rook)
-          board.add_to_cell(coord_C4, black_rook)
-          board.add_to_cell(coord_E4, white_rook)
-          board.add_to_cell(coord_C5, white_rook)
-          board.add_to_cell(coord_D5, white_rook)
-          board.add_to_cell(coord_E5, white_rook)
+          board.add_to_cell(coord_C3, enemy_rook)
+          board.add_to_cell(coord_D3, enemy_rook)
+          board.add_to_cell(coord_E3, enemy_rook)
+          board.add_to_cell(coord_C4, enemy_rook)
+          board.add_to_cell(coord_E4, team_rook)
+          board.add_to_cell(coord_C5, team_rook)
+          board.add_to_cell(coord_D5, team_rook)
+          board.add_to_cell(coord_E5, team_rook)
         end
 
         it '' do
-          print board
-          possible_paths = rules.possible_piece_paths_from(coord_D4)
+          board_visualization
+
+          possible_paths = rules.possible_piece_paths_from(testing_position)
 
           expect(possible_paths).to eq([path(coord_F5), path(coord_F3), path(coord_E6), path(coord_E2), path(coord_C6), path(coord_C2), path(coord_B5),
                                         path(coord_B3)])
@@ -705,26 +800,22 @@ describe Rules do
       end
 
       context 'when the board has other pieces that limit the knight move' do
-        let(:black_pawn) { Pieces::FACTORY[:black][:pawn] }
-        let(:white_pawn) { Pieces::FACTORY[:white][:pawn] }
-
         context 'other pieces are from the same color' do
           before do
-            board.add_to_cell(coord_D4, black_knight)
-
-            board.add_to_cell(coord_F5, black_pawn)
-            board.add_to_cell(coord_F3, black_pawn)
-            board.add_to_cell(coord_E6, black_pawn)
-            board.add_to_cell(coord_E2, black_pawn)
-            board.add_to_cell(coord_C6, black_pawn)
-            board.add_to_cell(coord_C2, black_pawn)
-            board.add_to_cell(coord_B5, black_pawn)
-            board.add_to_cell(coord_B3, black_pawn)
+            board.add_to_cell(coord_F5, team_pawn)
+            board.add_to_cell(coord_F3, team_pawn)
+            board.add_to_cell(coord_E6, team_pawn)
+            board.add_to_cell(coord_E2, team_pawn)
+            board.add_to_cell(coord_C6, team_pawn)
+            board.add_to_cell(coord_C2, team_pawn)
+            board.add_to_cell(coord_B5, team_pawn)
+            board.add_to_cell(coord_B3, team_pawn)
           end
 
           it '' do
-            print board
-            possible_paths = rules.possible_piece_paths_from(coord_D4)
+            board_visualization
+
+            possible_paths = rules.possible_piece_paths_from(testing_position)
 
             expect(possible_paths).to eq([])
           end
@@ -732,43 +823,77 @@ describe Rules do
 
         context 'other pieces are from the opposite color' do
           before do
-            board.add_to_cell(coord_D4, black_knight)
-            board.add_to_cell(coord_F5, white_pawn)
-            board.add_to_cell(coord_F3, white_pawn)
-            board.add_to_cell(coord_E6, white_pawn)
-            board.add_to_cell(coord_E2, white_pawn)
-            board.add_to_cell(coord_C6, white_pawn)
-            board.add_to_cell(coord_C2, white_pawn)
-            board.add_to_cell(coord_B5, white_pawn)
-            board.add_to_cell(coord_B3, white_pawn)
+            board.add_to_cell(coord_F5, enemy_pawn)
+            board.add_to_cell(coord_F3, enemy_pawn)
+            board.add_to_cell(coord_E6, enemy_pawn)
+            board.add_to_cell(coord_E2, enemy_pawn)
+            board.add_to_cell(coord_C6, enemy_pawn)
+            board.add_to_cell(coord_C2, enemy_pawn)
+            board.add_to_cell(coord_B5, enemy_pawn)
+            board.add_to_cell(coord_B3, enemy_pawn)
           end
 
           it '' do
-            print board
-            possible_paths = rules.possible_piece_paths_from(coord_D4)
+            board_visualization
+
+            possible_paths = rules.possible_piece_paths_from(testing_position)
 
             expect(possible_paths).to eq([path(coord_F5), path(coord_F3), path(coord_E6), path(coord_E2), path(coord_C6), path(coord_C2), path(coord_B5),
                                           path(coord_B3)])
+          end
+        end
+
+        context 'other pieces are attacking the king' do
+          before do
+            board.add_to_cell(coord_D1, team_king)
+            allow(Requirement).to receive(:move_is_safe_for_king).and_call_original
+          end
+
+          context 'the piece is already blocking the attack' do
+            before do
+              board.add_to_cell(coord_D8, enemy_rook)
+            end
+
+            it '' do
+              board_visualization
+              puts board
+
+              possible_paths = rules.possible_piece_paths_from(testing_position)
+
+              expect(possible_paths).to eq([])
+            end
+          end
+
+          context 'the piece can move to block the attack' do
+            before do
+              board.add_to_cell(coord_H5, enemy_bishop)
+            end
+            it '' do
+              board_visualization
+              puts board
+
+              possible_paths = rules.possible_piece_paths_from(testing_position)
+
+              expect(possible_paths).to eq([[coord_F3], [coord_E2]])
+            end
           end
         end
       end
     end
 
     context 'picking a pawn' do
-      let(:white_pawn) { Pieces::FACTORY[:white][:pawn] }
-      let(:black_pawn) { Pieces::FACTORY[:black][:pawn] }
-
       context 'in the middle of the board' do
         before do
-          board.add_to_cell(coord_D4, white_pawn)
+          board.add_to_cell(testing_position, team_pawn)
         end
 
         context 'forward move' do
           context 'unmoved pawn' do
             context 'cells free' do
               it '' do
-                print board
-                possible_paths = rules.possible_piece_paths_from(coord_D4)
+                board_visualization
+
+                possible_paths = rules.possible_piece_paths_from(testing_position)
 
                 expect(possible_paths).to eq([path(coord_D5), path(coord_D6)])
               end
@@ -777,18 +902,20 @@ describe Rules do
             context 'blocked by' do
               context 'same color piece' do
                 it '' do
-                  board.add_to_cell(coord_D6, white_pawn)
-                  print board
-                  possible_paths = rules.possible_piece_paths_from(coord_D4)
+                  board.add_to_cell(coord_D6, enemy_pawn)
+                  board_visualization
+
+                  possible_paths = rules.possible_piece_paths_from(testing_position)
 
                   expect(possible_paths).to eq([path(coord_D5)])
                 end
 
                 it '' do
-                  board.add_to_cell(coord_D5, white_pawn)
+                  board.add_to_cell(coord_D5, enemy_pawn)
 
-                  print board
-                  possible_paths = rules.possible_piece_paths_from(coord_D4)
+                  board_visualization
+
+                  possible_paths = rules.possible_piece_paths_from(testing_position)
 
                   expect(possible_paths).to eq([])
                 end
@@ -796,18 +923,20 @@ describe Rules do
 
               context 'opponent color piece' do
                 it '' do
-                  board.add_to_cell(coord_D6, black_pawn)
-                  print board
-                  possible_paths = rules.possible_piece_paths_from(coord_D4)
+                  board.add_to_cell(coord_D6, team_pawn)
+                  board_visualization
+
+                  possible_paths = rules.possible_piece_paths_from(testing_position)
 
                   expect(possible_paths).to eq([path(coord_D5)])
                 end
 
                 it '' do
-                  board.add_to_cell(coord_D5, black_pawn)
+                  board.add_to_cell(coord_D5, team_pawn)
 
-                  print board
-                  possible_paths = rules.possible_piece_paths_from(coord_D4)
+                  board_visualization
+
+                  possible_paths = rules.possible_piece_paths_from(testing_position)
 
                   expect(possible_paths).to eq([])
                 end
@@ -817,13 +946,14 @@ describe Rules do
 
           context 'moved pawn' do
             before do
-              allow(white_pawn).to receive(:move_status).and_return(:moved)
+              allow(team_pawn).to receive(:move_status).and_return(:moved)
             end
 
             context 'cells free' do
               it '' do
-                print board
-                possible_paths = rules.possible_piece_paths_from(coord_D4)
+                board_visualization
+
+                possible_paths = rules.possible_piece_paths_from(testing_position)
 
                 expect(possible_paths).to eq([path(coord_D5)])
               end
@@ -832,10 +962,11 @@ describe Rules do
             context 'blocked by' do
               context 'same color piece' do
                 it '' do
-                  board.add_to_cell(coord_D5, white_pawn)
+                  board.add_to_cell(coord_D5, enemy_pawn)
 
-                  print board
-                  possible_paths = rules.possible_piece_paths_from(coord_D4)
+                  board_visualization
+
+                  possible_paths = rules.possible_piece_paths_from(testing_position)
 
                   expect(possible_paths).to eq([])
                 end
@@ -843,10 +974,11 @@ describe Rules do
 
               context 'opponent color piece' do
                 it '' do
-                  board.add_to_cell(coord_D5, black_pawn)
+                  board.add_to_cell(coord_D5, team_pawn)
 
-                  print board
-                  possible_paths = rules.possible_piece_paths_from(coord_D4)
+                  board_visualization
+
+                  possible_paths = rules.possible_piece_paths_from(testing_position)
 
                   expect(possible_paths).to eq([])
                 end
@@ -859,41 +991,44 @@ describe Rules do
           context 'normal take pattern' do
             context 'same color piece' do
               it '' do
-                board.add_to_cell(coord_E5, black_pawn)
-                board.add_to_cell(coord_C5, black_pawn)
+                board.add_to_cell(coord_E5, team_pawn)
+                board.add_to_cell(coord_C5, team_pawn)
 
-                print board
-                possible_paths = rules.possible_piece_paths_from(coord_D4)
+                board_visualization
 
-                expect(possible_paths).to eq([path(coord_D5), path(coord_D6), path(coord_C5),
-                                              path(coord_E5)])
+                possible_paths = rules.possible_piece_paths_from(testing_position)
+
+                expect(possible_paths).to eq([path(coord_D5), path(coord_D6)])
               end
             end
 
             context 'opponent color piece' do
               it '' do
-                board.add_to_cell(coord_E5, white_pawn)
-                board.add_to_cell(coord_C5, white_pawn)
+                board.add_to_cell(coord_E5, enemy_pawn)
+                board.add_to_cell(coord_C5, enemy_pawn)
 
-                print board
-                possible_paths = rules.possible_piece_paths_from(coord_D4)
+                board_visualization
 
-                expect(possible_paths).to eq([path(coord_D5), path(coord_D6)])
+                possible_paths = rules.possible_piece_paths_from(testing_position)
+
+                expect(possible_paths).to eq([path(coord_D5), path(coord_D6), path(coord_C5),
+                                              path(coord_E5)])
               end
             end
           end
 
           context 'en passant pattern' do
             before do
-              allow(black_pawn).to receive(:move_status).and_return(:rushed)
+              allow(enemy_pawn).to receive(:move_status).and_return(:rushed)
             end
 
             it '' do
-              board.add_to_cell(coord_E4, black_pawn)
-              board.add_to_cell(coord_C4, black_pawn)
+              board.add_to_cell(coord_E4, enemy_pawn)
+              board.add_to_cell(coord_C4, enemy_pawn)
 
-              print board
-              possible_paths = rules.possible_piece_paths_from(coord_D4)
+              board_visualization
+
+              possible_paths = rules.possible_piece_paths_from(testing_position)
 
               expect(possible_paths).to eq([path(coord_D5), path(coord_D6), path(coord_C5),
                                             path(coord_E5)])
@@ -901,17 +1036,57 @@ describe Rules do
 
             context 'without flank exposed' do
               before do
-                allow(black_pawn).to receive(:move_status).and_return(:moved)
+                allow(enemy_pawn).to receive(:move_status).and_return(:moved)
               end
 
               it '' do
-                board.add_to_cell(coord_E4, black_pawn)
-                board.add_to_cell(coord_C4, black_pawn)
+                board.add_to_cell(coord_E4, enemy_pawn)
+                board.add_to_cell(coord_C4, enemy_pawn)
 
-                print board
-                possible_paths = rules.possible_piece_paths_from(coord_D4)
+                board_visualization
+
+                possible_paths = rules.possible_piece_paths_from(testing_position)
 
                 expect(possible_paths).to eq([path(coord_D5), path(coord_D6)])
+              end
+            end
+          end
+        end
+
+        context 'when the board has other pieces that limit the knight move' do
+          context 'other pieces are attacking the king' do
+            before do
+              allow(Requirement).to receive(:move_is_safe_for_king).and_call_original
+            end
+
+            context 'the piece is already blocking the attack' do
+              before do
+                board.add_to_cell(coord_D1, team_king)
+                board.add_to_cell(coord_D8, enemy_rook)
+              end
+
+              xit '' do
+                board_visualization
+                puts board
+
+                possible_paths = rules.possible_piece_paths_from(testing_position)
+
+                expect(possible_paths).to eq([[coord_D5], [coord_D6]])
+              end
+            end
+
+            context 'the piece can move to block the attack' do
+              before do
+                board.add_to_cell(coord_C3, team_king)
+                board.add_to_cell(coord_H8, enemy_bishop)
+              end
+              xit '' do
+                board_visualization
+                puts board
+
+                possible_paths = rules.possible_piece_paths_from(testing_position)
+
+                expect(possible_paths).to eq([])
               end
             end
           end
@@ -920,18 +1095,16 @@ describe Rules do
     end
 
     context 'picking a king' do
-      let(:black_king) { Pieces::FACTORY[:black][:king] }
-      let(:white_rook) { Pieces::FACTORY[:white][:rook] }
-
       context 'from the middle of a empty board' do
         context 'with no movement restriction' do
           before do
-            board.add_to_cell(coord_D4, black_king)
+            board.add_to_cell(testing_position, team_king)
           end
 
           it '' do
-            print board
-            possible_paths = rules.possible_piece_paths_from(coord_D4)
+            board_visualization
+
+            possible_paths = rules.possible_piece_paths_from(testing_position)
 
             expect(possible_paths).to eq([path(coord_E4), path(coord_C4),
                                           path(coord_D5), path(coord_D3),
@@ -941,13 +1114,14 @@ describe Rules do
         end
         context 'restricted on E row by a rook' do
           before do
-            board.add_to_cell(coord_D4, black_king)
-            board.add_to_cell(coord_E1, white_rook)
+            board.add_to_cell(testing_position, team_king)
+            board.add_to_cell(coord_E1, enemy_rook)
           end
 
           it '' do
-            print board
-            possible_paths = rules.possible_piece_paths_from(coord_D4)
+            board_visualization
+
+            possible_paths = rules.possible_piece_paths_from(testing_position)
 
             expect(possible_paths).to eq([path(coord_C4), path(coord_D5), path(coord_D3),
                                           path(coord_C3), path(coord_C5)])
