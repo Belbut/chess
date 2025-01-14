@@ -19,8 +19,10 @@ describe Rules do
     BOARD_VISUALIZATION && puts(board)
   end
 
-  describe '#position_under_attack_from' do
-    subject(:position_under_attack_from) { rules.position_under_attack_from(testing_position, team_color).sort }
+  describe '#attackers_coordinates_to_position' do
+    subject(:attackers_coordinates_to_position) do
+      rules.attackers_coordinates_to_position(testing_position, team_color).sort
+    end
 
     before do
       board.add_to_cell(testing_position, team_piece)
@@ -31,7 +33,7 @@ describe Rules do
         it 'is expected to return empty array' do
           board_visualization
 
-          expect(position_under_attack_from).to eq([])
+          expect(attackers_coordinates_to_position).to eq([])
         end
       end
       context 'the attacking paths are being blocked' do
@@ -52,7 +54,7 @@ describe Rules do
           it '' do
             board_visualization
 
-            expect(position_under_attack_from).to eq([])
+            expect(attackers_coordinates_to_position).to eq([])
           end
         end
 
@@ -66,7 +68,7 @@ describe Rules do
           it '' do
             board_visualization
 
-            expect(position_under_attack_from).to eq([])
+            expect(attackers_coordinates_to_position).to eq([])
           end
         end
       end
@@ -82,7 +84,7 @@ describe Rules do
           it '' do
             board_visualization
 
-            expect(position_under_attack_from).to eq([coord_E5])
+            expect(attackers_coordinates_to_position).to eq([coord_E5])
           end
 
           context 'one attack position another one blocked' do
@@ -93,7 +95,7 @@ describe Rules do
             it '' do
               board_visualization
 
-              expect(position_under_attack_from).to eq([coord_E5])
+              expect(attackers_coordinates_to_position).to eq([coord_E5])
             end
           end
         end
@@ -107,7 +109,7 @@ describe Rules do
           it '' do
             board_visualization
 
-            expect(position_under_attack_from).to eq([coord_C5, coord_E5].sort)
+            expect(attackers_coordinates_to_position).to eq([coord_C5, coord_E5].sort)
           end
         end
       end
@@ -121,7 +123,7 @@ describe Rules do
           it '' do
             board_visualization
 
-            expect(position_under_attack_from).to eq([coord_D1])
+            expect(attackers_coordinates_to_position).to eq([coord_D1])
           end
         end
 
@@ -134,7 +136,7 @@ describe Rules do
           it '' do
             board_visualization
 
-            expect(position_under_attack_from).to eq([coord_H4, coord_A4].sort)
+            expect(attackers_coordinates_to_position).to eq([coord_H4, coord_A4].sort)
           end
         end
       end
@@ -148,7 +150,7 @@ describe Rules do
           it '' do
             board_visualization
 
-            expect(position_under_attack_from).to eq([coord_B5])
+            expect(attackers_coordinates_to_position).to eq([coord_B5])
           end
         end
 
@@ -161,7 +163,7 @@ describe Rules do
           it '' do
             board_visualization
 
-            expect(position_under_attack_from).to eq([coord_F3, coord_E2].sort)
+            expect(attackers_coordinates_to_position).to eq([coord_F3, coord_E2].sort)
           end
         end
       end
@@ -175,7 +177,7 @@ describe Rules do
           it '' do
             board_visualization
 
-            expect(position_under_attack_from).to eq([coord_G1])
+            expect(attackers_coordinates_to_position).to eq([coord_G1])
           end
         end
 
@@ -188,7 +190,7 @@ describe Rules do
           it '' do
             board_visualization
 
-            expect(position_under_attack_from).to eq([coord_A1, coord_A7].sort)
+            expect(attackers_coordinates_to_position).to eq([coord_A1, coord_A7].sort)
           end
         end
       end
@@ -202,7 +204,7 @@ describe Rules do
           it '' do
             board_visualization
 
-            expect(position_under_attack_from).to eq([coord_D3])
+            expect(attackers_coordinates_to_position).to eq([coord_D3])
           end
         end
 
@@ -215,7 +217,7 @@ describe Rules do
           it '' do
             board_visualization
 
-            expect(position_under_attack_from).to eq([coord_D5, coord_E3].sort)
+            expect(attackers_coordinates_to_position).to eq([coord_D5, coord_E3].sort)
           end
         end
       end
@@ -229,7 +231,7 @@ describe Rules do
           it '' do
             board_visualization
 
-            expect(position_under_attack_from).to eq([coord_D3])
+            expect(attackers_coordinates_to_position).to eq([coord_D3])
           end
         end
 
@@ -242,16 +244,16 @@ describe Rules do
           it '' do
             board_visualization
 
-            expect(position_under_attack_from).to eq([coord_D5, coord_E3].sort)
+            expect(attackers_coordinates_to_position).to eq([coord_D5, coord_E3].sort)
           end
         end
       end
     end
   end
 
-  describe '#position_under_attack_from_path' do
-    subject(:position_under_attack_from_path) do
-      rules.position_under_attack_from_path(testing_position, team_color)
+  describe '#attack_paths_to_position' do
+    subject(:attack_paths_to_position) do
+      rules.attack_paths_to_position(testing_position, team_color)
     end
 
     before do
@@ -263,7 +265,7 @@ describe Rules do
         it 'is expected to return empty array' do
           board_visualization
 
-          expect(position_under_attack_from_path).to eq([])
+          expect(attack_paths_to_position).to eq([])
         end
       end
       context 'the attacking paths are being blocked' do
@@ -282,7 +284,7 @@ describe Rules do
           it '' do
             board_visualization
 
-            expect(position_under_attack_from_path).to eq([])
+            expect(attack_paths_to_position).to eq([])
           end
         end
 
@@ -296,7 +298,7 @@ describe Rules do
           it '' do
             board_visualization
 
-            expect(position_under_attack_from_path).to eq([])
+            expect(attack_paths_to_position).to eq([])
           end
         end
       end
@@ -312,7 +314,7 @@ describe Rules do
           it '' do
             board_visualization
 
-            expect(position_under_attack_from_path).to eq([path(coord_E5)])
+            expect(attack_paths_to_position).to eq([path(coord_E5)])
           end
 
           context 'one attack position another one blocked' do
@@ -323,7 +325,7 @@ describe Rules do
             it '' do
               board_visualization
 
-              expect(position_under_attack_from_path).to eq([path(coord_E5)])
+              expect(attack_paths_to_position).to eq([path(coord_E5)])
             end
           end
         end
@@ -337,7 +339,7 @@ describe Rules do
           it '' do
             board_visualization
 
-            expect(position_under_attack_from_path).to eq([path(coord_C5), path(coord_E5)])
+            expect(attack_paths_to_position).to eq([path(coord_C5), path(coord_E5)])
           end
         end
       end
@@ -351,7 +353,7 @@ describe Rules do
           it '' do
             board_visualization
 
-            expect(position_under_attack_from_path).to eq([path(coord_D3, coord_D2, coord_D1)])
+            expect(attack_paths_to_position).to eq([path(coord_D3, coord_D2, coord_D1)])
           end
         end
 
@@ -364,8 +366,8 @@ describe Rules do
           it '' do
             board_visualization
 
-            expect(position_under_attack_from_path).to eq([path(coord_E4, coord_F4, coord_G4, coord_H4),
-                                                           path(coord_C4, coord_B4, coord_A4)])
+            expect(attack_paths_to_position).to eq([path(coord_E4, coord_F4, coord_G4, coord_H4),
+                                                    path(coord_C4, coord_B4, coord_A4)])
           end
         end
       end
@@ -379,7 +381,7 @@ describe Rules do
           it '' do
             board_visualization
 
-            expect(position_under_attack_from_path).to eq([path(coord_B5)])
+            expect(attack_paths_to_position).to eq([path(coord_B5)])
           end
         end
 
@@ -392,7 +394,7 @@ describe Rules do
           it '' do
             board_visualization
 
-            expect(position_under_attack_from_path).to eq([path(coord_F3), path(coord_E2)])
+            expect(attack_paths_to_position).to eq([path(coord_F3), path(coord_E2)])
           end
         end
       end
@@ -406,7 +408,7 @@ describe Rules do
           it '' do
             board_visualization
 
-            expect(position_under_attack_from_path).to eq([path(coord_E3, coord_F2, coord_G1)])
+            expect(attack_paths_to_position).to eq([path(coord_E3, coord_F2, coord_G1)])
           end
         end
 
@@ -419,8 +421,8 @@ describe Rules do
           it '' do
             board_visualization
 
-            expect(position_under_attack_from_path).to eq([path(coord_C3, coord_B2, coord_A1),
-                                                           path(coord_C5, coord_B6, coord_A7)])
+            expect(attack_paths_to_position).to eq([path(coord_C3, coord_B2, coord_A1),
+                                                    path(coord_C5, coord_B6, coord_A7)])
           end
         end
       end
@@ -434,7 +436,7 @@ describe Rules do
           it '' do
             board_visualization
 
-            expect(position_under_attack_from_path).to eq([path(coord_D3)])
+            expect(attack_paths_to_position).to eq([path(coord_D3)])
           end
         end
 
@@ -447,7 +449,7 @@ describe Rules do
           it '' do
             board_visualization
 
-            expect(position_under_attack_from_path).to eq([path(coord_D5), path(coord_E3)])
+            expect(attack_paths_to_position).to eq([path(coord_D5), path(coord_E3)])
           end
         end
       end
@@ -461,7 +463,7 @@ describe Rules do
           it '' do
             board_visualization
 
-            expect(position_under_attack_from_path).to eq([path(coord_D3)])
+            expect(attack_paths_to_position).to eq([path(coord_D3)])
           end
         end
 
@@ -474,14 +476,14 @@ describe Rules do
           it '' do
             board_visualization
 
-            expect(position_under_attack_from_path).to eq([path(coord_D5), path(coord_E3)])
+            expect(attack_paths_to_position).to eq([path(coord_D5), path(coord_E3)])
           end
         end
       end
     end
   end
 
-  describe '#possible_piece_paths_from' do
+  describe '#available_moves_for_piece' do
     before do
       allow(Requirement).to receive(:move_is_safe_for_king).and_return(proc { true })
     end
@@ -494,7 +496,7 @@ describe Rules do
         it '' do
           board_visualization
 
-          possible_paths = rules.possible_piece_paths_from(testing_position)
+          possible_paths = rules.available_moves_for_piece(testing_position)
 
           expect(possible_paths).to eq([path(coord_E4, coord_F4, coord_G4, coord_H4),
                                         path(coord_C4, coord_B4, coord_A4),
@@ -515,7 +517,7 @@ describe Rules do
           it '' do
             board_visualization
 
-            possible_paths = rules.possible_piece_paths_from(testing_position)
+            possible_paths = rules.available_moves_for_piece(testing_position)
 
             expect(possible_paths).to eq([path(coord_E4),
                                           path(coord_C4, coord_B4),
@@ -534,7 +536,7 @@ describe Rules do
           it '' do
             board_visualization
 
-            possible_paths = rules.possible_piece_paths_from(testing_position)
+            possible_paths = rules.available_moves_for_piece(testing_position)
 
             expect(possible_paths).to eq([path(coord_E4, coord_F4), path(coord_C4, coord_B4, coord_A4),
                                           path(coord_D5, coord_D6, coord_D7), path(coord_D3)])
@@ -556,7 +558,7 @@ describe Rules do
               board_visualization
               puts board
 
-              possible_paths = rules.possible_piece_paths_from(testing_position)
+              possible_paths = rules.available_moves_for_piece(testing_position)
 
               expect(possible_paths).to eq([path(coord_D5, coord_D6, coord_D7, coord_D8),
                                             path(coord_D3, coord_D2)])
@@ -571,7 +573,7 @@ describe Rules do
               board_visualization
               puts board
 
-              possible_paths = rules.possible_piece_paths_from(testing_position)
+              possible_paths = rules.available_moves_for_piece(testing_position)
 
               expect(possible_paths).to eq([coord_G4])
             end
@@ -588,7 +590,7 @@ describe Rules do
         it '' do
           board_visualization
 
-          possible_paths = rules.possible_piece_paths_from(testing_position)
+          possible_paths = rules.available_moves_for_piece(testing_position)
 
           expect(possible_paths).to eq([path(coord_E5, coord_F6, coord_G7, coord_H8), path(coord_C3, coord_B2, coord_A1),
                                         path(coord_E3, coord_F2, coord_G1), path(coord_C5, coord_B6, coord_A7)])
@@ -607,7 +609,7 @@ describe Rules do
           it '' do
             board_visualization
 
-            possible_paths = rules.possible_piece_paths_from(testing_position)
+            possible_paths = rules.available_moves_for_piece(testing_position)
 
             expect(possible_paths).to eq([path(coord_E5, coord_F6), path(coord_E3),
                                           path(coord_C5, coord_B6)])
@@ -625,7 +627,7 @@ describe Rules do
           it '' do
             board_visualization
 
-            possible_paths = rules.possible_piece_paths_from(testing_position)
+            possible_paths = rules.available_moves_for_piece(testing_position)
 
             expect(possible_paths).to eq([path(coord_E5, coord_F6, coord_G7), path(coord_C3),
                                           path(coord_E3, coord_F2), path(coord_C5, coord_B6, coord_A7)])
@@ -647,7 +649,7 @@ describe Rules do
               board_visualization
               puts board
 
-              possible_paths = rules.possible_piece_paths_from(testing_position)
+              possible_paths = rules.available_moves_for_piece(testing_position)
 
               expect(possible_paths).to eq([path(coord_E5, coord_F6, coord_G7, coord_H8),
                                             path(coord_C3, coord_B2)])
@@ -662,7 +664,7 @@ describe Rules do
               board_visualization
               puts board
 
-              possible_paths = rules.possible_piece_paths_from(testing_position)
+              possible_paths = rules.available_moves_for_piece(testing_position)
 
               expect(possible_paths).to eq([coord_G4])
             end
@@ -679,7 +681,7 @@ describe Rules do
         it '' do
           board_visualization
 
-          possible_paths = rules.possible_piece_paths_from(testing_position)
+          possible_paths = rules.available_moves_for_piece(testing_position)
 
           expect(possible_paths).to eq([path(coord_E4, coord_F4, coord_G4, coord_H4), path(coord_C4, coord_B4, coord_A4),
                                         path(coord_D5, coord_D6, coord_D7, coord_D8), path(coord_D3, coord_D2, coord_D1),
@@ -704,7 +706,7 @@ describe Rules do
           it '' do
             board_visualization
 
-            possible_paths = rules.possible_piece_paths_from(testing_position)
+            possible_paths = rules.available_moves_for_piece(testing_position)
 
             expect(possible_paths).to eq([path(coord_E4), path(coord_C4, coord_B4),
                                           path(coord_D5, coord_D6), path(coord_E5, coord_F6), path(coord_E3), path(coord_C5, coord_B6)])
@@ -726,7 +728,7 @@ describe Rules do
           it '' do
             board_visualization
 
-            possible_paths = rules.possible_piece_paths_from(testing_position)
+            possible_paths = rules.available_moves_for_piece(testing_position)
 
             expect(possible_paths).to eq([path(coord_E4, coord_F4), path(coord_C4, coord_B4, coord_A4),
                                           path(coord_D5, coord_D6, coord_D7), path(coord_D3), path(coord_E5, coord_F6, coord_G7), path(coord_C3), path(coord_E3, coord_F2), path(coord_C5, coord_B6, coord_A7)])
@@ -748,7 +750,7 @@ describe Rules do
               board_visualization
               puts board
 
-              possible_paths = rules.possible_piece_paths_from(testing_position)
+              possible_paths = rules.available_moves_for_piece(testing_position)
 
               expect(possible_paths).to eq([path(coord_D5, coord_D6, coord_D7, coord_D8),
                                             path(coord_D3, coord_D2)])
@@ -763,7 +765,7 @@ describe Rules do
               board_visualization
               puts board
 
-              possible_paths = rules.possible_piece_paths_from(testing_position)
+              possible_paths = rules.available_moves_for_piece(testing_position)
 
               expect(possible_paths).to eq([coord_G4])
             end
@@ -792,7 +794,7 @@ describe Rules do
         it '' do
           board_visualization
 
-          possible_paths = rules.possible_piece_paths_from(testing_position)
+          possible_paths = rules.available_moves_for_piece(testing_position)
 
           expect(possible_paths).to eq([path(coord_F5), path(coord_F3), path(coord_E6), path(coord_E2), path(coord_C6), path(coord_C2), path(coord_B5),
                                         path(coord_B3)])
@@ -815,7 +817,7 @@ describe Rules do
           it '' do
             board_visualization
 
-            possible_paths = rules.possible_piece_paths_from(testing_position)
+            possible_paths = rules.available_moves_for_piece(testing_position)
 
             expect(possible_paths).to eq([])
           end
@@ -836,7 +838,7 @@ describe Rules do
           it '' do
             board_visualization
 
-            possible_paths = rules.possible_piece_paths_from(testing_position)
+            possible_paths = rules.available_moves_for_piece(testing_position)
 
             expect(possible_paths).to eq([path(coord_F5), path(coord_F3), path(coord_E6), path(coord_E2), path(coord_C6), path(coord_C2), path(coord_B5),
                                           path(coord_B3)])
@@ -858,7 +860,7 @@ describe Rules do
               board_visualization
               puts board
 
-              possible_paths = rules.possible_piece_paths_from(testing_position)
+              possible_paths = rules.available_moves_for_piece(testing_position)
 
               expect(possible_paths).to eq([])
             end
@@ -872,7 +874,7 @@ describe Rules do
               board_visualization
               puts board
 
-              possible_paths = rules.possible_piece_paths_from(testing_position)
+              possible_paths = rules.available_moves_for_piece(testing_position)
 
               expect(possible_paths).to eq([[coord_F3], [coord_E2]])
             end
@@ -893,7 +895,7 @@ describe Rules do
               it '' do
                 board_visualization
 
-                possible_paths = rules.possible_piece_paths_from(testing_position)
+                possible_paths = rules.available_moves_for_piece(testing_position)
 
                 expect(possible_paths).to eq([path(coord_D5), path(coord_D6)])
               end
@@ -905,7 +907,7 @@ describe Rules do
                   board.add_to_cell(coord_D6, enemy_pawn)
                   board_visualization
 
-                  possible_paths = rules.possible_piece_paths_from(testing_position)
+                  possible_paths = rules.available_moves_for_piece(testing_position)
 
                   expect(possible_paths).to eq([path(coord_D5)])
                 end
@@ -915,7 +917,7 @@ describe Rules do
 
                   board_visualization
 
-                  possible_paths = rules.possible_piece_paths_from(testing_position)
+                  possible_paths = rules.available_moves_for_piece(testing_position)
 
                   expect(possible_paths).to eq([])
                 end
@@ -926,7 +928,7 @@ describe Rules do
                   board.add_to_cell(coord_D6, team_pawn)
                   board_visualization
 
-                  possible_paths = rules.possible_piece_paths_from(testing_position)
+                  possible_paths = rules.available_moves_for_piece(testing_position)
 
                   expect(possible_paths).to eq([path(coord_D5)])
                 end
@@ -936,7 +938,7 @@ describe Rules do
 
                   board_visualization
 
-                  possible_paths = rules.possible_piece_paths_from(testing_position)
+                  possible_paths = rules.available_moves_for_piece(testing_position)
 
                   expect(possible_paths).to eq([])
                 end
@@ -953,7 +955,7 @@ describe Rules do
               it '' do
                 board_visualization
 
-                possible_paths = rules.possible_piece_paths_from(testing_position)
+                possible_paths = rules.available_moves_for_piece(testing_position)
 
                 expect(possible_paths).to eq([path(coord_D5)])
               end
@@ -966,7 +968,7 @@ describe Rules do
 
                   board_visualization
 
-                  possible_paths = rules.possible_piece_paths_from(testing_position)
+                  possible_paths = rules.available_moves_for_piece(testing_position)
 
                   expect(possible_paths).to eq([])
                 end
@@ -978,7 +980,7 @@ describe Rules do
 
                   board_visualization
 
-                  possible_paths = rules.possible_piece_paths_from(testing_position)
+                  possible_paths = rules.available_moves_for_piece(testing_position)
 
                   expect(possible_paths).to eq([])
                 end
@@ -996,7 +998,7 @@ describe Rules do
 
                 board_visualization
 
-                possible_paths = rules.possible_piece_paths_from(testing_position)
+                possible_paths = rules.available_moves_for_piece(testing_position)
 
                 expect(possible_paths).to eq([path(coord_D5), path(coord_D6)])
               end
@@ -1009,7 +1011,7 @@ describe Rules do
 
                 board_visualization
 
-                possible_paths = rules.possible_piece_paths_from(testing_position)
+                possible_paths = rules.available_moves_for_piece(testing_position)
 
                 expect(possible_paths).to eq([path(coord_D5), path(coord_D6), path(coord_C5),
                                               path(coord_E5)])
@@ -1028,7 +1030,7 @@ describe Rules do
 
               board_visualization
 
-              possible_paths = rules.possible_piece_paths_from(testing_position)
+              possible_paths = rules.available_moves_for_piece(testing_position)
 
               expect(possible_paths).to eq([path(coord_D5), path(coord_D6), path(coord_C5),
                                             path(coord_E5)])
@@ -1045,7 +1047,7 @@ describe Rules do
 
                 board_visualization
 
-                possible_paths = rules.possible_piece_paths_from(testing_position)
+                possible_paths = rules.available_moves_for_piece(testing_position)
 
                 expect(possible_paths).to eq([path(coord_D5), path(coord_D6)])
               end
@@ -1069,7 +1071,7 @@ describe Rules do
                 board_visualization
                 puts board
 
-                possible_paths = rules.possible_piece_paths_from(testing_position)
+                possible_paths = rules.available_moves_for_piece(testing_position)
 
                 expect(possible_paths).to eq([[coord_D5], [coord_D6]])
               end
@@ -1084,7 +1086,7 @@ describe Rules do
                 board_visualization
                 puts board
 
-                possible_paths = rules.possible_piece_paths_from(testing_position)
+                possible_paths = rules.available_moves_for_piece(testing_position)
 
                 expect(possible_paths).to eq([])
               end
@@ -1104,7 +1106,7 @@ describe Rules do
           it '' do
             board_visualization
 
-            possible_paths = rules.possible_piece_paths_from(testing_position)
+            possible_paths = rules.available_moves_for_piece(testing_position)
 
             expect(possible_paths).to eq([path(coord_E4), path(coord_C4),
                                           path(coord_D5), path(coord_D3),
@@ -1121,7 +1123,7 @@ describe Rules do
           it '' do
             board_visualization
 
-            possible_paths = rules.possible_piece_paths_from(testing_position)
+            possible_paths = rules.available_moves_for_piece(testing_position)
 
             expect(possible_paths).to eq([path(coord_C4), path(coord_D5), path(coord_D3),
                                           path(coord_C3), path(coord_C5)])

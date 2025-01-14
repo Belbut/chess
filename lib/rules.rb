@@ -3,6 +3,8 @@ require_relative './rules/movement_pattern/root_position'
 class Rules
   attr_reader :chess_kit
 
+  PIECE_TYPES = %i[pawn rook knight bishop queen king].freeze
+
   def initialize(chess_kit)
     @chess_kit = chess_kit
   end
@@ -12,55 +14,55 @@ class Rules
     Rules.new(chess_kit_cloned)
   end
 
-  def piece_pattern_rules(color, type, safe_king:)
-    pattern_rules_factory(safe_king)[color][type]
+  def attackers_coordinates_to_position(position, team_color)
+    attacker_coordinates = attack_paths_to_position(position, team_color).map(&:last)
+
+    attacker_coordinates.flatten
   end
 
-  def position_under_attack_from(position, team_color)
-    list_of_attackers = position_under_attack_from_path(position, team_color).map(&:last)
+  def attack_paths_to_position(position, team_color)
+    attack_paths = []
 
-    list_of_attackers.flatten
-  end
-
-  def position_under_attack_from_path(position, team_color)
-    list_all_piece_types = %i[pawn rook knight bishop queen king]
-    list_of_attackers = []
-
-    list_all_piece_types.each do |piece_type|
-      list_of_attackers += vulnerable_position_from_path(position, team_color, piece_type)
+    PIECE_TYPES.each do |piece_type|
+      attack_paths += paths_to_position_by_piece(position, team_color, piece_type)
     end
-    list_of_attackers
+    attack_paths
   end
 
-  def possible_piece_paths_from(from)
-    piece = board.lookup_cell(from)
+  def available_moves_for_piece(from_position)
+    piece = board.lookup_cell(from_position)
+    movement_patterns = movement_patterns_for_piece(piece.color, piece.type, ensure_king_safety: true)
 
-    piece_pattern_rules(piece.color, piece.type, safe_king: true)
-      .reduce([]) do |reduce_memory, same_requirement_pattern_rules|
-      reduce_memory + RootPosition.new(from,
-                                       same_requirement_pattern_rules).find_all_paths
-    end
+    generate_paths_for_piece(from_position, movement_patterns)
   end
 
   private
 
-  def vulnerable_position_from_path(position, piece_color, piece_type)
-    active_paths_to_position(position, piece_color, piece_type)
-  end
-
-  def all_paths_to_position(position, piece_color, piece_type)
-    pattern_rules = piece_pattern_rules(piece_color, piece_type, safe_king: false)
-
-    pattern_rules.reduce([]) do |memory, same_requirement_pattern_rules|
-      memory + RootPosition.new(position, same_requirement_pattern_rules).find_all_paths
+  def generate_paths_for_piece(from_position, movement_patterns)
+    movement_patterns.reduce([]) do |paths, pattern|
+      paths + RootPosition.new(from_position, pattern).find_all_paths
     end
   end
 
-  def active_paths_to_position(position, piece_color, piece_type)
-    enemy_piece = Pieces::FACTORY[opposite_color(piece_color)][piece_type]
+  def movement_patterns_for_piece(color, type, ensure_king_safety:)
+    movement_pattern_factory(ensure_king_safety)[color][type]
+  end
 
-    all_paths_to_position(position, piece_color, piece_type).find_all do |possible_path|
-      board.lookup_cell(possible_path.last) == enemy_piece
+  def paths_to_position_by_piece(position, team_color, piece_type)
+    attack_paths_from_pieces(position, team_color, piece_type)
+  end
+
+  def all_possible_paths_to_position(position, team_color, piece_type)
+    movement_patterns = movement_patterns_for_piece(team_color, piece_type, ensure_king_safety: false)
+
+    generate_paths_for_piece(position, movement_patterns)
+  end
+
+  def attack_paths_from_pieces(position, team_color, piece_type)
+    enemy_piece = Pieces::FACTORY[opposite_color(team_color)][piece_type]
+
+    all_possible_paths_to_position(position, team_color, piece_type).find_all do |path|
+      board.lookup_cell(path.last) == enemy_piece
     end
   end
 
@@ -72,8 +74,8 @@ class Rules
     chess_kit.board
   end
 
-  def pattern_rules_factory(safe_king)
-    if safe_king
+  def movement_pattern_factory(ensure_king_safety)
+    if ensure_king_safety
       { white: color_pattern_rules_restricted(:white),
         black: color_pattern_rules_restricted(:black) }
     else

@@ -1,5 +1,4 @@
 class Unit
-  require_relative '../../rules/piece_movements'
   require_relative '../../interface'
 
   attr_reader :color, :type, :move_status

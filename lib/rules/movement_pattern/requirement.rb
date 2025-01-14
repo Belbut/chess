@@ -32,7 +32,7 @@ module Requirement
       rules_clone.chess_kit.board.add_to_cell!(target_cord, moving_piece)
       king_cord = rules_clone.chess_kit.board.find_position_of(Pieces::FACTORY[team_color][:king])
 
-      king_is_safe = rules_clone.position_under_attack_from(king_cord, team_color).empty?
+      king_is_safe = rules_clone.attackers_coordinates_to_position(king_cord, team_color).empty?
       king_is_safe
     }
   end
@@ -51,7 +51,7 @@ module Requirement
 
   def self.no_suicide_move(team_color, rules)
     lambda { |_, target_cord|
-      rules.position_under_attack_from(target_cord, team_color).empty?
+      rules.attackers_coordinates_to_position(target_cord, team_color).empty?
     }
   end
 
