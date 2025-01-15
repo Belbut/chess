@@ -25,11 +25,11 @@ module Requirement
   end
 
   def self.move_is_safe_for_king(rules, team_color)
-    lambda { |parent_cord, target_cord|
+    lambda { |board_cord, testing_move_cord|
       rules_clone = rules.deep_clone
 
-      moving_piece = rules_clone.chess_kit.board.clear_cell(parent_cord) # problem with this
-      rules_clone.chess_kit.board.add_to_cell!(target_cord, moving_piece)
+      moving_piece = rules_clone.chess_kit.board.clear_cell(board_cord) # problem with this
+      rules_clone.chess_kit.board.add_to_cell!(testing_move_cord, moving_piece)
       king_cord = rules_clone.chess_kit.board.find_position_of(Pieces::FACTORY[team_color][:king])
 
       king_is_safe = rules_clone.attackers_coordinates_to_position(king_cord, team_color).empty?
