@@ -29,11 +29,17 @@ class Rules
     attack_paths
   end
 
-  def available_moves_for_piece(from_position)
+  def available_paths_for_piece(from_position)
     piece = board.lookup_cell(from_position)
-    movement_patterns = movement_patterns_for_piece(piece.color, piece.type, ensure_king_safety: true)
 
-    generate_paths_for_piece(from_position, movement_patterns)
+    rules = self
+    team_color = piece.color
+    safe_king_requirement = Requirement.move_is_safe_for_king(rules, team_color)
+
+    all_possible_paths_to_position = all_possible_paths_to_position(from_position, piece.color, piece.type)
+    all_possible_paths_to_position.map do |possible_path|
+      possible_path.find_all { |possible_cord| safe_king_requirement.call(from_position, possible_cord) }
+    end.reject(&:empty?)
   end
 
   private
@@ -44,8 +50,8 @@ class Rules
     end
   end
 
-  def movement_patterns_for_piece(color, type, ensure_king_safety:)
-    movement_pattern_factory(ensure_king_safety)[color][type]
+  def movement_patterns_for_piece(color, type)
+    movement_pattern_factory[color][type]
   end
 
   def paths_to_position_by_piece(position, team_color, piece_type)
@@ -53,7 +59,7 @@ class Rules
   end
 
   def all_possible_paths_to_position(position, team_color, piece_type)
-    movement_patterns = movement_patterns_for_piece(team_color, piece_type, ensure_king_safety: false)
+    movement_patterns = movement_patterns_for_piece(team_color, piece_type)
 
     generate_paths_for_piece(position, movement_patterns)
   end
@@ -74,32 +80,18 @@ class Rules
     chess_kit.board
   end
 
-  def movement_pattern_factory(ensure_king_safety)
-    if ensure_king_safety
-      { white: color_pattern_rules_restricted(:white),
-        black: color_pattern_rules_restricted(:black) }
-    else
-      { white: color_pattern_rules_general(:white),
-        black: color_pattern_rules_general(:black) }
-    end
+  def movement_pattern_factory
+    { white: color_pattern_rules(:white),
+      black: color_pattern_rules(:black) }
   end
 
-  def color_pattern_rules_general(color)
+  def color_pattern_rules(color)
     { pawn: pawn_moves(color),
       rook: rook_moves(color),
       knight: knight_moves(color),
       bishop: bishop_moves(color),
       queen: queen_moves(color),
       king: king_moves(color) }
-  end
-
-  def color_pattern_rules_restricted(color)
-    { pawn: pawn_moves(color),
-      rook: rook_moves2(color),
-      knight: knight_moves2(color),
-      bishop: bishop_moves2(color),
-      queen: queen_moves2(color),
-      king: king_moves2(color) }
   end
 
   def pawn_moves(piece_color)
@@ -152,29 +144,12 @@ class Rules
                       Requirement.target_is_no_friendly_kill(board, piece_color))]
   end
 
-  def rook_moves2(piece_color)
-    [PatternRules.new([[:n, 0], [0, :n]],
-                      Requirement.target_is_inside_board(board),
-                      Requirement.parent_move_was_not_a_kill(board, piece_color),
-                      Requirement.target_is_no_friendly_kill(board, piece_color),
-                      Requirement.move_is_safe_for_king(self, piece_color))]
-  end
-
   def knight_moves(piece_color)
     [PatternRules.new([[+2, 1], [+2, -1], [+1, +2], [+1, -2],
                        [-1, +2], [-1, -2], [-2, 1], [-2, -1]],
                       Requirement.target_is_inside_board(board),
                       Requirement.parent_move_was_not_a_kill(board, piece_color),
                       Requirement.target_is_no_friendly_kill(board, piece_color))]
-  end
-
-  def knight_moves2(piece_color)
-    [PatternRules.new([[+2, 1], [+2, -1], [+1, +2], [+1, -2],
-                       [-1, +2], [-1, -2], [-2, 1], [-2, -1]],
-                      Requirement.target_is_inside_board(board),
-                      Requirement.parent_move_was_not_a_kill(board, piece_color),
-                      Requirement.target_is_no_friendly_kill(board, piece_color),
-                      Requirement.move_is_safe_for_king(self, piece_color))]
   end
 
   def bishop_moves(piece_color)
@@ -184,14 +159,6 @@ class Rules
                       Requirement.target_is_no_friendly_kill(board, piece_color))]
   end
 
-  def bishop_moves2(piece_color)
-    [PatternRules.new([%i[n n], %i[n nn]],
-                      Requirement.target_is_inside_board(board),
-                      Requirement.parent_move_was_not_a_kill(board, piece_color),
-                      Requirement.target_is_no_friendly_kill(board, piece_color),
-                      Requirement.move_is_safe_for_king(self, piece_color))]
-  end
-
   def queen_moves(piece_color)
     [PatternRules.new([[:n, 0], [0, :n], %i[n n], %i[n nn]],
                       Requirement.target_is_inside_board(board),
@@ -199,24 +166,9 @@ class Rules
                       Requirement.target_is_no_friendly_kill(board, piece_color))]
   end
 
-  def queen_moves2(piece_color)
-    [PatternRules.new([[:n, 0], [0, :n], %i[n n], %i[n nn]],
-                      Requirement.target_is_inside_board(board),
-                      Requirement.parent_move_was_not_a_kill(board, piece_color),
-                      Requirement.target_is_no_friendly_kill(board, piece_color),
-                      Requirement.move_is_safe_for_king(self, piece_color))]
-  end
-
   def king_moves(piece_color)
     [PatternRules.new([[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, -1], [1, -1], [-1, 1]],
                       Requirement.target_is_inside_board(board),
                       Requirement.target_is_no_friendly_kill(board, piece_color))]
-  end
-
-  def king_moves2(piece_color)
-    [PatternRules.new([[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, -1], [1, -1], [-1, 1]],
-                      Requirement.target_is_inside_board(board),
-                      Requirement.target_is_no_friendly_kill(board, piece_color),
-                      Requirement.no_suicide_move(piece_color, self))]
   end
 end
