@@ -1,4 +1,12 @@
 module Requirement
+  def self.general_requirement(board, piece_color)
+    lambda { |parent_cord, target_cord|
+      target_is_inside_board(board).call(parent_cord, target_cord) &&
+        parent_move_was_not_a_kill(board, piece_color).call(parent_cord, target_cord) &&
+        target_is_no_friendly_kill(board, piece_color).call(parent_cord, target_cord)
+    }
+  end
+
   # all
   def self.target_is_inside_board(board)
     lambda { |_parent_cord, target_cord|
@@ -39,7 +47,7 @@ module Requirement
 
   # king & pawn
   # The king and the rook involved must not have moved before.
-  def self.parent_piece_not_moved(board)
+  def self.piece_not_moved(board)
     lambda { |parent_cord, _ = nil|
       parent_unit = board.lookup_cell(parent_cord)
 
@@ -86,10 +94,9 @@ module Requirement
 
   # The king must not currently be in check.
   # The king must not move through or land on a square that is under attack.
-  def self.cell_not_under_attack(board, team_color)
-    lambda { |cell_cord|
-      RootPosition.new(cell_cord,
-                       PatternRules.new([[:n, 0], [0, :n]], Requirement.standard_requirements(board, team_color)))
+  def self.cell_not_under_attack(rules, team_color)
+    lambda { |_parent_cord, target_cord|
+      rules.attackers_coordinates_to_position(target_cord, team_color).empty?
     }
   end
 

@@ -125,8 +125,8 @@ describe Requirement do
     # Tested in rules_spec because it requires a integration test due to rules being one of the arguments
   end
 
-  describe '::parent_piece_not_moved' do
-    let(:parent_piece_not_moved_requirement) { Requirement.parent_piece_not_moved(board_with_piece) }
+  describe '::piece_not_moved' do
+    let(:piece_not_moved_requirement) { Requirement.piece_not_moved(board_with_piece) }
     let(:board_with_piece) { empty_board }
 
     let(:unmoved_piece) { instance_double(Unit, move_status: :unmoved) }
@@ -140,7 +140,7 @@ describe Requirement do
         end
 
         it 'is expected to return false' do
-          expect(parent_piece_not_moved_requirement.call(testing_position)).to eq(true)
+          expect(piece_not_moved_requirement.call(testing_position)).to eq(true)
         end
       end
 
@@ -152,7 +152,7 @@ describe Requirement do
         end
 
         it 'is expected to return false' do
-          expect(parent_piece_not_moved_requirement.call(testing_position)).to eq(false)
+          expect(piece_not_moved_requirement.call(testing_position)).to eq(false)
         end
       end
     end

@@ -20,32 +20,38 @@ module PatternFactory
      pawn_normal_take_moves(piece_color), pawn_flank_take_moves(piece_color)]
   end
 
-  def pawn_normal_take_moves(piece_color)
-    color_direction = piece_color == :white ? 1 : -1
+  def pawn_color_move_direction(piece_color)
+    piece_color == :white ? 1 : -1
+  end
 
-    PatternRules.new([[-1, color_direction], [1, color_direction]],
+  def pawn_normal_take_moves(piece_color)
+    move_direction = pawn_color_move_direction(piece_color)
+
+    PatternRules.new([[-1, move_direction], [1, move_direction]],
                      Requirement.target_is_inside_board(board),
                      Requirement.target_move_is_kill(board, piece_color))
   end
 
   def pawn_flank_take_moves(piece_color)
-    color_direction = piece_color == :white ? 1 : -1
+    move_direction = pawn_color_move_direction(piece_color)
 
-    PatternRules.new([[-1, color_direction], [1, color_direction]],
+    PatternRules.new([[-1, move_direction], [1, move_direction]],
                      Requirement.target_is_inside_board(board),
                      Requirement.target_move_is_flank_kill(board, piece_color))
   end
 
   def pawn_normal_moves(piece_color)
-    color_direction = piece_color == :white ? 1 : -1
-    PatternRules.new([[0, color_direction]],
+    move_direction = pawn_color_move_direction(piece_color)
+
+    PatternRules.new([[0, move_direction]],
                      Requirement.target_is_inside_board(board),
                      Requirement.target_move_is_empty(board))
   end
 
   def pawn_rush_moves(piece_color)
-    color_direction = piece_color == :white ? 2 : -2
-    PatternRules.new([[0, color_direction]],
+    move_direction = pawn_color_move_direction(piece_color) * 2
+
+    PatternRules.new([[0, move_direction]],
                      Requirement.piece_not_moved(board),
                      Requirement.target_is_inside_board(board),
                      Requirement.empty_column_between(board),
@@ -53,44 +59,36 @@ module PatternFactory
   end
 
   def pawn_kill_pattern(piece_color)
-    color_direction = piece_color == :white ? 1 : -1
-    PatternRules.new([[0, color_direction]],
+    move_direction = pawn_color_move_direction(piece_color)
+
+    PatternRules.new([[0, move_direction]],
                      Requirement.target_is_inside_board(board),
                      Requirement.target_is_no_friendly_kill(board, piece_color))
   end
 
   def rook_moves(piece_color)
     [PatternRules.new([[:n, 0], [0, :n]],
-                      Requirement.target_is_inside_board(board),
-                      Requirement.parent_move_was_not_a_kill(board, piece_color),
-                      Requirement.target_is_no_friendly_kill(board, piece_color))]
+                      Requirement.general_requirement(board, piece_color))]
   end
 
   def knight_moves(piece_color)
     [PatternRules.new([[+2, 1], [+2, -1], [+1, +2], [+1, -2],
                        [-1, +2], [-1, -2], [-2, 1], [-2, -1]],
-                      Requirement.target_is_inside_board(board),
-                      Requirement.parent_move_was_not_a_kill(board, piece_color),
-                      Requirement.target_is_no_friendly_kill(board, piece_color))]
+                      Requirement.general_requirement(board, piece_color))]
   end
 
   def bishop_moves(piece_color)
     [PatternRules.new([%i[n n], %i[n nn]],
-                      Requirement.target_is_inside_board(board),
-                      Requirement.parent_move_was_not_a_kill(board, piece_color),
-                      Requirement.target_is_no_friendly_kill(board, piece_color))]
+                      Requirement.general_requirement(board, piece_color))]
   end
 
   def queen_moves(piece_color)
     [PatternRules.new([[:n, 0], [0, :n], %i[n n], %i[n nn]],
-                      Requirement.target_is_inside_board(board),
-                      Requirement.parent_move_was_not_a_kill(board, piece_color),
-                      Requirement.target_is_no_friendly_kill(board, piece_color))]
+                      Requirement.general_requirement(board, piece_color))]
   end
 
   def king_moves(piece_color)
     [PatternRules.new([[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, -1], [1, -1], [-1, 1]],
-                      Requirement.target_is_inside_board(board),
-                      Requirement.target_is_no_friendly_kill(board, piece_color))]
+                      Requirement.general_requirement(board, piece_color))]
   end
 end
