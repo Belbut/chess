@@ -1,5 +1,5 @@
 require_relative './rules/movement_pattern/requirement'
-require_relative './rules/movement_pattern/root_position'
+require_relative './rules/movement_pattern/tree_framework/root_position'
 class Rules
   attr_reader :chess_kit
 

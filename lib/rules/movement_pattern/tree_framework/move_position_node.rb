@@ -1,4 +1,4 @@
-require_relative './movement_util'
+require_relative '../movement_util'
 
 class MovePositionNode
   attr_reader :coordinate, :pattern, :propagation_inertia, :child_move_node

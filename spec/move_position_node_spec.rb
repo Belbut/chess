@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require_relative '../lib/rules/movement_pattern/move_position_node'
-require_relative '../lib/rules/movement_pattern/pattern_rules'
 require_relative '../lib/chess_kit/coordinate'
+require_relative '../lib/rules/movement_pattern/pattern_rules'
+require_relative '../lib/rules/movement_pattern/tree_framework/move_position_node'
 
 describe MovePositionNode do
   subject(:move_position_node) { described_class.new(coordinate_dbl, pattern_dbl, [requirements_dbl], inertia_dbl) }

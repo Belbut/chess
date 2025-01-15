@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require_relative '../lib/rules/movement_pattern/root_position'
 require_relative '../lib/chess_kit/coordinate'
 require_relative '../lib/rules/movement_pattern/pattern_rules'
-require_relative '../lib/rules/movement_pattern/move_position_node'
+require_relative '../lib/rules/movement_pattern/tree_framework/root_position'
+require_relative '../lib/rules/movement_pattern/tree_framework/move_position_node'
 
 require_relative './testing_util_spec'
 

@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
-require_relative 'player'
-require_relative 'chess_kit'
-require_relative 'rules'
-
-require_relative './rules/movement_pattern/root_position' # remove this
+require_relative './player'
+require_relative './chess_kit'
+require_relative './rules'
 
 class Game
   attr_reader :chess_kit, :game_rules
