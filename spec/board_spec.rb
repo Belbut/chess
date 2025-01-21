@@ -173,25 +173,46 @@ describe Board do
 
   describe '#clear_cell' do
     context 'when targeting a occupied cell' do
-      let(:cell_coord) { coord_A1 }
-      let!(:cell_content) { known_board.lookup_cell(cell_coord) }
+      context 'cell on diagonal' do
+        let(:cell_coord) { coord_A1 }
+        let!(:cell_content) { known_board.lookup_cell(cell_coord) }
 
-      it 'is expected to change cell content to nil' do
-        expect { known_board.clear_cell(cell_coord) }
-          .to(change { known_board.lookup_cell(cell_coord) }.from(cell_content).to(nil))
+        it 'is expected to change cell content to nil' do
+          expect { known_board.clear_cell(cell_coord) }
+            .to(change { known_board.lookup_cell(cell_coord) }.from(cell_content).to(nil))
+        end
+
+        it 'is expected not to change any other cell content' do
+          expect { known_board.clear_cell(cell_coord) }
+            .to(not_change { all_cells_except.call(known_board, cell_coord) })
+        end
+
+        it 'it returns the content of the cell that was deleted' do
+          expect(known_board.clear_cell(cell_coord)).to eq cell_content
+        end
       end
 
-      it 'is expected not to change any other cell content' do
-        expect { known_board.clear_cell(cell_coord) }
-          .to(not_change { all_cells_except.call(known_board, cell_coord) })
-      end
+      context 'cell not on diagonal' do
+        let(:cell_coord) { coord_B4 }
+        let!(:cell_content) { known_board.lookup_cell(cell_coord) }
 
-      it 'it returns the content of the cell that was deleted' do
-        expect(known_board.clear_cell(cell_coord)).to eq cell_content
+        it 'is expected to change cell content to nil' do
+          expect { known_board.clear_cell(cell_coord) }
+            .to(change { known_board.lookup_cell(cell_coord) }.from(cell_content).to(nil))
+        end
+
+        it 'is expected not to change any other cell content' do
+          expect { known_board.clear_cell(cell_coord) }
+            .to(not_change { all_cells_except.call(known_board, cell_coord) })
+        end
+
+        it 'it returns the content of the cell that was deleted' do
+          expect(known_board.clear_cell(cell_coord)).to eq cell_content
+        end
       end
     end
 
-    context 'when targeting a occupied cell' do
+    context 'when targeting a empty cell' do
       let(:cell_coord) { coord_A1 }
       let!(:cell_content) { empty_board.lookup_cell(cell_coord) }
 

@@ -82,7 +82,7 @@ class Board
   def clear_cell(coord)
     check_coord(coord)
 
-    old_obj = cells[coord.x][coord.y]
+    old_obj = cells[coord.y][coord.x]
     cells[coord.y][coord.x] = nil
 
     old_obj
