@@ -135,6 +135,7 @@ describe Rules do
 
           it '' do
             board_visualization
+            puts board
 
             expect(attackers_coordinates_to_position).to eq([coord_H4, coord_A4].sort)
           end
@@ -1004,6 +1005,7 @@ describe Rules do
                 board.add_to_cell(coord_C5, enemy_pawn)
 
                 board_visualization
+                puts board
 
                 possible_paths = rules.available_paths_for_piece(testing_position)
 
@@ -1093,7 +1095,7 @@ describe Rules do
         allow(Requirement).to receive(:move_is_safe_for_king).and_call_original
       end
 
-      context 'from the middle of a empty board' do
+      context 'from the middle of a board' do
         context 'with no movement restriction' do
           before do
             board.add_to_cell(testing_position, team_king)
@@ -1110,7 +1112,8 @@ describe Rules do
                                           path(coord_E3), path(coord_C5)])
           end
         end
-        context 'restricted on E row by a rook' do
+
+        context 'with restricted movement' do
           before do
             board.add_to_cell(testing_position, team_king)
             board.add_to_cell(coord_E1, enemy_rook)
@@ -1124,6 +1127,101 @@ describe Rules do
 
             expect(possible_paths).to eq([path(coord_C4), path(coord_D5), path(coord_D3),
                                           path(coord_C3), path(coord_C5)])
+          end
+        end
+      end
+
+      context 'in starting position' do
+        let(:castle_team_king) { team_king.clone }
+        let(:castle_team_rook) { team_rook.clone }
+
+        before do
+          board.add_to_cell(coord_E1, castle_team_king)
+          board.add_to_cell(coord_A1, castle_team_rook)
+        end
+
+        context 'can castle' do
+          it '' do
+            board_visualization
+            puts board
+
+            possible_paths = rules.available_paths_for_piece(coord_E1)
+
+            expect(possible_paths).to(eq([path(coord_F1), path(coord_D1), path(coord_E2), path(coord_F2),
+                                          path(coord_D2), path(coord_C1)]))
+          end
+        end
+
+        context 'can\'t castle' do
+          context 'because king and/or rook already moved' do
+            context 'when king has moved' do
+              before do
+                castle_team_king.mark_as_moved
+              end
+
+              it '' do
+                possible_paths = rules.available_paths_for_piece(coord_E1)
+
+                expect(possible_paths).to(eq([path(coord_F1), path(coord_D1), path(coord_E2), path(coord_F2),
+                                              path(coord_D2)]))
+              end
+            end
+
+            context 'when rook has moved' do
+              before do
+                castle_team_rook.mark_as_moved
+              end
+
+              it '' do
+                possible_paths = rules.available_paths_for_piece(coord_E1)
+
+                expect(possible_paths).to(eq([path(coord_F1), path(coord_D1), path(coord_E2), path(coord_F2),
+                                              path(coord_D2)]))
+              end
+            end
+          end
+
+          context 'any cell involved are under attack' do
+            context 'king targeted' do
+              before do
+                board.add_to_cell(coord_E8, enemy_rook)
+              end
+              it '' do
+                board_visualization
+
+                possible_paths = rules.available_paths_for_piece(coord_E1)
+
+                expect(possible_paths).to(eq([path(coord_F1), path(coord_D1), path(coord_F2),
+                                              path(coord_D2)]))
+              end
+            end
+            context 'row targeted' do
+              before do
+                board.add_to_cell(coord_C8, enemy_rook)
+              end
+              it '' do
+                board_visualization
+
+                possible_paths = rules.available_paths_for_piece(coord_E1)
+
+                expect(possible_paths).to(eq([path(coord_F1), path(coord_D1), path(coord_E2), path(coord_F2),
+                                              path(coord_D2)]))
+              end
+            end
+          end
+          context 'one of the cells are not empty' do
+            before do
+              board.add_to_cell(coord_C1, team_bishop)
+            end
+            it '' do
+              board_visualization
+              puts board
+
+              possible_paths = rules.available_paths_for_piece(coord_E1)
+
+              expect(possible_paths).to(eq([path(coord_F1), path(coord_D1), path(coord_E2), path(coord_F2),
+                                            path(coord_D2)]))
+            end
           end
         end
       end

@@ -36,7 +36,7 @@ module Requirement
     lambda { |board_cord, testing_move_cord|
       rules_clone = rules.deep_clone
 
-      moving_piece = rules_clone.chess_kit.board.clear_cell(board_cord) # problem with this
+      moving_piece = rules_clone.chess_kit.board.clear_cell(board_cord)
       rules_clone.chess_kit.board.add_to_cell!(testing_move_cord, moving_piece)
       king_cord = rules_clone.chess_kit.board.find_position_of(Pieces::FACTORY[team_color][:king])
 
@@ -92,6 +92,22 @@ module Requirement
     }
   end
 
+  def self.safe_row_between(board, team_color)
+    rules = Rules.new(ChessKit.new(board)) # TODO: Refactor this hacky part <---------------
+
+    lambda { |initial_cord, final_cord|
+      return false unless initial_cord.y == final_cord.y # Ensure same row
+
+      start_x, end_x = [initial_cord.x, final_cord.x].sort
+      yy = initial_cord.y
+
+      (start_x..end_x).all? do |row_number|
+        target_cord = Coordinate.new(row_number, yy)
+        rules.attackers_coordinates_to_position(target_cord, team_color).empty?
+      end
+    }
+  end
+
   # The king must not currently be in check.
   # The king must not move through or land on a square that is under attack.
   def self.cell_not_under_attack(rules, team_color)
@@ -100,9 +116,48 @@ module Requirement
     }
   end
 
-  def self.left_side_castle(board); end
+  # The king that makes the castling move has not yet moved in the game.
+  # The rook that makes the castling move has not yet moved in the game.
+  # The king is not in check.
+  # The king does not move over a square that is attacked by an enemy piece during the castling move, i.e., when castling, there may not be an enemy piece that can move (in case of pawns: by diagonal movement) to a square that is moved over by the king.
+  # The king does not move to a square that is attacked by an enemy piece during the castling move, i.e., you may not castle and end the move with the king in check.
+  # All squares between the rook and king before the castling move are empty.
+  # The King and rook must occupy the same rank (or row).
+  def self.left_side_castle(board, team_color)
+    rook_column = 0
+    lambda { |parent_cord, _target_cord|
+      rook_row = parent_cord.y
+      rook_cord = Coordinate.new(rook_column, rook_row)
 
-  def self.right_side_castle(board); end
+      king = board.lookup_cell(parent_cord)
+      rook = board.lookup_cell(rook_cord)
+      return false unless king.is_a?(Pieces::King) && king.unmoved?
+      return false unless rook.is_a?(Pieces::Rook) && rook.color == team_color && rook.unmoved?
+
+      return false unless safe_row_between(board, team_color).call(parent_cord, rook_cord)
+      return false unless empty_row_between(board).call(parent_cord, rook_cord)
+
+      true
+    }
+  end
+
+  def self.right_side_castle(board, team_color)
+    rook_column = 7
+    lambda { |parent_cord, _target_cord|
+      rook_row = parent_cord.y
+      rook_cord = Coordinate.new(rook_column, rook_row)
+
+      king = board.lookup_cell(parent_cord)
+      rook = board.lookup_cell(rook_cord)
+      return false unless king.is_a?(Pieces::King) && king.unmoved?
+      return false unless rook.is_a?(Pieces::Rook) && rook.color == team_color && rook.unmoved?
+
+      return false unless safe_row_between(board, team_color).call(parent_cord, rook_cord)
+      return false unless empty_row_between(board).call(parent_cord, rook_cord)
+
+      true
+    }
+  end
 
   # pawn
   def self.target_move_is_empty(board)

@@ -21,6 +21,10 @@ class Unit
     @move_status = :moved
   end
 
+  def unmoved?
+    @move_status == :unmoved
+  end
+
   def black?
     @color == :black
   end

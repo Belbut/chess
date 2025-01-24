@@ -193,17 +193,7 @@ describe Requirement do
   end
 
   describe '::cell_not_under_attack' do
-    let(:cell_not_under_attack_requirement) { Requirement.cell_not_under_attack(board_with_pieces, :white) }
-    let(:board_with_pieces) { empty_board }
-
-    context 'when the cell is not under attack ' do
-      xit 'is expected to return true' do
-        # p RootPosition.new(testing_position,
-        #                    PatternRules.new([[:n, 0], [0, :n]],
-        #                                     Requirement.standard_requirements(board_with_pieces, :white)))
-        # expect(cell_not_under_attack_requirement.call(testing_position)).to eq true
-      end
-    end
+    # Tested in rules_spec because it requires a integration test due to rules being one of the arguments
   end
 
   describe '::target_move_is_kill' do
