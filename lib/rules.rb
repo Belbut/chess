@@ -42,7 +42,9 @@ class Rules
 
     all_possible_paths_to_position = all_possible_paths_to_position(from_position, piece.color, piece.type)
     all_possible_paths_to_position.map do |possible_path|
-      possible_path.find_all { |possible_cord| safe_king_requirement.call(from_position, possible_cord) }
+      possible_path.find_all do |possible_cord|
+        safe_king_requirement.call(from_position, possible_cord)
+      end
     end.reject(&:empty?)
   end
 
@@ -54,8 +56,8 @@ class Rules
     end
   end
 
-  def movement_patterns_for_piece(color, type)
-    movement_pattern[color][type]
+  def movement_patterns_for_piece(color, type, move_type: :move)
+    movement_pattern(move_type)[color][type]
   end
 
   def paths_to_position_by_piece(position, team_color, piece_type)
@@ -68,10 +70,15 @@ class Rules
     generate_paths_for_piece(position, movement_patterns)
   end
 
+  def all_possible_attack_paths_to_position(position, team_color, piece_type)
+    movement_patterns = movement_patterns_for_piece(team_color, piece_type, move_type: :attack)
+    generate_paths_for_piece(position, movement_patterns)
+  end
+
   def attack_paths_from_pieces(position, team_color, piece_type)
     enemy_piece = Pieces::FACTORY[opposite_color(team_color)][piece_type]
 
-    all_possible_paths_to_position(position, team_color, piece_type).find_all do |path|
+    all_possible_attack_paths_to_position(position, team_color, piece_type).find_all do |path|
       board.lookup_cell(path.last) == enemy_piece
     end
   end
