@@ -92,8 +92,7 @@ module PatternFactory
   def king_move_pattern(piece_color, move_type = nil)
     return [king_normal_move_pattern(piece_color)] if move_type == :attack
 
-    [king_normal_move_pattern(piece_color), king_castle_left_move_pattern(piece_color),
-     king_castle_right_move_pattern(piece_color)]
+    [king_normal_move_pattern(piece_color), king_castle_move_pattern(piece_color)]
   end
 
   def king_normal_move_pattern(piece_color)
@@ -101,13 +100,8 @@ module PatternFactory
                      Requirement.general_requirement(board, piece_color))
   end
 
-  def king_castle_left_move_pattern(piece_color)
-    PatternRules.new([[-2, 0]], Requirement.target_is_inside_board(board),
-                     Requirement.left_side_castle(board, piece_color))
-  end
-
-  def king_castle_right_move_pattern(piece_color)
-    PatternRules.new([[2, 0]], Requirement.target_is_inside_board(board),
-                     Requirement.right_side_castle(board, piece_color))
+  def king_castle_move_pattern(piece_color)
+    PatternRules.new([[-2, 0], [2, 0]], Requirement.target_is_inside_board(board),
+                     Requirement.can_castle(board, piece_color))
   end
 end

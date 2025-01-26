@@ -57,63 +57,55 @@ module Requirement
     }
   end
 
-  def self.no_suicide_move(team_color, rules)
-    lambda { |_, target_cord|
-      rules.attackers_coordinates_to_position(target_cord, team_color).empty?
-    }
-  end
-
   # The squares between the king and the rook must be empty.
   def self.empty_row_between(board)
     lambda { |initial_cord, final_cord|
-      return false unless initial_cord.y == final_cord.y # Ensure same row
+      coord_between(initial_cord, final_cord) { |target_cord| board.lookup_cell(target_cord).nil? }
+    }
+  end
 
-      start_x, end_x = [initial_cord.x, final_cord.x].sort
-      yy = initial_cord.y
+  def self.safe_row_between(board, team_color)
+    rules = Rules.new(ChessKit.new(board))
 
-      (start_x + 1..end_x - 1).all? do |row_number|
-        target_cord = Coordinate.new(row_number, yy)
-        board.lookup_cell(target_cord).nil?
+    lambda { |initial_cord, final_cord|
+      coord_between(initial_cord, final_cord, mode: :inclusive) do |target_cord|
+        rules.attackers_coordinates_to_position(target_cord, team_color).empty?
       end
     }
   end
 
   def self.empty_column_between(board)
     lambda { |initial_cord, final_cord|
-      return false unless initial_cord.x == final_cord.x # Ensure same column
-
-      start_y, end_y = [initial_cord.y, final_cord.y].sort
-      xx = initial_cord.x
-
-      (start_y + 1..end_y - 1).all? do |column_number|
-        target_cord = Coordinate.new(xx, column_number)
-        board.lookup_cell(target_cord).nil?
-      end
+      coord_between(initial_cord, final_cord) { |target_cord| board.lookup_cell(target_cord).nil? }
     }
   end
 
-  def self.safe_row_between(board, team_color)
-    rules = Rules.new(ChessKit.new(board)) # TODO: Refactor this hacky part <---------------
-
-    lambda { |initial_cord, final_cord|
-      return false unless initial_cord.y == final_cord.y # Ensure same row
-
-      start_x, end_x = [initial_cord.x, final_cord.x].sort
-      yy = initial_cord.y
-
-      (start_x..end_x).all? do |row_number|
-        target_cord = Coordinate.new(row_number, yy)
-        rules.attackers_coordinates_to_position(target_cord, team_color).empty?
-      end
-    }
+  def self.range_definition(start, stop, mode)
+    case mode
+    when :inclusive then (start..stop)
+    when :exclusive then (start + 1...stop)
+    else raise ArgumentError, 'Invalid mode'
+    end
   end
 
-  # The king must not currently be in check.
-  # The king must not move through or land on a square that is under attack.
-  def self.cell_not_under_attack(rules, team_color)
-    lambda { |_parent_cord, target_cord|
-      rules.attackers_coordinates_to_position(target_cord, team_color).empty?
-    }
+  # only works in vertical or horizontal directions
+  def self.coord_between(initial_cord, final_cord, mode: :exclusive)
+    raise ArgumentError, 'Invalid direction' if initial_cord.x != final_cord.x && initial_cord.y != final_cord.y
+
+    variable_axis, stable_axis = initial_cord.x != final_cord.x ? %i[x y] : %i[y x]
+
+    start_axis, final_axis = [initial_cord.send(variable_axis), final_cord.send(variable_axis)].sort
+    stable_number = initial_cord.send(stable_axis)
+
+    range_definition(start_axis, final_axis, mode).all? do |axis_number|
+      target_cord = case variable_axis
+                    when :x
+                      Coordinate.new(axis_number, stable_number)
+                    when :y
+                      Coordinate.new(stable_number, axis_number)
+                    end
+      yield(target_cord)
+    end
   end
 
   # The king that makes the castling move has not yet moved in the game.
@@ -123,16 +115,15 @@ module Requirement
   # The king does not move to a square that is attacked by an enemy piece during the castling move, i.e., you may not castle and end the move with the king in check.
   # All squares between the rook and king before the castling move are empty.
   # The King and rook must occupy the same rank (or row).
-  def self.left_side_castle(board, team_color)
-    rook_column = 0
-    lambda { |parent_cord, _target_cord|
-      rook_row = parent_cord.y
-      rook_cord = Coordinate.new(rook_column, rook_row)
+  RIGHT_CASTLE_ROOK_COLUMN = 7
+  LEFT_CASTLE_ROOK_COLUMN = 0
 
-      king = board.lookup_cell(parent_cord)
-      rook = board.lookup_cell(rook_cord)
-      return false unless king.is_a?(Pieces::King) && king.unmoved?
-      return false unless rook.is_a?(Pieces::Rook) && rook.color == team_color && rook.unmoved?
+  def self.can_castle(board, team_color)
+    lambda { |parent_cord, target_cord|
+      rook_cord = rook_position_from_castle_direction(parent_cord, target_cord)
+
+      return false unless king_castle_conditions(board, parent_cord)
+      return false unless rook_castle_condition(board, rook_cord)
 
       return false unless safe_row_between(board, team_color).call(parent_cord, rook_cord)
       return false unless empty_row_between(board).call(parent_cord, rook_cord)
@@ -141,22 +132,23 @@ module Requirement
     }
   end
 
-  def self.right_side_castle(board, team_color)
-    rook_column = 7
-    lambda { |parent_cord, _target_cord|
-      rook_row = parent_cord.y
-      rook_cord = Coordinate.new(rook_column, rook_row)
+  def self.rook_position_from_castle_direction(parent_cord, target_cord)
+    rook_column = target_cord.x > parent_cord.x ? RIGHT_CASTLE_ROOK_COLUMN : LEFT_CASTLE_ROOK_COLUMN
+    rook_row = parent_cord.y
 
-      king = board.lookup_cell(parent_cord)
-      rook = board.lookup_cell(rook_cord)
-      return false unless king.is_a?(Pieces::King) && king.unmoved?
-      return false unless rook.is_a?(Pieces::Rook) && rook.color == team_color && rook.unmoved?
+    Coordinate.new(rook_column, rook_row)
+  end
 
-      return false unless safe_row_between(board, team_color).call(parent_cord, rook_cord)
-      return false unless empty_row_between(board).call(parent_cord, rook_cord)
+  def self.king_castle_conditions(board, parent_cord)
+    king = board.lookup_cell(parent_cord)
 
-      true
-    }
+    king.is_a?(Pieces::King) && king.unmoved?
+  end
+
+  def self.rook_castle_condition(board, rook_cord)
+    rook = board.lookup_cell(rook_cord)
+
+    rook.is_a?(Pieces::Rook) && rook.unmoved?
   end
 
   # pawn
