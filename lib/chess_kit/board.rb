@@ -55,15 +55,12 @@ class Board
     matrix[coord.y][coord.x]
   end
 
-  # refactor this into a lambda
-  def find_position_of(object, strict: false)
+  def find_position_of(object = nil, &block)
+    raise ArgumentError, 'Provide either an object or a block, not both' if object && block
+
     x_index = nil
     y_index = matrix.index do |row|
-      x_index = if strict
-                  row.index { |cell| object.strict_equal?(cell) }
-                else
-                  row.index(object)
-                end
+      x_index = block_given? ? row.index(&block) : row.index(object)
     end
 
     return nil if y_index.nil?
@@ -71,12 +68,17 @@ class Board
     Coordinate.new(x_index, y_index)
   end
 
-  def find_all_positions_of(object)
-    result = []
+  def find_all_positions_of(object = nil, &block)
+    raise ArgumentError, 'Provide either an object or a block, not both' if object && block
 
+    result = []
     matrix.each_with_index do |row, yy|
       row.each_with_index do |cell, xx|
-        result.append(Coordinate.new(xx, yy)) if cell == object
+        if block_given?
+          result.append(Coordinate.new(xx, yy)) if yield(cell)
+        elsif cell == object
+          result.append(Coordinate.new(xx, yy))
+        end
       end
     end
 

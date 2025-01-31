@@ -45,7 +45,7 @@ module FEN
   end
 
   def self.en_passant_representation(board)
-    result = ''
+    result = '-'
     rushed_pawn_position = find_position_rushed_pawn(board)
 
     unless rushed_pawn_position.nil?
@@ -57,20 +57,10 @@ module FEN
       result = pawn_lagging_position.to_notation.downcase
     end
 
-    if result == ''
-      '-'
-    else
-      result
-    end
+    result
   end
 
   def self.find_position_rushed_pawn(board)
-    x_index = nil
-    y_index = board.matrix.index do |row|
-      x_index = row.index { |cell| cell.is_a?(Pieces::Pawn) && cell.move_status == :rushed }
-    end
-    return nil if y_index.nil?
-
-    Coordinate.new(x_index, y_index)
+    board.find_position_of { |cell| cell.is_a?(Pieces::Pawn) && cell.move_status == :rushed }
   end
 end
