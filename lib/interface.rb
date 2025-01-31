@@ -51,7 +51,7 @@ module Interface
     def self.render_board(board)
       rows = []
 
-      board.cells.each_with_index do |row, row_index|
+      board.matrix.each_with_index do |row, row_index|
         row_label = padded_content(row_index + 1)
         row_cells = render_row_cells(row, row_index)
 

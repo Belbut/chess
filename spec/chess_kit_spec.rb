@@ -3,10 +3,13 @@
 require_relative '../lib/chess_kit'
 require_relative '../lib/chess_kit/coordinate'
 
+require_relative './testing_util_spec'
+
 describe ChessKit do
+  include TestingUtil
+  subject(:chess_kit) { described_class.new }
+  let(:board) { chess_kit.board }
   context 'is composed by' do
-    subject(:chess_kit) { described_class.new }
-    let(:board) { chess_kit.board }
     context do
       it ' ' do
         puts chess_kit.board
@@ -14,15 +17,15 @@ describe ChessKit do
     end
     context 'A Board' do
       it 'expected to be sized 8x8' do
-        height = board.cells.size
-        width = board.cells.first.size
+        height = board.matrix.size
+        width = board.matrix.first.size
 
         expect(height).to eq 8
         expect(width).to eq 8
       end
 
       context 'with Pieces' do
-        let(:pieces) { board.cells.flatten.reject(&:nil?) }
+        let(:pieces) { board.matrix.flatten.reject(&:nil?) }
         let(:white_pieces) { pieces.find_all(&:white?) }
         let(:black_pieces) { pieces.find_all(&:black?) }
 
@@ -226,6 +229,196 @@ describe ChessKit do
               end
             end
           end
+        end
+      end
+    end
+  end
+
+  context '#to_fen' do
+    context 'when the chess_kit is in initial position' do
+      let(:fen_result) { chess_kit.to_fen.split(' ') }
+      context 'does it return the board in algebraic notation' do
+        let(:board_representation) { fen_result[0] }
+        let(:rows_representation) { board_representation.split('/') }
+        it 'where the 8 rows are separated by"/"' do
+          expect(rows_representation.size).to eq 8
+        end
+
+        context 'Starting from the back:' do
+          it 'first row is represented correctly' do
+            expect(rows_representation[0]).to eq 'rnbqkbnr'
+          end
+
+          it 'second row is represented correctly' do
+            expect(rows_representation[1]).to eq 'pppppppp'
+          end
+
+          it 'empty rows are represented correctly' do
+            (2..5).each do |index|
+              expect(rows_representation[index]).to eq '8'
+            end
+          end
+
+          it 'seventh row is represented correctly' do
+            expect(rows_representation[6]).to eq 'PPPPPPPP'
+          end
+
+          it 'eight row is represented correctly' do
+            expect(rows_representation[7]).to eq 'RNBQKBNR'
+          end
+        end
+      end
+
+      context 'does it return the representation of the current player' do
+        let(:current_player_representation) { fen_result[1] }
+
+        it '' do
+          expect(current_player_representation).to eq 'w'
+        end
+      end
+
+      context 'does it return the representation of the castle availability' do
+        let(:castle_condition_representation) { fen_result[2] }
+
+        it '' do
+          expect(castle_condition_representation).to eq 'KQkq'
+        end
+      end
+
+      context 'does it return the representation of the en passant availability' do
+        let(:en_passant_representation) { fen_result[3] }
+
+        it '' do
+          expect(en_passant_representation).to eq '-'
+        end
+      end
+
+      context 'does it return the representation of the half move clock' do
+        let(:half_move_representation) { fen_result[4] }
+
+        it '' do
+          expect(half_move_representation).to eq '0'
+        end
+      end
+
+      context 'does it return the representation of the full move count' do
+        let(:full_move_representation) { fen_result[5] }
+
+        it '' do
+          expect(full_move_representation).to eq '1'
+        end
+      end
+
+      context 'does it represent the full FEN notation' do
+        it '' do
+          expected_result = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+
+          expect(chess_kit.to_fen).to eq expected_result
+        end
+      end
+    end
+
+    context 'when the chess_kit mid game' do
+      before do
+        first_move_piece = chess_kit.board.clear_cell(coord_E2)
+        chess_kit.board.add_to_cell(coord_E4, first_move_piece)
+
+        second_move_piece = chess_kit.board.clear_cell(coord_C7)
+        chess_kit.board.add_to_cell(coord_C5, second_move_piece)
+        second_move_piece.instance_variable_set(:@move_status, :rushed)
+        chess_kit.increase_full_move_count
+      end
+
+      let(:fen_result) { chess_kit.to_fen.split(' ') }
+      context 'does it return the board in algebraic notation' do
+        let(:board_representation) { fen_result[0] }
+        let(:rows_representation) { board_representation.split('/') }
+        it 'where the 8 rows are separated by"/"' do
+          expect(rows_representation.size).to eq 8
+        end
+
+        context 'Starting from the back:' do
+          it 'first row is represented correctly' do
+            expect(rows_representation[0]).to eq 'rnbqkbnr'
+          end
+
+          it 'second row is represented correctly' do
+            expect(rows_representation[1]).to eq 'pp1ppppp'
+          end
+
+          it 'third row is represented correctly' do
+            expect(rows_representation[2]).to eq '8'
+          end
+
+          it 'fourth row is represented correctly' do
+            expect(rows_representation[3]).to eq '2p5'
+          end
+
+          it 'fifth row is represented correctly' do
+            expect(rows_representation[4]).to eq '4P3'
+          end
+
+          it 'sixth row is represented correctly' do
+            expect(rows_representation[5]).to eq '8'
+          end
+
+          it 'seventh row is represented correctly' do
+            expect(rows_representation[6]).to eq 'PPPP1PPP'
+          end
+
+          it 'eight row is represented correctly' do
+            expect(rows_representation[7]).to eq 'RNBQKBNR'
+          end
+        end
+      end
+
+      context 'does it return the representation of the current player' do
+        let(:current_player_representation) { fen_result[1] }
+
+        it '' do
+          expect(current_player_representation).to eq 'w'
+        end
+      end
+
+      context 'does it return the representation of the castle availability' do
+        let(:castle_condition_representation) { fen_result[2] }
+
+        it '' do
+          expect(castle_condition_representation).to eq 'KQkq'
+        end
+      end
+
+      context 'does it return the representation of the en passant availability' do
+        let(:en_passant_representation) { fen_result[3] }
+
+        it '' do
+          expect(en_passant_representation).to eq 'c6'
+        end
+      end
+
+      context 'does it return the representation of the half move clock' do
+        let(:half_move_representation) { fen_result[4] }
+
+        it '' do
+          expect(half_move_representation).to eq '0'
+        end
+      end
+
+      context 'does it return the representation of the full move count' do
+        let(:full_move_representation) { fen_result[5] }
+
+        it '' do
+          expect(full_move_representation).to eq '2'
+        end
+      end
+
+      context 'does it represent the full FEN notation' do
+        it '' do
+          puts chess_kit.board
+
+          expected_result = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2'
+
+          expect(chess_kit.to_fen).to eq expected_result
         end
       end
     end

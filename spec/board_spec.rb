@@ -21,15 +21,15 @@ describe Board do
 
   subject(:known_board) { described_class.new(5, 5) }
   before do
-    known_board.instance_variable_set(:@cells, KNOWN_BOARD)
+    known_board.instance_variable_set(:@matrix, KNOWN_BOARD)
   end
 
-  let(:all_cells_except) do
+  let(:all_matrix_except) do
     lambda { |board, coord|
-      initial_cells = board.cells.map(&:dup)
+      initial_matrix = board.matrix.map(&:dup)
 
-      initial_cells[coord.y].delete_at(coord.x)
-      initial_cells
+      initial_matrix[coord.y].delete_at(coord.x)
+      initial_matrix
     }
   end
 
@@ -38,11 +38,11 @@ describe Board do
   let(:coord_D4) { instance_double(Coordinate, x: 3, y: 3) }
   let(:coord_E5) { instance_double(Coordinate, x: 4, y: 4) }
 
-  describe '#cells' do
+  describe '#matrix' do
     it 'is expected to be a 2 dimensional Array' do
-      expect(empty_board.cells).to be_a(Array)
+      expect(empty_board.matrix).to be_a(Array)
 
-      empty_board.cells.each do |column|
+      empty_board.matrix.each do |column|
         expect(column).to be_a(Array)
       end
     end
@@ -128,7 +128,7 @@ describe Board do
                %w[41 B5 C5 D5 41]].freeze
 
     before do
-      allow(known_board).to receive(:cells).and_return BOARD41
+      allow(known_board).to receive(:matrix).and_return BOARD41
     end
     context 'when checking a object' do
       it 'is expected to return nil if the object is not on the board' do
@@ -152,21 +152,21 @@ describe Board do
 
       it 'is expected not to change any other cell' do
         expect { empty_board.add_to_cell(coord_A1, rand_obj) }
-          .to(not_change { all_cells_except.call(empty_board, coord_A1) })
+          .to(not_change { all_matrix_except.call(empty_board, coord_A1) })
       end
 
       it 'when doing multiples additions in a roll' do
         expect { empty_board.add_to_cell(coord_A1, rand_obj) }
           .to change { empty_board.lookup_cell(coord_A1) }.from(nil).to(rand_obj)
-          .and(not_change { all_cells_except.call(empty_board, coord_A1) })
+          .and(not_change { all_matrix_except.call(empty_board, coord_A1) })
 
         expect { empty_board.add_to_cell(coord_B4, rand_obj) }
           .to change { empty_board.lookup_cell(coord_B4) }.from(nil).to(rand_obj)
-          .and(not_change { all_cells_except.call(empty_board, coord_B4) })
+          .and(not_change { all_matrix_except.call(empty_board, coord_B4) })
 
         expect { empty_board.add_to_cell(coord_D4, rand_obj) }
           .to change { empty_board.lookup_cell(coord_D4) }.from(nil).to(rand_obj)
-          .and(not_change { all_cells_except.call(empty_board, coord_D4) })
+          .and(not_change { all_matrix_except.call(empty_board, coord_D4) })
       end
     end
   end
@@ -184,7 +184,7 @@ describe Board do
 
         it 'is expected not to change any other cell content' do
           expect { known_board.clear_cell(cell_coord) }
-            .to(not_change { all_cells_except.call(known_board, cell_coord) })
+            .to(not_change { all_matrix_except.call(known_board, cell_coord) })
         end
 
         it 'it returns the content of the cell that was deleted' do
@@ -203,7 +203,7 @@ describe Board do
 
         it 'is expected not to change any other cell content' do
           expect { known_board.clear_cell(cell_coord) }
-            .to(not_change { all_cells_except.call(known_board, cell_coord) })
+            .to(not_change { all_matrix_except.call(known_board, cell_coord) })
         end
 
         it 'it returns the content of the cell that was deleted' do
@@ -223,7 +223,7 @@ describe Board do
 
       it 'is expected not to change any other cell' do
         expect { empty_board.clear_cell(cell_coord) }
-          .to(not_change { all_cells_except.call(empty_board, cell_coord) })
+          .to(not_change { all_matrix_except.call(empty_board, cell_coord) })
       end
 
       it 'is expected to return nil' do

@@ -17,6 +17,10 @@ class Unit
     color == other.color && type == other.type
   end
 
+  def strict_equal?(other)
+    self == other && move_status == other.move_status
+  end
+
   def mark_as_moved
     @move_status = :moved
   end

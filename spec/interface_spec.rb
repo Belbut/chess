@@ -178,10 +178,10 @@ describe Interface do
 
           context 'body of the board' do
             context 'when the board is empty' do
-              let(:empty_board_cells) { Array.new(height) { Array.new(width) } }
+              let(:empty_board_matrix) { Array.new(height) { Array.new(width) } }
 
               before do
-                allow(board_dbl).to receive(:cells).and_return empty_board_cells
+                allow(board_dbl).to receive(:matrix).and_return empty_board_matrix
               end
 
               context 'does it have the correct number of rows' do
@@ -263,10 +263,10 @@ describe Interface do
 
           context 'body of the board' do
             context 'when the board is empty' do
-              let(:empty_board_cells) { Array.new(height) { Array.new(width) } }
+              let(:empty_board_matrix) { Array.new(height) { Array.new(width) } }
 
               before do
-                allow(board_dbl).to receive(:cells).and_return empty_board_cells
+                allow(board_dbl).to receive(:matrix).and_return empty_board_matrix
               end
 
               context 'does it have the correct number of rows' do
@@ -348,10 +348,10 @@ describe Interface do
 
           context 'body of the board' do
             context 'when the board is empty' do
-              let(:empty_board_cells) { Array.new(height) { Array.new(width) } }
+              let(:empty_board_matrix) { Array.new(height) { Array.new(width) } }
 
               before do
-                allow(board_dbl).to receive(:cells).and_return empty_board_cells
+                allow(board_dbl).to receive(:matrix).and_return empty_board_matrix
               end
 
               context 'does it have the correct number of rows' do
