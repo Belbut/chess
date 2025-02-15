@@ -5,17 +5,64 @@ require_relative '../lib/chess_kit/pieces'
 
 require_relative '../lib/rules/initial_piece_positions'
 class ChessKit
-  attr_reader :board
+  attr_reader :board, :current_player, :half_move_count, :full_move_count
 
   # rows = height // columns = width
   BOARD_SIZE = { rows: 8, columns: 8 }.freeze
 
-  def initialize(board_copy = nil)
+  def initialize(board_copy = nil, current_player = nil, half_move_count = nil, full_move_count = nil)
     @board = board_copy || Board.new(BOARD_SIZE[:rows], BOARD_SIZE[:columns])
     place_initial_pieces if board_copy.nil?
-    @current_player = :w
-    @half_move_count = 0
-    @full_move_count = 1
+    @current_player = current_player || :w
+    @half_move_count = half_move_count || 0
+    @full_move_count = full_move_count || 1
+  end
+
+  def self.from_fen(fen)
+    fen_decomposition = fen.split(' ')
+
+    board_algebraic_notation = Board.from_algebraic_notation(fen_decomposition[0])
+    current_player = fen_decomposition[1].to_sym
+    castling_notation = fen_decomposition[2].split('')
+    en_passant_notation = fen_decomposition[3]
+    half_move_count = fen_decomposition[4].to_i
+    full_move_count = fen_decomposition[5].to_i
+    chess_kit = new(board_algebraic_notation, current_player, half_move_count, full_move_count)
+
+    if en_passant_notation != '-'
+      position_of_en_passant = FEN.position_of_en_passant(current_player, en_passant_notation)
+      chess_kit.board.lookup_cell(position_of_en_passant).mark_as_rushed
+    end
+
+    if castling_notation != '-'
+      template_castling = %w[K Q k q]
+      notation_decomposition = castling_notation
+
+      moved_pieces_codes = template_castling - notation_decomposition
+
+      if moved_pieces_codes.any?('K')
+        king_side_rook_coord = Coordinate.from_notation('H8')
+        rook = chess_kit.board.lookup_cell(king_side_rook_coord)
+        rook.mark_as_moved if rook.is_a?(Pieces::Rook)
+      end
+      if moved_pieces_codes.any?('Q')
+        king_side_rook_coord = Coordinate.from_notation('A8')
+        rook = chess_kit.board.lookup_cell(king_side_rook_coord)
+        rook.mark_as_moved if rook.is_a?(Pieces::Rook)
+      end
+      if moved_pieces_codes.any?('k')
+        king_side_rook_coord = Coordinate.from_notation('H1')
+        rook = chess_kit.board.lookup_cell(king_side_rook_coord)
+        rook.mark_as_moved if rook.is_a?(Pieces::Rook)
+      end
+      if moved_pieces_codes.any?('q')
+        king_side_rook_coord = Coordinate.from_notation('A1')
+        rook = chess_kit.board.lookup_cell(king_side_rook_coord)
+        rook.mark_as_moved if rook.is_a?(Pieces::Rook)
+      end
+    end
+
+    chess_kit
   end
 
   def deep_clone
@@ -28,15 +75,13 @@ class ChessKit
   end
 
   def to_fen
-    fen = ''
-
-    fen + @board.to_algebraic_notation + ' ' +
-      @current_player.to_s + ' ' + FEN.castling_notation(@board) +
-      ' ' + FEN.en_passant_representation(@board) + ' ' + @half_move_count.to_s + ' ' +
-      @full_move_count.to_s
+    [@board.to_algebraic_notation,
+     @current_player,
+     FEN.castling_notation(@board),
+     FEN.en_passant_representation(@board),
+     @half_move_count,
+     @full_move_count].join(' ')
   end
-
-  def self.from_fen; end
 
   def make_move(_from, _to)
     update_current_player

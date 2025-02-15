@@ -19,6 +19,10 @@ class Board
     Interface::Output.render_game(self)
   end
 
+  def ==(other)
+    matrix == other.matrix
+  end
+
   def to_algebraic_notation
     result = ''
     @matrix.reverse.each do |row|
@@ -42,7 +46,45 @@ class Board
     result.chop
   end
 
-  def self.from_algebraic_notation; end
+  def self.from_algebraic_notation(notation)
+    board_decomposition = notation.split('/').reverse
+    row_number = board_decomposition.size
+    column_number = count_columns(board_decomposition.sample)
+
+    board = Board.new(row_number, column_number)
+
+    board_decomposition.each_with_index do |row_notation, row_index|
+      column_pointer = 0
+
+      row_notation.each_char do |char|
+        if char.to_i.zero?
+          target_coord = Coordinate.new(column_pointer, row_index)
+          target_piece = FEN.algebraic_notation_to_piece(char)
+          board.add_to_cell(target_coord, target_piece)
+          column_pointer += 1
+        else
+          column_pointer += char.to_i
+        end
+      end
+    end
+    board
+  end
+
+  def self.count_rows(notation)
+    notation.size
+  end
+
+  def self.count_columns(row_notation)
+    n = 0
+    row_notation.each_char do |char|
+      n += if char.to_i.zero?
+             1
+           else
+             char.to_i
+           end
+    end
+    n
+  end
 
   def check_coord(coord)
     raise ArgumentError, "The Coordinate doesn't respond to :x , :y" unless valid_coord?(coord)

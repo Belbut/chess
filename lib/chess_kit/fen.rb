@@ -16,7 +16,27 @@ module FEN
                  'k'
                end
 
-    unit.black? ? notation : notation.capitalize
+    unit.black? ? notation : notation.capitalize\
+  end
+
+  def self.algebraic_notation_to_piece(notation)
+    standard_notation = notation.downcase
+    color = notation == standard_notation ? :black : :white
+
+    case standard_notation
+    when 'p'
+      Pieces::Pawn.new(color)
+    when 'r'
+      Pieces::Rook.new(color)
+    when 'n'
+      Pieces::Knight.new(color)
+    when 'b'
+      Pieces::Bishop.new(color)
+    when 'q'
+      Pieces::Queen.new(color)
+    when 'k'
+      Pieces::King.new(color)
+    end
   end
 
   def self.castling_notation(board)
@@ -58,6 +78,13 @@ module FEN
     end
 
     result
+  end
+
+  def position_of_en_passant(current_player, notation)
+    pawn_flank_position = Coordinate.from_notation(notation)
+    pawn_rushed_direction = current_player == :w ? 1 : -1
+
+    Coordinate.new(pawn_flank_position.x,pawn_flank_position.y+ pawn_rushed_direction)
   end
 
   def self.find_position_rushed_pawn(board)

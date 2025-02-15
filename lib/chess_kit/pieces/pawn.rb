@@ -13,5 +13,9 @@ module Pieces
 
       @move_status = :rushed
     end
+
+    def rushed?
+      @move_status == :rushed
+    end
   end
 end

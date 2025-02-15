@@ -423,4 +423,63 @@ describe ChessKit do
       end
     end
   end
+
+  context '#from_fen' do
+    context 'when fen represents initial position' do
+      let(:fen_position_notation) { 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1' }
+
+      let(:testing_chess_kit) { described_class.from_fen(fen_position_notation) }
+      let(:reference_chess_kit) { described_class.new }
+
+      it 'does the board gets created correctly' do
+        expect(reference_chess_kit.board).to eq testing_chess_kit.board
+      end
+
+      it 'does the current player gets created correctly' do
+        expect(reference_chess_kit.current_player).to eq testing_chess_kit.current_player
+      end
+
+      context 'does the pieces movement involved in castling gets created correctly' do
+        context 'when there the white castle codes "kq" are missing' do
+          let(:fen_no_white_castle) { 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQ - 0 1' }
+          let(:testing_no_white_castle) { described_class.from_fen(fen_no_white_castle) }
+
+          it 'is expected to both rook move status to be set to moved' do
+            queen_rook = testing_no_white_castle.board.lookup_cell(coord_A1)
+            king_rook = testing_no_white_castle.board.lookup_cell(coord_H1)
+
+            expect(queen_rook).to be_a(Pieces::Rook).and have_attributes(move_status: :moved)
+            expect(king_rook).to be_a(Pieces::Rook).and have_attributes(move_status: :moved)
+          end
+        end
+
+        context 'when there the black castle codes "kq" are missing' do
+          let(:fen_no_black_castle) { 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w kq - 0 1' }
+          let(:testing_no_black_castle) { described_class.from_fen(fen_no_black_castle) }
+
+          it 'is expected to both rook move status to be set to moved' do
+            queen_rook = testing_no_black_castle.board.lookup_cell(coord_A8)
+            king_rook = testing_no_black_castle.board.lookup_cell(coord_H8)
+
+            expect(queen_rook).to be_a(Pieces::Rook).and have_attributes(move_status: :moved)
+            expect(king_rook).to be_a(Pieces::Rook).and have_attributes(move_status: :moved)
+          end
+        end
+      end
+
+      it 'does the rushed pawn status gets created correctly' do
+        expect(testing_chess_kit.board.find_all_positions_of do |cell|
+          cell.is_a?(Pieces::Pawn) && cell.rushed?
+        end).to be_empty
+      end
+
+      it 'does the half move count gets created correctly' do
+        expect(reference_chess_kit.half_move_count).to eq testing_chess_kit.half_move_count
+      end
+
+      it 'does the full move count gets created correctly' do
+        expect(reference_chess_kit.full_move_count).to eq testing_chess_kit.full_move_count
+      end
+    end
+  end
 end
