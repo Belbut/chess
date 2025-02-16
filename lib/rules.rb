@@ -5,17 +5,17 @@ require_relative './rules/movement_pattern/tree_framework/root_position'
 class Rules
   include PatternFactory
 
-  attr_reader :chess_kit
+  attr_reader :board
 
   PIECE_TYPES = %i[pawn rook knight bishop queen king].freeze
 
-  def initialize(chess_kit)
-    @chess_kit = chess_kit
+  def initialize(board)
+    @board = board
   end
 
   def deep_clone
-    chess_kit_cloned = chess_kit.deep_clone
-    Rules.new(chess_kit_cloned)
+    board_cloned = board.deep_clone
+    Rules.new(board_cloned)
   end
 
   def attackers_coordinates_to_position(position, team_color)
@@ -34,7 +34,7 @@ class Rules
   end
 
   def available_paths_for_piece(from_position)
-    piece = board.lookup_cell(from_position)
+    piece = @board.lookup_cell(from_position)
 
     rules = self
     team_color = piece.color
@@ -85,9 +85,5 @@ class Rules
 
   def opposite_color(team_color)
     { white: :black, black: :white }[team_color]
-  end
-
-  def board
-    chess_kit.board
   end
 end

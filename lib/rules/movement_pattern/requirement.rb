@@ -36,9 +36,9 @@ module Requirement
     lambda { |board_cord, testing_move_cord|
       rules_clone = rules.deep_clone
 
-      moving_piece = rules_clone.chess_kit.board.clear_cell(board_cord)
-      rules_clone.chess_kit.board.add_to_cell!(testing_move_cord, moving_piece)
-      king_cord = rules_clone.chess_kit.board.find_position_of(Pieces::FACTORY[team_color][:king])
+      moving_piece = rules_clone.board.clear_cell(board_cord)
+      rules_clone.board.add_to_cell!(testing_move_cord, moving_piece)
+      king_cord = rules_clone.board.find_position_of(Pieces::FACTORY[team_color][:king])
 
       king_is_safe = rules_clone.attackers_coordinates_to_position(king_cord, team_color).empty?
       king_is_safe
@@ -65,7 +65,7 @@ module Requirement
   end
 
   def self.safe_row_between(board, team_color)
-    rules = Rules.new(ChessKit.new(board))
+    rules = Rules.new(board)
 
     lambda { |initial_cord, final_cord|
       coord_between(initial_cord, final_cord, mode: :inclusive) do |target_cord|

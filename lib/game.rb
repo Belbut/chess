@@ -13,7 +13,7 @@ class Game
     @current_player = @white_player
 
     @chess_kit = ChessKit.new
-    @game_rules = Rules.new(@chess_kit)
+    @game_rules = Rules.new(@chess_kit.board)
   end
 
   def play

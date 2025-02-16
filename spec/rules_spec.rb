@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require_relative '../lib/rules'
-require_relative '../lib/chess_kit'
 require_relative '../lib/chess_kit/board'
 require_relative '../lib/chess_kit/pieces'
 
@@ -10,8 +9,7 @@ require_relative './testing_util_spec'
 describe Rules do
   include TestingUtil
 
-  subject(:rules) { described_class.new(chess_kit) }
-  let(:chess_kit) { ChessKit.new(board) }
+  subject(:rules) { described_class.new(board) }
   let(:board) { Board.new(8, 8) }
 
   BOARD_VISUALIZATION = false
