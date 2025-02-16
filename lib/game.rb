@@ -12,8 +12,8 @@ class Game
     @black_player = Player.new(:black, Interface)
     @current_player = @white_player
 
-    @chess_kit = ChessKit.new
-    @game_rules = Rules.new(@chess_kit.board)
+    @chess_kit = ChessKit.new_game
+    @game_rules = Rules.new(@chess_kit)
   end
 
   def play

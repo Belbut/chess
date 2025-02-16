@@ -7,7 +7,7 @@ require_relative './testing_util_spec'
 
 describe ChessKit do
   include TestingUtil
-  subject(:chess_kit) { described_class.new }
+  subject(:chess_kit) { described_class.new_game }
   let(:board) { chess_kit.board }
   context 'is composed by' do
     context do
@@ -429,7 +429,7 @@ describe ChessKit do
       let(:fen_position_notation) { 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1' }
 
       let(:testing_chess_kit) { described_class.from_fen(fen_position_notation) }
-      let(:reference_chess_kit) { described_class.new }
+      let(:reference_chess_kit) { described_class.new_game }
 
       it 'does the board gets created correctly' do
         expect(reference_chess_kit.board).to eq testing_chess_kit.board
