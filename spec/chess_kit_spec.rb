@@ -320,13 +320,8 @@ describe ChessKit do
 
     context 'when the chess_kit mid game' do
       before do
-        first_move_piece = chess_kit.board.clear_cell(coord_E2)
-        chess_kit.board.add_to_cell(coord_E4, first_move_piece)
-
-        second_move_piece = chess_kit.board.clear_cell(coord_C7) # TODO: update this when make move is finalised
-        chess_kit.board.add_to_cell(coord_C5, second_move_piece)
-        second_move_piece.mark_as_rushed
-        chess_kit.update_full_move_count22222222222
+        chess_kit.make_move(coord_E2, coord_E4)
+        chess_kit.make_move(coord_C7, coord_C5)
       end
 
       let(:fen_result) { chess_kit.to_fen.split(' ') }

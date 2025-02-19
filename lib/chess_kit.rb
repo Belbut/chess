@@ -2,8 +2,8 @@
 
 require_relative '../lib/chess_kit/board'
 require_relative '../lib/chess_kit/pieces'
-
 require_relative '../lib/rules/initial_piece_positions'
+
 class ChessKit
   attr_reader :board, :current_player, :half_move_count, :full_move_count
 
@@ -28,9 +28,9 @@ class ChessKit
     FEN.load_game(fen)
   end
 
-  def deep_clone
-    board_cloned = board.deep_clone
-    new(board_cloned, current_player, half_move_count, full_move_count)
+  def place_initial_pieces
+    place_color_pieces_on_board(:white)
+    place_color_pieces_on_board(:black)
   end
 
   def to_s
@@ -41,48 +41,47 @@ class ChessKit
     FEN.generate(self)
   end
 
+  def deep_clone
+    board_cloned = board.deep_clone
+    new(board_cloned, current_player, half_move_count, full_move_count)
+  end
+
   def make_move(from, to)
     moving_piece = board.lookup_cell(from)
     target_cell = board.lookup_cell(to)
 
+    validate_move(moving_piece, target_cell)
+    board.move_piece(from, to)
+
+    process_move_effects(moving_piece, target_cell, from, to)
+  end
+
+  def validate_move(moving_piece, target_cell)
     if target_cell.is_a?(Unit) && moving_piece.color == (target_cell.color)
       return raise ArgumentError, 'The target cell is the same color'
     end
 
-    if moving_piece.color != current_player_color
-      return raise ArgumentError,
-                   'The moving piece is not from the current player'
-    end
+    return unless moving_piece.color != current_player_color
 
-    board.clear_cell(from)
-    board.add_to_cell!(to, moving_piece)
+    raise ArgumentError,
+          'The moving piece is not from the current player'
+  end
 
-    update_move_status(from, to)
+  def process_move_effects(moving_piece, target_cell, from, to)
+    update_move_status(moving_piece, from, to)
     update_current_player
     update_full_move_count
     update_half_move_count(moving_piece, target_cell)
   end
 
-  def place_initial_pieces
-    place_color_pieces_on_board(:white)
-    place_color_pieces_on_board(:black)
-  end
-
-  def update_full_move_count22222222222
-    @full_move_count += 1 if @current_player == :w
-  end
-
   private
 
-  def update_move_status(from, to)
-    board.find { |piece| piece.move_status == :rushed }&.mark_as_moved
+  def update_current_player
+    @current_player = @current_player == :w ? :b : :w
+  end
 
-    moving_piece = board.lookup_cell(to)
-    if moving_piece.is_a?(Pieces::Pawn) && Coordinate.distance_between(from, to) >= 2
-      moving_piece.mark_as_rushed
-    else
-      moving_piece.mark_as_moved
-    end
+  def update_full_move_count
+    @full_move_count += 1 if @current_player == :w
   end
 
   def update_half_move_count(moving_piece, target_cell)
@@ -90,20 +89,13 @@ class ChessKit
     @half_move_count = 0 if moving_piece.is_a?(Pieces::Pawn) || !target_cell.nil?
   end
 
-  def update_full_move_count
-    @full_move_count += 1 if @current_player == :w
-  end
+  def update_move_status(moving_piece, from, to)
+    board.find { |piece| piece.move_status == :rushed }&.mark_as_moved
 
-  def update_current_player
-    @current_player = @current_player == :w ? :b : :w
-  end
-
-  def current_player_color
-    case current_player
-    when :w
-      :white
-    when :b
-      :black
+    if moving_piece.is_a?(Pieces::Pawn) && Coordinate.distance_between(from, to) >= 2
+      moving_piece.mark_as_rushed
+    else
+      moving_piece.mark_as_moved
     end
   end
 
@@ -115,9 +107,18 @@ class ChessKit
     @half_move_count += 1
   end
 
+  def current_player_color
+    case current_player
+    when :w
+      :white
+    when :b
+      :black
+    end
+  end
+
   def place_color_pieces_on_board(color)
-    InitialPiecePositions::PIECE_POSITIONS[color].each_pair do |pice_type, all_positions|
-      piece = Pieces::FACTORY[color][pice_type]
+    InitialPiecePositions::PIECE_POSITIONS[color].each_pair do |piece_type, all_positions|
+      piece = Pieces::FACTORY[color][piece_type]
       all_positions.each do |position_notation|
         coord = Coordinate.from_notation(position_notation)
         @board.add_to_cell(coord, piece.dup)

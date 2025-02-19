@@ -122,7 +122,7 @@ class Board
                else
                  raise ArgumentError, 'Must provide either an object or a block'
                end
-               
+
     lookup_cell(position) unless position.nil?
   end
 
@@ -163,6 +163,13 @@ class Board
     matrix[coord.y][coord.x] = nil
 
     old_obj
+  end
+
+  def move_piece(from, to)
+    moving_piece = lookup_cell(from)
+
+    clear_cell(from)
+    add_to_cell!(to, moving_piece)
   end
 
   def board_height
