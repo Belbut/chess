@@ -12,9 +12,10 @@ describe Rules do
   subject(:rules) { described_class.new(board) }
   let(:board) { Board.new(8, 8) }
 
-  BOARD_VISUALIZATION = false
   def board_visualization
-    BOARD_VISUALIZATION && puts(board)
+    should_print = false
+
+    should_print && puts(board)
   end
 
   describe '#attackers_coordinates_to_position' do
@@ -487,6 +488,218 @@ describe Rules do
       allow(Requirement).to receive(:move_is_safe_for_king).and_return(proc { true })
     end
 
+    context 'picking a pawn' do
+      context 'in the middle of the board' do
+        before do
+          board.add_to_cell(testing_position, team_pawn)
+        end
+
+        context 'forward move' do
+          context 'unmoved pawn' do
+            context 'cells free' do
+              it '' do
+                board_visualization
+
+                possible_paths = rules.available_paths_for_piece(testing_position)
+
+                expect(possible_paths).to eq([path(coord_D5), path(coord_D6)])
+              end
+            end
+
+            context 'blocked by' do
+              context 'same color piece' do
+                it '' do
+                  board.add_to_cell(coord_D6, enemy_pawn)
+                  board_visualization
+
+                  possible_paths = rules.available_paths_for_piece(testing_position)
+
+                  expect(possible_paths).to eq([path(coord_D5)])
+                end
+
+                it '' do
+                  board.add_to_cell(coord_D5, enemy_pawn)
+
+                  board_visualization
+
+                  possible_paths = rules.available_paths_for_piece(testing_position)
+
+                  expect(possible_paths).to eq([])
+                end
+              end
+
+              context 'opponent color piece' do
+                it '' do
+                  board.add_to_cell(coord_D6, team_pawn)
+                  board_visualization
+
+                  possible_paths = rules.available_paths_for_piece(testing_position)
+
+                  expect(possible_paths).to eq([path(coord_D5)])
+                end
+
+                it '' do
+                  board.add_to_cell(coord_D5, team_pawn)
+
+                  board_visualization
+
+                  possible_paths = rules.available_paths_for_piece(testing_position)
+
+                  expect(possible_paths).to eq([])
+                end
+              end
+            end
+          end
+
+          context 'moved pawn' do
+            before do
+              allow(team_pawn).to receive(:move_status).and_return(:moved)
+            end
+
+            context 'cells free' do
+              it '' do
+                board_visualization
+
+                possible_paths = rules.available_paths_for_piece(testing_position)
+
+                expect(possible_paths).to eq([path(coord_D5)])
+              end
+            end
+
+            context 'blocked by' do
+              context 'same color piece' do
+                it '' do
+                  board.add_to_cell(coord_D5, enemy_pawn)
+
+                  board_visualization
+
+                  possible_paths = rules.available_paths_for_piece(testing_position)
+
+                  expect(possible_paths).to eq([])
+                end
+              end
+
+              context 'opponent color piece' do
+                it '' do
+                  board.add_to_cell(coord_D5, team_pawn)
+
+                  board_visualization
+
+                  possible_paths = rules.available_paths_for_piece(testing_position)
+
+                  expect(possible_paths).to eq([])
+                end
+              end
+            end
+          end
+        end
+
+        context 'side take' do
+          context 'normal take pattern' do
+            context 'same color piece' do
+              it '' do
+                board.add_to_cell(coord_E5, team_pawn)
+                board.add_to_cell(coord_C5, team_pawn)
+
+                board_visualization
+
+                possible_paths = rules.available_paths_for_piece(testing_position)
+
+                expect(possible_paths).to eq([path(coord_D5), path(coord_D6)])
+              end
+            end
+
+            context 'opponent color piece' do
+              it '' do
+                board.add_to_cell(coord_E5, enemy_pawn)
+                board.add_to_cell(coord_C5, enemy_pawn)
+
+                board_visualization
+                puts board
+
+                possible_paths = rules.available_paths_for_piece(testing_position)
+
+                expect(possible_paths).to eq([path(coord_D5), path(coord_D6), path(coord_C5),
+                                              path(coord_E5)])
+              end
+            end
+          end
+
+          context 'en passant pattern' do
+            before do
+              allow(enemy_pawn).to receive(:move_status).and_return(:rushed)
+            end
+
+            it '' do
+              board.add_to_cell(coord_E4, enemy_pawn)
+              board.add_to_cell(coord_C4, enemy_pawn)
+
+              board_visualization
+
+              possible_paths = rules.available_paths_for_piece(testing_position)
+
+              expect(possible_paths).to eq([path(coord_D5), path(coord_D6), path(coord_C5),
+                                            path(coord_E5)])
+            end
+
+            context 'without flank exposed' do
+              before do
+                allow(enemy_pawn).to receive(:move_status).and_return(:moved)
+              end
+
+              it '' do
+                board.add_to_cell(coord_E4, enemy_pawn)
+                board.add_to_cell(coord_C4, enemy_pawn)
+
+                board_visualization
+
+                possible_paths = rules.available_paths_for_piece(testing_position)
+
+                expect(possible_paths).to eq([path(coord_D5), path(coord_D6)])
+              end
+            end
+          end
+        end
+
+        context 'when the board has other pieces that limit the knight move' do
+          context 'other pieces are attacking the king' do
+            before do
+              allow(Requirement).to receive(:move_is_safe_for_king).and_call_original
+            end
+
+            context 'the piece is already blocking the attack' do
+              before do
+                board.add_to_cell(coord_D1, team_king)
+                board.add_to_cell(coord_D8, enemy_rook)
+              end
+
+              it '' do
+                board_visualization
+
+                possible_paths = rules.available_paths_for_piece(testing_position)
+
+                expect(possible_paths).to eq([[coord_D5], [coord_D6]])
+              end
+            end
+
+            context 'the piece can move to block the attack' do
+              before do
+                board.add_to_cell(coord_C3, team_king)
+                board.add_to_cell(coord_H8, enemy_bishop)
+              end
+              it '' do
+                board_visualization
+
+                possible_paths = rules.available_paths_for_piece(testing_position)
+
+                expect(possible_paths).to eq([])
+              end
+            end
+          end
+        end
+      end
+    end
+
     context 'picking a rook' do
       before do
         board.add_to_cell(testing_position, team_rook)
@@ -870,218 +1083,6 @@ describe Rules do
               possible_paths = rules.available_paths_for_piece(testing_position)
 
               expect(possible_paths).to eq([[coord_F3], [coord_E2]])
-            end
-          end
-        end
-      end
-    end
-
-    context 'picking a pawn' do
-      context 'in the middle of the board' do
-        before do
-          board.add_to_cell(testing_position, team_pawn)
-        end
-
-        context 'forward move' do
-          context 'unmoved pawn' do
-            context 'cells free' do
-              it '' do
-                board_visualization
-
-                possible_paths = rules.available_paths_for_piece(testing_position)
-
-                expect(possible_paths).to eq([path(coord_D5), path(coord_D6)])
-              end
-            end
-
-            context 'blocked by' do
-              context 'same color piece' do
-                it '' do
-                  board.add_to_cell(coord_D6, enemy_pawn)
-                  board_visualization
-
-                  possible_paths = rules.available_paths_for_piece(testing_position)
-
-                  expect(possible_paths).to eq([path(coord_D5)])
-                end
-
-                it '' do
-                  board.add_to_cell(coord_D5, enemy_pawn)
-
-                  board_visualization
-
-                  possible_paths = rules.available_paths_for_piece(testing_position)
-
-                  expect(possible_paths).to eq([])
-                end
-              end
-
-              context 'opponent color piece' do
-                it '' do
-                  board.add_to_cell(coord_D6, team_pawn)
-                  board_visualization
-
-                  possible_paths = rules.available_paths_for_piece(testing_position)
-
-                  expect(possible_paths).to eq([path(coord_D5)])
-                end
-
-                it '' do
-                  board.add_to_cell(coord_D5, team_pawn)
-
-                  board_visualization
-
-                  possible_paths = rules.available_paths_for_piece(testing_position)
-
-                  expect(possible_paths).to eq([])
-                end
-              end
-            end
-          end
-
-          context 'moved pawn' do
-            before do
-              allow(team_pawn).to receive(:move_status).and_return(:moved)
-            end
-
-            context 'cells free' do
-              it '' do
-                board_visualization
-
-                possible_paths = rules.available_paths_for_piece(testing_position)
-
-                expect(possible_paths).to eq([path(coord_D5)])
-              end
-            end
-
-            context 'blocked by' do
-              context 'same color piece' do
-                it '' do
-                  board.add_to_cell(coord_D5, enemy_pawn)
-
-                  board_visualization
-
-                  possible_paths = rules.available_paths_for_piece(testing_position)
-
-                  expect(possible_paths).to eq([])
-                end
-              end
-
-              context 'opponent color piece' do
-                it '' do
-                  board.add_to_cell(coord_D5, team_pawn)
-
-                  board_visualization
-
-                  possible_paths = rules.available_paths_for_piece(testing_position)
-
-                  expect(possible_paths).to eq([])
-                end
-              end
-            end
-          end
-        end
-
-        context 'side take' do
-          context 'normal take pattern' do
-            context 'same color piece' do
-              it '' do
-                board.add_to_cell(coord_E5, team_pawn)
-                board.add_to_cell(coord_C5, team_pawn)
-
-                board_visualization
-
-                possible_paths = rules.available_paths_for_piece(testing_position)
-
-                expect(possible_paths).to eq([path(coord_D5), path(coord_D6)])
-              end
-            end
-
-            context 'opponent color piece' do
-              it '' do
-                board.add_to_cell(coord_E5, enemy_pawn)
-                board.add_to_cell(coord_C5, enemy_pawn)
-
-                board_visualization
-                puts board
-
-                possible_paths = rules.available_paths_for_piece(testing_position)
-
-                expect(possible_paths).to eq([path(coord_D5), path(coord_D6), path(coord_C5),
-                                              path(coord_E5)])
-              end
-            end
-          end
-
-          context 'en passant pattern' do
-            before do
-              allow(enemy_pawn).to receive(:move_status).and_return(:rushed)
-            end
-
-            it '' do
-              board.add_to_cell(coord_E4, enemy_pawn)
-              board.add_to_cell(coord_C4, enemy_pawn)
-
-              board_visualization
-
-              possible_paths = rules.available_paths_for_piece(testing_position)
-
-              expect(possible_paths).to eq([path(coord_D5), path(coord_D6), path(coord_C5),
-                                            path(coord_E5)])
-            end
-
-            context 'without flank exposed' do
-              before do
-                allow(enemy_pawn).to receive(:move_status).and_return(:moved)
-              end
-
-              it '' do
-                board.add_to_cell(coord_E4, enemy_pawn)
-                board.add_to_cell(coord_C4, enemy_pawn)
-
-                board_visualization
-
-                possible_paths = rules.available_paths_for_piece(testing_position)
-
-                expect(possible_paths).to eq([path(coord_D5), path(coord_D6)])
-              end
-            end
-          end
-        end
-
-        context 'when the board has other pieces that limit the knight move' do
-          context 'other pieces are attacking the king' do
-            before do
-              allow(Requirement).to receive(:move_is_safe_for_king).and_call_original
-            end
-
-            context 'the piece is already blocking the attack' do
-              before do
-                board.add_to_cell(coord_D1, team_king)
-                board.add_to_cell(coord_D8, enemy_rook)
-              end
-
-              it '' do
-                board_visualization
-
-                possible_paths = rules.available_paths_for_piece(testing_position)
-
-                expect(possible_paths).to eq([[coord_D5], [coord_D6]])
-              end
-            end
-
-            context 'the piece can move to block the attack' do
-              before do
-                board.add_to_cell(coord_C3, team_king)
-                board.add_to_cell(coord_H8, enemy_bishop)
-              end
-              it '' do
-                board_visualization
-
-                possible_paths = rules.available_paths_for_piece(testing_position)
-
-                expect(possible_paths).to eq([])
-              end
             end
           end
         end

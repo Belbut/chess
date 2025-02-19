@@ -110,6 +110,22 @@ class Board
     Coordinate.new(x_index, y_index)
   end
 
+  def find(object = nil, &block)
+    raise ArgumentError, 'Provide either an object or a block, not both' if object && block_given?
+
+    position = if object
+                 find_position_of(object)
+               elsif block_given?
+                 find_position_of do |cell|
+                   cell.is_a?(Unit) && block.call(cell)
+                 end
+               else
+                 raise ArgumentError, 'Must provide either an object or a block'
+               end
+               
+    lookup_cell(position) unless position.nil?
+  end
+
   def find_all_positions_of(object = nil, &block)
     raise ArgumentError, 'Provide either an object or a block, not both' if object && block
 

@@ -41,13 +41,70 @@ class ChessKit
     FEN.generate(self)
   end
 
-  def make_move(_from, _to)
+  def make_move(from, to)
+    moving_piece = board.lookup_cell(from)
+    target_cell = board.lookup_cell(to)
+
+    if target_cell.is_a?(Unit) && moving_piece.color == (target_cell.color)
+      return raise ArgumentError, 'The target cell is the same color'
+    end
+
+    if moving_piece.color != current_player_color
+      return raise ArgumentError,
+                   'The moving piece is not from the current player'
+    end
+
+    board.clear_cell(from)
+    board.add_to_cell!(to, moving_piece)
+
+    update_move_status(from, to)
     update_current_player
-    increase_full_move_count
+    update_full_move_count
+    update_half_move_count(moving_piece, target_cell)
+  end
+
+  def place_initial_pieces
+    place_color_pieces_on_board(:white)
+    place_color_pieces_on_board(:black)
+  end
+
+  def update_full_move_count22222222222
+    @full_move_count += 1 if @current_player == :w
+  end
+
+  private
+
+  def update_move_status(from, to)
+    board.find { |piece| piece.move_status == :rushed }&.mark_as_moved
+
+    moving_piece = board.lookup_cell(to)
+    if moving_piece.is_a?(Pieces::Pawn) && Coordinate.distance_between(from, to) >= 2
+      moving_piece.mark_as_rushed
+    else
+      moving_piece.mark_as_moved
+    end
+  end
+
+  def update_half_move_count(moving_piece, target_cell)
+    @half_move_count += 1
+    @half_move_count = 0 if moving_piece.is_a?(Pieces::Pawn) || !target_cell.nil?
+  end
+
+  def update_full_move_count
+    @full_move_count += 1 if @current_player == :w
   end
 
   def update_current_player
-    @current_player == :w ? :b : :w
+    @current_player = @current_player == :w ? :b : :w
+  end
+
+  def current_player_color
+    case current_player
+    when :w
+      :white
+    when :b
+      :black
+    end
   end
 
   def reset_half_move_count
@@ -58,23 +115,12 @@ class ChessKit
     @half_move_count += 1
   end
 
-  def increase_full_move_count
-    @full_move_count += 1
-  end
-
-  def place_initial_pieces
-    place_color_pieces_on_board(:white)
-    place_color_pieces_on_board(:black)
-  end
-
-  private
-
   def place_color_pieces_on_board(color)
     InitialPiecePositions::PIECE_POSITIONS[color].each_pair do |pice_type, all_positions|
       piece = Pieces::FACTORY[color][pice_type]
       all_positions.each do |position_notation|
         coord = Coordinate.from_notation(position_notation)
-        @board.add_to_cell(coord, piece)
+        @board.add_to_cell(coord, piece.dup)
       end
     end
   end

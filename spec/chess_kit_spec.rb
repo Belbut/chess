@@ -323,10 +323,10 @@ describe ChessKit do
         first_move_piece = chess_kit.board.clear_cell(coord_E2)
         chess_kit.board.add_to_cell(coord_E4, first_move_piece)
 
-        second_move_piece = chess_kit.board.clear_cell(coord_C7)
+        second_move_piece = chess_kit.board.clear_cell(coord_C7) # TODO: update this when make move is finalised
         chess_kit.board.add_to_cell(coord_C5, second_move_piece)
-        second_move_piece.instance_variable_set(:@move_status, :rushed)
-        chess_kit.increase_full_move_count
+        second_move_piece.mark_as_rushed
+        chess_kit.update_full_move_count22222222222
       end
 
       let(:fen_result) { chess_kit.to_fen.split(' ') }
@@ -479,6 +479,149 @@ describe ChessKit do
 
       it 'does the full move count gets created correctly' do
         expect(reference_chess_kit.full_move_count).to eq testing_chess_kit.full_move_count
+      end
+    end
+  end
+
+  context '#make_move' do
+    let(:pawn_move) { chess_kit.make_move(coord_A2, coord_A3) }
+    let(:pawn_rush_move) { chess_kit.make_move(coord_A2, coord_A4) }
+    let(:knight_move) { chess_kit.make_move(coord_B1, coord_C3) }
+    let(:king_bad_move) { chess_kit.make_move(coord_E1, coord_F1) }
+    context 'does it move the selected piece from x to y' do
+      it 'removes the piece on x position' do
+        expect { pawn_move }.to(change do
+          chess_kit.board.lookup_cell(coord_A2)
+        end.from(Pieces::Pawn).to(nil))
+      end
+      context 'the same piece is inserted on y position' do
+        context 'if there was another piece in the y position' do
+          it 'same color pieces' do
+            expect { king_bad_move }.to raise_error(ArgumentError)
+          end
+          it 'different color pieces' do
+            chess_kit.board.clear_cell(coord_D2)
+
+            expect { chess_kit.make_move(coord_D1, coord_D7) }.to(change do
+              chess_kit.board.lookup_cell(coord_D7)
+            end.from(Pieces::Pawn).to(Pieces::Queen))
+          end
+        end
+
+        it 'if the y position was empty' do
+          expect { pawn_move }.to(change do
+            chess_kit.board.lookup_cell(coord_A3)
+          end.from(nil).to(Pieces::Pawn))
+        end
+      end
+
+      context 'does it update the variables' do
+        context 'piece move status' do
+          context 'correctly distinguishes pawn moves' do
+            it 'when it rushes' do
+              pawn = chess_kit.board.lookup_cell(coord_H2)
+
+              expect { chess_kit.make_move(coord_H2, coord_H4) }.to(change do
+                pawn.move_status
+              end.from(:unmoved).to(:rushed))
+            end
+
+            it 'when it makes a normal move' do
+              pawn = chess_kit.board.lookup_cell(coord_H2)
+
+              expect { chess_kit.make_move(coord_H2, coord_H3) }.to(change do
+                pawn.move_status
+              end.from(:unmoved).to(:moved))
+            end
+
+            it 'when it takes' do
+              puts board
+
+              pawn = chess_kit.board.lookup_cell(coord_D2)
+              chess_kit.make_move(coord_D2, coord_D4)
+              chess_kit.make_move(coord_E7, coord_E5)
+
+              expect { chess_kit.make_move(coord_D4, coord_E5) }.not_to(change do
+                pawn.move_status
+              end.from(:moved))
+              puts board
+            end
+          end
+
+          context 'all other moves' do
+            it 'pawn normal move' do
+              pawn = chess_kit.board.lookup_cell(coord_H2)
+
+              expect { chess_kit.make_move(coord_H2, coord_H3) }.to(change do
+                pawn.move_status
+              end.from(:unmoved).to(:moved))
+            end
+            it 'noble pice move' do
+              rook = chess_kit.board.lookup_cell(coord_H1)
+
+              expect { chess_kit.make_move(coord_H1, coord_H5) }.to(change do
+                rook.move_status
+              end.from(:unmoved).to(:moved))
+            end
+          end
+
+          context 'does it rest rushed pawns between turns' do
+            it '' do
+              testing_pawn = chess_kit.board.lookup_cell(coord_A2)
+
+              expect { chess_kit.make_move(coord_A2, coord_A4) }.to(change do
+                testing_pawn.move_status
+              end.from(:unmoved).to(:rushed))
+              expect { chess_kit.make_move(coord_A7, coord_A6) }.to(change do
+                testing_pawn.move_status
+              end.from(:rushed).to(:moved))
+            end
+          end
+        end
+
+        context 'current player' do
+          it 'from white to black player' do
+            expect { pawn_move }.to(change { chess_kit.current_player }.from(:w).to(:b))
+          end
+          it 'consecutive from white to black back to white' do
+            expect { chess_kit.make_move(coord_A2, coord_A3) }.to(change { chess_kit.current_player }.from(:w).to(:b))
+            expect { chess_kit.make_move(coord_A7, coord_A6) }.to(change { chess_kit.current_player }.from(:b).to(:w))
+          end
+        end
+
+        context ' full count move' do
+          it 'it increases the full move count' do
+            expect { chess_kit.make_move(coord_A2, coord_A3) }.not_to(change { chess_kit.full_move_count })
+            expect { chess_kit.make_move(coord_A7, coord_A6) }.to(change { chess_kit.full_move_count }.from(1).to(2))
+            expect { chess_kit.make_move(coord_A3, coord_A4) }.not_to(change { chess_kit.full_move_count })
+            expect { chess_kit.make_move(coord_A6, coord_A5) }.to(change { chess_kit.full_move_count }.from(2).to(3))
+          end
+        end
+
+        context 'half count move' do
+          let(:random_int) { 42 }
+          before do
+            chess_kit.instance_variable_set(:@half_move_count, random_int)
+          end
+
+          context 'when the move is made from a noble piece' do
+            it 'it should increase the half move count by 1 ' do
+              expect { knight_move }.to(change { chess_kit.half_move_count }.by(1))
+            end
+          end
+
+          context 'if it should reset the count' do
+            it 'because it was a pawn move' do
+              expect { pawn_move }.to(change { chess_kit.half_move_count }.from(random_int).to(0))
+            end
+
+            it ' because it was a capture move' do
+              expect { chess_kit.make_move(coord_D1, coord_H8) }.to(change do
+                chess_kit.half_move_count
+              end.from(random_int).to(0))
+            end
+          end
+        end
       end
     end
   end

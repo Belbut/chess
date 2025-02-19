@@ -14,7 +14,7 @@ class Unit
   end
 
   def ==(other)
-    color == other.color && type == other.type
+    self.class == other.class && color == other.color && type == other.type
   end
 
   def strict_equal?(other)

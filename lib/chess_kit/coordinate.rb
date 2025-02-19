@@ -58,4 +58,13 @@ class Coordinate
 
     new(x, y)
   end
+
+  def self.distance_between(coord_i, coord_f)
+    xxi = coord_i.x
+    yyi = coord_i.y
+    xxf = coord_f.x
+    yyf = coord_f.y
+
+    Math.sqrt((xxi - xxf)**2 + (yyi - yyf)**2)
+  end
 end
