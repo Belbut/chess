@@ -21,7 +21,11 @@ describe Board do
 
   subject(:known_board) { described_class.new(5, 5) }
   before do
-    known_board.instance_variable_set(:@matrix, KNOWN_BOARD)
+    known_board.matrix.each_with_index do |row, row_i|
+      row.each_with_index do |_cell, column_i|
+        known_board.add_to_cell(Coordinate.new(column_i, row_i), KNOWN_BOARD[row_i][column_i])
+      end
+    end
   end
 
   let(:all_matrix_except) do
@@ -128,7 +132,7 @@ describe Board do
                %w[41 B5 C5 D5 41]].freeze
 
     before do
-      allow(known_board).to receive(:matrix).and_return BOARD41
+      allow(known_board).to receive(:contents).and_return BOARD41
     end
     context 'when checking a object' do
       it 'is expected to return nil if the object is not on the board' do

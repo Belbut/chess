@@ -35,7 +35,6 @@ class Rules
 
   def available_paths_for_piece(from_position)
     piece = @board.lookup_cell(from_position)
-
     rules = self
     team_color = piece.color
     safe_king_requirement = Requirement.move_is_safe_for_king(rules, team_color)
@@ -72,6 +71,7 @@ class Rules
 
   def all_possible_attack_paths_to_position(position, team_color, piece_type)
     movement_patterns = movement_patterns_for_piece(team_color, piece_type, move_type: :attack)
+
     generate_paths_for_piece(position, movement_patterns)
   end
 

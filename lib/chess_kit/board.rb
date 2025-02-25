@@ -1,11 +1,18 @@
 class Board
+  require_relative './board/cell'
   require_relative '../interface'
   require_relative './fen'
 
   attr_reader :matrix
 
   def initialize(rows, columns, matrix = nil)
-    @matrix = matrix || Array.new(rows) { Array.new(columns) }
+    @matrix = matrix || Array.new(rows) { Array.new(columns) { Cell.new } }
+  end
+
+  def contents
+    @matrix.map do |row|
+      row.map(&:content)
+    end
   end
 
   def deep_clone
@@ -25,7 +32,7 @@ class Board
 
   def to_algebraic_notation
     result = ''
-    @matrix.reverse.each do |row|
+    contents.reverse.each do |row|
       row_notation = ''
       empty_in_a_row = 0
       row.each do |cell|
@@ -94,20 +101,7 @@ class Board
   def lookup_cell(coord)
     check_coord(coord)
 
-    matrix[coord.y][coord.x]
-  end
-
-  def find_position_of(object = nil, &block)
-    raise ArgumentError, 'Provide either an object or a block, not both' if object && block
-
-    x_index = nil
-    y_index = matrix.index do |row|
-      x_index = block_given? ? row.index(&block) : row.index(object)
-    end
-
-    return nil if y_index.nil?
-
-    Coordinate.new(x_index, y_index)
+    contents[coord.y][coord.x]
   end
 
   def find(object = nil, &block)
@@ -126,11 +120,24 @@ class Board
     lookup_cell(position) unless position.nil?
   end
 
+  def find_position_of(object = nil, &block)
+    raise ArgumentError, 'Provide either an object or a block, not both' if object && block
+
+    x_index = nil
+    y_index = contents.index do |row|
+      x_index = block_given? ? row.index(&block) : row.index(object)
+    end
+
+    return nil if y_index.nil?
+
+    Coordinate.new(x_index, y_index)
+  end
+
   def find_all_positions_of(object = nil, &block)
     raise ArgumentError, 'Provide either an object or a block, not both' if object && block
 
     result = []
-    matrix.each_with_index do |row, yy|
+    contents.each_with_index do |row, yy|
       row.each_with_index do |cell, xx|
         if block_given?
           result.append(Coordinate.new(xx, yy)) if yield(cell)
@@ -144,23 +151,22 @@ class Board
   end
 
   def add_to_cell(coord, object)
-    check_coord(coord) # redundant but makes it explicit
     raise ArgumentError, "Cell already occupied at #{coord}" unless lookup_cell(coord).nil?
 
-    matrix[coord.y][coord.x] = object if lookup_cell(coord).nil?
+    add_to_cell!(coord, object)
   end
 
   def add_to_cell!(coord, object)
-    check_coord(coord) # redundant but makes it explicit
+    check_coord(coord)
 
-    matrix[coord.y][coord.x] = object
+    matrix[coord.y][coord.x].content = object
   end
 
   def clear_cell(coord)
     check_coord(coord)
 
-    old_obj = matrix[coord.y][coord.x]
-    matrix[coord.y][coord.x] = nil
+    old_obj = contents[coord.y][coord.x]
+    add_to_cell!(coord, nil)
 
     old_obj
   end

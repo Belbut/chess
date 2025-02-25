@@ -25,7 +25,8 @@ describe ChessKit do
       end
 
       context 'with Pieces' do
-        let(:pieces) { board.matrix.flatten.reject(&:nil?) }
+        let(:pieces) { board.contents.flatten.reject(&:nil?) }
+
         let(:white_pieces) { pieces.find_all(&:white?) }
         let(:black_pieces) { pieces.find_all(&:black?) }
 
