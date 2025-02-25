@@ -271,10 +271,10 @@ describe ChessKit do
       end
 
       context 'does it return the representation of the current player' do
-        let(:current_player_representation) { fen_result[1] }
+        let(:current_color_representation) { fen_result[1] }
 
         it '' do
-          expect(current_player_representation).to eq 'w'
+          expect(current_color_representation).to eq 'w'
         end
       end
 
@@ -369,10 +369,10 @@ describe ChessKit do
       end
 
       context 'does it return the representation of the current player' do
-        let(:current_player_representation) { fen_result[1] }
+        let(:current_color_representation) { fen_result[1] }
 
         it '' do
-          expect(current_player_representation).to eq 'w'
+          expect(current_color_representation).to eq 'w'
         end
       end
 
@@ -432,7 +432,7 @@ describe ChessKit do
       end
 
       it 'does the current player gets created correctly' do
-        expect(reference_chess_kit.current_player).to eq testing_chess_kit.current_player
+        expect(reference_chess_kit.current_color).to eq testing_chess_kit.current_color
       end
 
       context 'does the pieces movement involved in castling gets created correctly' do
@@ -577,11 +577,11 @@ describe ChessKit do
 
         context 'current player' do
           it 'from white to black player' do
-            expect { pawn_move }.to(change { chess_kit.current_player }.from(:w).to(:b))
+            expect { pawn_move }.to(change { chess_kit.current_color }.from(:w).to(:b))
           end
           it 'consecutive from white to black back to white' do
-            expect { chess_kit.make_move(coord_A2, coord_A3) }.to(change { chess_kit.current_player }.from(:w).to(:b))
-            expect { chess_kit.make_move(coord_A7, coord_A6) }.to(change { chess_kit.current_player }.from(:b).to(:w))
+            expect { chess_kit.make_move(coord_A2, coord_A3) }.to(change { chess_kit.current_color }.from(:w).to(:b))
+            expect { chess_kit.make_move(coord_A7, coord_A6) }.to(change { chess_kit.current_color }.from(:b).to(:w))
           end
         end
 

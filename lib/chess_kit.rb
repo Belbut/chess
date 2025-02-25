@@ -5,14 +5,14 @@ require_relative '../lib/chess_kit/pieces'
 require_relative '../lib/rules/initial_piece_positions'
 
 class ChessKit
-  attr_reader :board, :current_player, :half_move_count, :full_move_count
+  attr_reader :board, :current_color, :half_move_count, :full_move_count
 
   # rows = height // columns = width
   BOARD_SIZE = { rows: 8, columns: 8 }.freeze
 
-  def initialize(board_copy, current_player, half_move_count, full_move_count)
+  def initialize(board_copy, current_color, half_move_count, full_move_count)
     @board = board_copy
-    @current_player = current_player
+    @current_color = current_color
     @half_move_count = half_move_count
     @full_move_count = full_move_count
   end
@@ -43,7 +43,7 @@ class ChessKit
 
   def deep_clone
     board_cloned = board.deep_clone
-    new(board_cloned, current_player, half_move_count, full_move_count)
+    new(board_cloned, current_color, half_move_count, full_move_count)
   end
 
   def make_move(from, to)
@@ -61,27 +61,45 @@ class ChessKit
       return raise ArgumentError, 'The target cell is the same color'
     end
 
-    return unless moving_piece.color != current_player_color
+    return if piece_belongs_to_current_player?(moving_piece)
 
     raise ArgumentError,
           'The moving piece is not from the current player'
   end
 
+  def piece_belongs_to_current_player?(piece)
+    piece.color == current_color_name
+  end
+
+  def current_player_owns_piece_at?(target_coord)
+    target = board.lookup_cell(target_coord)
+
+    target.is_a?(Unit) && piece_belongs_to_current_player?(target)
+  end
+
   def process_move_effects(moving_piece, target_cell, from, to)
     update_move_status(moving_piece, from, to)
-    update_current_player
+    update_current_color
     update_full_move_count
     update_half_move_count(moving_piece, target_cell)
   end
 
+  def current_color_name
+    case current_color
+    when :w then :white
+    when :b then :black
+    else raise "Invalid color: #{current_color}"
+    end
+  end
+
   private
 
-  def update_current_player
-    @current_player = @current_player == :w ? :b : :w
+  def update_current_color
+    @current_color = @current_color == :w ? :b : :w
   end
 
   def update_full_move_count
-    @full_move_count += 1 if @current_player == :w
+    @full_move_count += 1 if @current_color == :w
   end
 
   def update_half_move_count(moving_piece, target_cell)
@@ -105,15 +123,6 @@ class ChessKit
 
   def increase_half_move_count
     @half_move_count += 1
-  end
-
-  def current_player_color
-    case current_player
-    when :w
-      :white
-    when :b
-      :black
-    end
   end
 
   def place_color_pieces_on_board(color)

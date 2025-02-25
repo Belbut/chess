@@ -3,8 +3,8 @@
 class Player
   attr_reader :color, :name
 
-  def initialize(color, interface)
+  def initialize(color)
     @color = color
-    @name = interface.prompt_for_name
+    @name = Interface.prompt_for_name(color)
   end
 end

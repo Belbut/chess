@@ -4,11 +4,10 @@ require_relative '../lib/player'
 require_relative '../lib/interface'
 
 describe Player do
-  subject(:player) { described_class.new(:player_color, interface_dbl) }
-  let(:interface_dbl) { double }
+  subject(:player) { described_class.new(:player_color) }
 
   before do
-    allow(interface_dbl).to receive(:prompt_for_name)
+    allow(Interface).to receive(:prompt_for_name)
   end
 
   describe '#color' do
@@ -19,7 +18,7 @@ describe Player do
 
   describe '#name' do
     before do
-      allow(interface_dbl).to receive(:prompt_for_name).and_return('John')
+      allow(Interface).to receive(:prompt_for_name).and_return('John')
     end
     it 'returns player name' do
       expect(player.name).to eq('John')

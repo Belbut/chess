@@ -1,7 +1,125 @@
 # frozen_string_literal: true
 
 module Interface
-  def self.prompt_for_name; end
+  GAME_GREETING = <<~ASCII
+         ___      _ _           _   _        ___ _#{'                   '}
+        / __\\ ___| | |__  _   _| |_( )__    / __\\ |__   ___  ___ ___#{' '}
+       /__\\/// _ \\ | '_ \\| | | | __|/ __|  / /  | '_ \\ / _ \\/ __/ __|
+      / \\/  \\  __/ | |_) | |_| | |_ \\__ \\ / /___| | | |  __/\\__ \\__ \\
+      \\_____/\\___|_|_.__/ \\__,_|\\__||___/ \\____/|_| |_|\\___||___/___/
+
+    Welcome to Terminal Chess
+    This is a command-line chess game where you can play against another player or the computer
+    You can start a new game or load a previously saved one
+
+  ASCII
+
+  def self.game_greeting
+    reset_terminal_display
+    puts GAME_GREETING
+    sleep(1)
+  end
+
+  def self.new_match_intro
+    puts 'First lets create each players'
+  end
+
+  def self.load_or_new_game
+    puts 'Would you like to load a saved game or play a new one? (new/load)'
+    response = prompt_standardized_input(%w[new load])
+    reset_terminal_display
+
+    if response == 'load'
+      puts "Let's resume the last game"
+      :load_game
+    else
+      puts "Let's play a new game"
+      :new_game
+    end
+  end
+
+  def self.get_round_moves(chess_kit, rules)
+    display_chess_board(chess_kit)
+
+    puts "Turn ##{chess_kit.full_move_count}: #{chess_kit.current_color_name.capitalize} move:"
+    move_from = get_piece_to_pick_up(chess_kit)
+    # Step 2: Show available moves for the selected piece
+
+    possible_moves_of_picked_up = rules.available_paths_for_piece(move_from)
+    move_to = get_target_cell(possible_moves_of_picked_up.flatten)
+
+    [move_from, move_to]
+  end
+
+  def self.possible_moves_of(_piece_coord, _chess_kit, rules)
+    possible_moves_of_picked_up = rules.available_paths_for_piece(move_from)
+
+    display_possible_moves_board
+
+    possible_moves_of_picked_up
+  end
+
+  def self.display_possible_moves_board(chess_kit)
+    
+  end
+
+  def self.get_piece_to_pick_up(chess_kit)
+    puts "Select a piece to move (e.g., 'e2' for the piece at e2):"
+
+    loop do
+      move_from = prompt_for_coordinate_notation
+
+      return move_from if chess_kit.current_player_owns_piece_at?(move_from)
+
+      puts "That coordinate #{move_from.to_notation} doesn't have your piece, pick again"
+    end
+  end
+
+  def self.get_target_cell(possible_moves_of_picked_up)
+    puts "Enter the destination square (e.g., 'e4') or type 'change' to pick a different piece:"
+    loop do
+      move_to = prompt_for_coordinate_notation
+
+      return move_to if possible_moves_of_picked_up.include?(move_to)
+
+      puts "The target move #{move_to.to_notation} is not possible, pick again:"
+    end
+  end
+
+  def self.display_chess_board(chess_kit)
+    reset_terminal_display
+    puts chess_kit
+    puts "\n"
+  end
+
+  def self.prompt_for_name(color)
+    puts "\nWho will be playing as the #{color.capitalize} pieces? (Type 'AI' if you want the computer to play.)"
+    prompt_standardized_input(['AI'], no_constrains: true).capitalize
+  end
+
+  def self.reset_terminal_display
+    system('clear') || system('cls')
+  end
+
+  # standard should be an array were nil represents any response
+  def self.prompt_standardized_input(standard = [], no_constrains: false, case_sensitive: false)
+    loop do
+      print '  -> '
+      input = case_sensitive ? gets.chomp : gets.chomp.downcase
+
+      return input if standard.any?(input) || no_constrains
+
+      puts "Your input \"#{input}\" doesn't fit inside the possible answers \"#{standard.join(', ')}\" so try and pick one of them"
+    end
+  end
+
+  def self.prompt_for_coordinate_notation
+    Coordinate.from_notation(prompt_standardized_input(no_constrains: true))
+  rescue ArgumentError => e
+    puts e
+    puts "Chose again, (e.g., 'e2' for the piece at e2)"
+    prompt_for_coordinate_notation
+  end
 
   module Output
     require 'rainbow'

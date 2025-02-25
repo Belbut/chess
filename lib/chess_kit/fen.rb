@@ -7,7 +7,7 @@ module FEN
 
     chess_kit = ChessKit.new(
       fen_data[:board_algebraic_notation],
-      fen_data[:current_player],
+      fen_data[:current_color],
       fen_data[:half_move_count],
       fen_data[:full_move_count]
     )
@@ -21,7 +21,7 @@ module FEN
   def self.update_en_passant_rights(chess_kit, fen_data)
     return unless fen_data[:en_passant_notation] != '-'
 
-    position_of_en_passant = FEN.position_of_en_passant(current_player, en_passant_notation)
+    position_of_en_passant = FEN.position_of_en_passant(current_color, en_passant_notation)
     chess_kit.board.lookup_cell(position_of_en_passant).mark_as_rushed
   end
 
@@ -53,7 +53,7 @@ module FEN
   def self.generate(chess_kit)
     [
       chess_kit.board.to_algebraic_notation,
-      chess_kit.current_player,
+      chess_kit.current_color,
       castling_notation(chess_kit.board),
       en_passant_representation(chess_kit.board),
       chess_kit.half_move_count,
@@ -104,14 +104,14 @@ module FEN
     fen_decomposition = fen_message.split(' ')
 
     board_algebraic_notation = Board.from_algebraic_notation(fen_decomposition[0])
-    current_player = fen_decomposition[1].to_sym
+    current_color = fen_decomposition[1].to_sym
     castling_notation = fen_decomposition[2].split('')
     en_passant_notation = fen_decomposition[3]
     half_move_count = fen_decomposition[4].to_i
     full_move_count = fen_decomposition[5].to_i
 
     { board_algebraic_notation: board_algebraic_notation,
-      current_player: current_player,
+      current_color: current_color,
       castling_notation: castling_notation,
       en_passant_notation: en_passant_notation,
       half_move_count: half_move_count,
@@ -159,9 +159,9 @@ module FEN
     result
   end
 
-  def position_of_en_passant(current_player, notation)
+  def position_of_en_passant(current_color, notation)
     pawn_flank_position = Coordinate.from_notation(notation)
-    pawn_rushed_direction = current_player == :w ? 1 : -1
+    pawn_rushed_direction = current_color == :w ? 1 : -1
 
     Coordinate.new(pawn_flank_position.x, pawn_flank_position.y + pawn_rushed_direction)
   end

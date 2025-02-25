@@ -5,25 +5,55 @@ require_relative './chess_kit'
 require_relative './rules'
 
 class Game
-  attr_reader :chess_kit, :game_rules
-
+  SKIP = true
   def initialize
-    @white_player = Player.new(:white, Interface)
-    @black_player = Player.new(:black, Interface)
-    @current_player = @white_player
-
-    @chess_kit = ChessKit.new_game
-    @game_rules = Rules.new(@chess_kit)
+    Interface.game_greeting
+    case Interface.load_or_new_game
+    when :new_game
+      new_game
+    when :load_game
+      load_last_game
+    end
   end
 
+  def new_game
+    Interface.new_match_intro
+    @white_player = Player.new(:white)
+    @black_player = Player.new(:black)
+    puts("\nGame setup complete. \"#{@white_player.name}\" will play as White, and \"#{@black_player.name}\" will play as Black.")
+
+    @chess_kit = ChessKit.new_game
+    @rules = Rules.new(@chess_kit.board)
+  end
+
+  def load_last_game; end
+
   def play
+    loop do
+      game_round
+
+      break if game_should_end
+    end
     # setup game Interface.setup
     # loop game logic until we have game result
     #   one step of the loop is to change pawn status from rushed to moved on beginning of turn
     # present game result
   end
 
-  # def make_move(from_coord, to_coord); end
+  private
+
+  def game_round
+    from, to = Interface.get_round_moves(@chess_kit, @rules)
+
+    @chess_kit.make_move(from, to)
+    Interface.display_chess_board(@chess_kit)
+  end
+
+  def game_should_end
+    :black if false
+    :white if false
+    :draw if false
+  end
 end
 
 # Chess is a Game
