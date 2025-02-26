@@ -7,20 +7,21 @@ require_relative './rules'
 class Game
   SKIP = true
   def initialize
-    Interface.game_greeting
-    case Interface.load_or_new_game
-    when :new_game
-      new_game
-    when :load_game
-      load_last_game
-    end
+    SKIP || Interface.game_greeting
+    SKIP || case Interface.load_or_new_game
+            when :new_game
+              new_game
+            when :load_game
+              load_last_game
+            end
+    new_game
   end
 
   def new_game
-    Interface.new_match_intro
-    @white_player = Player.new(:white)
-    @black_player = Player.new(:black)
-    puts("\nGame setup complete. \"#{@white_player.name}\" will play as White, and \"#{@black_player.name}\" will play as Black.")
+    SKIP || Interface.new_match_intro
+    SKIP || @white_player = Player.new(:white)
+    SKIP || @black_player = Player.new(:black)
+    SKIP || puts("\nGame setup complete. \"#{@white_player.name}\" will play as White, and \"#{@black_player.name}\" will play as Black.")
 
     @chess_kit = ChessKit.new_game
     @rules = Rules.new(@chess_kit.board)
@@ -34,10 +35,6 @@ class Game
 
       break if game_should_end
     end
-    # setup game Interface.setup
-    # loop game logic until we have game result
-    #   one step of the loop is to change pawn status from rushed to moved on beginning of turn
-    # present game result
   end
 
   private

@@ -1,9 +1,9 @@
 class Cell
-  attr_accessor :content, :bg_color
+  attr_accessor :content, :state
 
-  def initialize(content = nil, bg_color = nil)
+  def initialize(content = nil, state = nil)
     @content = content
-    @bg_color = bg_color
+    @state = state
   end
 
   def nil?
@@ -16,5 +16,9 @@ class Cell
 
   def to_s
     @content.to_s
+  end
+
+  def reset_state
+    @state = nil
   end
 end

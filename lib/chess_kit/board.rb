@@ -171,6 +171,28 @@ class Board
     old_obj
   end
 
+  def add_to_cell_state(coord, state)
+    check_coord(coord)
+
+    allowed_states = %i[picked capturable movable]
+    unless allowed_states.include?(state)
+      raise ArgumentError, 'Invalid action. Allowed states are :picked, :capturable, :movable.'
+    end
+
+    matrix[coord.y][coord.x].state = state
+  end
+
+  def remove_cell_state(coord)
+    old_obj = matrix[coord.y][coord.x].bg_color
+    paint_cell(coord, nil)
+
+    old_obj
+  end
+
+  def remove_all_cell_states
+    @matrix.each { |row| row.each(&:reset_state)}
+  end
+
   def move_piece(from, to)
     moving_piece = lookup_cell(from)
 

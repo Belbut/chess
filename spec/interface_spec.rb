@@ -154,6 +154,8 @@ describe Interface do
       let(:board_render_body) { board_render.lines[1...-1] }
       let(:bottom_label) { board_render.lines.last }
 
+      let(:empty_board_matrix) { Array.new(height) { Array.new(width) { Cell.new } } }
+
       context 'does it render the board' do
         let(:label_5_columns) { '   ' + ' A  B  C  D  E ' + '   ' + "\n" }
         let(:label_8_columns) { '   ' + ' A  B  C  D  E  F  G  H ' + '   ' + "\n" }
@@ -178,7 +180,7 @@ describe Interface do
 
           context 'body of the board' do
             context 'when the board is empty' do
-              let(:empty_board_matrix) { Array.new(height) { Array.new(width) } }
+              let(:empty_board_matrix) { Array.new(height) { Array.new(width) { Cell.new } } }
 
               before do
                 allow(board_dbl).to receive(:matrix).and_return empty_board_matrix
@@ -263,7 +265,7 @@ describe Interface do
 
           context 'body of the board' do
             context 'when the board is empty' do
-              let(:empty_board_matrix) { Array.new(height) { Array.new(width) } }
+              let(:empty_board_matrix) { Array.new(height) { Array.new(width) { Cell.new } } }
 
               before do
                 allow(board_dbl).to receive(:matrix).and_return empty_board_matrix
@@ -348,8 +350,6 @@ describe Interface do
 
           context 'body of the board' do
             context 'when the board is empty' do
-              let(:empty_board_matrix) { Array.new(height) { Array.new(width) } }
-
               before do
                 allow(board_dbl).to receive(:matrix).and_return empty_board_matrix
               end

@@ -42,47 +42,62 @@ module Interface
     display_chess_board(chess_kit)
 
     puts "Turn ##{chess_kit.full_move_count}: #{chess_kit.current_color_name.capitalize} move:"
-    move_from = get_piece_to_pick_up(chess_kit)
-    # Step 2: Show available moves for the selected piece
 
-    possible_moves_of_picked_up = rules.available_paths_for_piece(move_from)
-    move_to = get_target_cell(possible_moves_of_picked_up.flatten)
+    move_from = get_piece_to_pick_up(chess_kit, rules)
+    display_possible_moves(move_from, chess_kit, rules)
+
+    move_to = get_target_cell(rules, move_from)
+    clean_cell_states(chess_kit) # needed after the display_possible_moves
 
     [move_from, move_to]
   end
 
-  def self.possible_moves_of(_piece_coord, _chess_kit, rules)
-    possible_moves_of_picked_up = rules.available_paths_for_piece(move_from)
+  def self.display_possible_moves(move_from, chess_kit, rules)
+    possible_moves_from = rules.available_paths_for_piece(move_from).flatten
 
-    display_possible_moves_board
+    chess_kit.board.add_to_cell_state(move_from, :picked)
 
-    possible_moves_of_picked_up
+    possible_moves_from.each do |coord|
+      if chess_kit.board.lookup_cell(coord).nil?
+        chess_kit.board.add_to_cell_state(coord, :movable)
+      else
+        chess_kit.board.add_to_cell_state(coord, :capturable)
+      end
+    end
+
+    display_chess_board(chess_kit)
   end
 
-  def self.display_possible_moves_board(chess_kit)
-    
+  def self.clean_cell_states(chess_kit)
+    chess_kit.board.remove_all_cell_states
   end
 
-  def self.get_piece_to_pick_up(chess_kit)
+  def self.get_piece_to_pick_up(chess_kit, rules)
     puts "Select a piece to move (e.g., 'e2' for the piece at e2):"
 
     loop do
       move_from = prompt_for_coordinate_notation
 
-      return move_from if chess_kit.current_player_owns_piece_at?(move_from)
+      unless chess_kit.current_player_owns_piece_at?(move_from)
+        puts "The cell #{move_from.to_notation} doesn't have your piece, pick again"
+        next
+      end
+      return move_from unless rules.available_paths_for_piece(move_from).empty?
 
-      puts "That coordinate #{move_from.to_notation} doesn't have your piece, pick again"
+      puts "The piece in #{move_from.to_notation} can't move, pick another"
     end
   end
 
-  def self.get_target_cell(possible_moves_of_picked_up)
+  def self.get_target_cell(rules, move_from)
+    possible_moves_from = rules.available_paths_for_piece(move_from).flatten
+
     puts "Enter the destination square (e.g., 'e4') or type 'change' to pick a different piece:"
     loop do
       move_to = prompt_for_coordinate_notation
 
-      return move_to if possible_moves_of_picked_up.include?(move_to)
+      return move_to if possible_moves_from.include?(move_to)
 
-      puts "The target move #{move_to.to_notation} is not possible, pick again:"
+      puts "The target move #{move_to.to_notation} is not possible, pick another !!!!!!!or pick another piece:"
     end
   end
 
@@ -101,7 +116,7 @@ module Interface
     system('clear') || system('cls')
   end
 
-  # standard should be an array were nil represents any response
+  # standard should be an array with
   def self.prompt_standardized_input(standard = [], no_constrains: false, case_sensitive: false)
     loop do
       print '  -> '
@@ -132,7 +147,6 @@ module Interface
                         bishop: "\u265D",
                         queen: "\u265B",
                         king: "\u265A" }.freeze
-
     DISPLAY_BLOCK_SIZE = 3
 
     def self.render_piece(unit)
@@ -187,6 +201,16 @@ module Interface
         content_canvas = Rainbow(content_blueprint)
         background_color = (row_index + cell_number).even? ? COLOR_PALETTE[:dark] : COLOR_PALETTE[:light]
         content_with_tile_color = content_canvas.bg(background_color)
+
+        case cell_content.state
+        when :picked
+          content_with_tile_color = content_with_tile_color.blink
+        when :capturable
+          content_with_tile_color = content_canvas.bg(:red)
+        when :movable
+          content_with_tile_color = content_with_tile_color.sub(padded_content(cell_content),
+                                                                padded_content('x'))
+        end
 
         row_cells.append(content_with_tile_color)
       end
