@@ -1226,4 +1226,40 @@ describe Rules do
       end
     end
   end
+
+  describe '#available_flanks_for_en_passant' do
+    before do
+      allow(Requirement).to receive(:move_is_safe_for_king).and_return(proc { true })
+      board.add_to_cell(testing_position, team_pawn)
+      board.add_to_cell(coord_E4, enemy_pawn)
+      board.add_to_cell(coord_C4, enemy_pawn)
+    end
+    context 'with flank exposed' do
+      before do
+        allow(enemy_pawn).to receive(:move_status).and_return(:rushed)
+      end
+
+      it '' do
+        board_visualization
+
+        possible_flanks = rules.available_flanks_for_en_passant(testing_position)
+
+        expect(possible_flanks).to eq([{ flank: coord_C5, target: coord_C4 }, { flank: coord_E5, target: coord_E4 }])
+      end
+    end
+
+    context 'without flank exposed' do
+      before do
+        allow(enemy_pawn).to receive(:move_status).and_return(:moved)
+      end
+
+      it '' do
+        board_visualization
+
+        possible_flanks = rules.available_flanks_for_en_passant(testing_position)
+
+        expect(possible_flanks).to eq([])
+      end
+    end
+  end
 end

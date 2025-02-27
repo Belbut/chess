@@ -15,8 +15,9 @@ module PatternFactory
       king: king_move_pattern(color, move_type) }
   end
 
-  def pawn_move_pattern(piece_color, move_type = nil)
+  def pawn_move_pattern(piece_color, move_type)
     return [pawn_normal_take_pattern(piece_color), pawn_flank_take_pattern(piece_color)] if move_type == :attack
+    return [pawn_flank_take_pattern(piece_color)] if move_type == :en_passant
 
     [pawn_normal_move_pattern(piece_color), pawn_rush_move_pattern(piece_color),
      pawn_normal_take_pattern(piece_color), pawn_flank_take_pattern(piece_color)]

@@ -59,6 +59,7 @@ module Interface
 
     possible_moves_from.each do |coord|
       if chess_kit.board.lookup_cell(coord).nil?
+        # if the move is a an passant move -> movable to the other side
         chess_kit.board.add_to_cell_state(coord, :movable)
       else
         chess_kit.board.add_to_cell_state(coord, :capturable)
