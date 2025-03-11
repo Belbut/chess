@@ -48,7 +48,6 @@ module Interface
 
     move_to = get_target_cell(rules, move_from)
     clean_cell_states(chess_kit) # needed after the display_possible_moves
-
     [move_from, move_to]
   end
 
@@ -57,15 +56,20 @@ module Interface
 
     chess_kit.board.add_to_cell_state(move_from, :picked)
 
+    en_passant_especial_cases = rules.possible_flanks_for_en_passant(move_from)
+
     possible_moves_from.each do |coord|
-      if chess_kit.board.lookup_cell(coord).nil?
+      if chess_kit.board.lookup_cell_content(coord).nil?
         # if the move is a an passant move -> movable to the other side
-        chess_kit.board.add_to_cell_state(coord, :movable)
+        if en_passant_especial_cases.map { |en_passant_case| en_passant_case[:flank] }.include?(coord)
+          chess_kit.board.add_to_cell_state(coord, :flankable)
+        else
+          chess_kit.board.add_to_cell_state(coord, :movable)
+        end
       else
         chess_kit.board.add_to_cell_state(coord, :capturable)
       end
     end
-
     display_chess_board(chess_kit)
   end
 
@@ -104,6 +108,9 @@ module Interface
 
   def self.display_chess_board(chess_kit)
     reset_terminal_display
+    puts 'FEN: ' + chess_kit.to_fen + "\n"
+    puts "\n"
+
     puts chess_kit
     puts "\n"
   end
@@ -206,7 +213,7 @@ module Interface
         case cell_content.state
         when :picked
           content_with_tile_color = content_with_tile_color.blink
-        when :capturable
+        when :capturable, :flankable
           content_with_tile_color = content_canvas.bg(:red)
         when :movable
           content_with_tile_color = content_with_tile_color.sub(padded_content(cell_content),

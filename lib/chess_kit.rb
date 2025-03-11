@@ -47,17 +47,18 @@ class ChessKit
   end
 
   def make_move(from, to)
-    moving_piece = board.lookup_cell(from)
+    moving_piece = board.lookup_cell_content(from)
     target_cell = board.lookup_cell(to)
 
     validate_move(moving_piece, target_cell)
-    board.move_piece(from, to)
 
     process_move_effects(moving_piece, target_cell, from, to)
+    board.move_piece(from, to)
   end
 
   def validate_move(moving_piece, target_cell)
-    if target_cell.is_a?(Unit) && moving_piece.color == (target_cell.color)
+    target = target_cell.content
+    if target.is_a?(Unit) && moving_piece.color == (target.color)
       return raise ArgumentError, 'The target cell is the same color'
     end
 
@@ -72,16 +73,29 @@ class ChessKit
   end
 
   def current_player_owns_piece_at?(target_coord)
-    target = board.lookup_cell(target_coord)
+    target = board.lookup_cell_content(target_coord)
 
     target.is_a?(Unit) && piece_belongs_to_current_player?(target)
   end
 
   def process_move_effects(moving_piece, target_cell, from, to)
-    update_move_status(moving_piece, from, to)
+    remove_flanked_piece(moving_piece, from, to)
+    board.find { |piece| piece.move_status == :rushed }&.mark_as_moved
     update_current_color
     update_full_move_count
     update_half_move_count(moving_piece, target_cell)
+    update_move_status(moving_piece, from, to)
+  end
+
+  def remove_flanked_piece(moving_piece, from, to)
+    return unless moving_piece.is_a?(Pieces::Pawn)
+
+    rules = Rules.new(board)
+    possible_en_passant = rules.possible_flanks_for_en_passant(from)
+
+    possible_en_passant.each do |en_passant_move|
+      board.clear_cell(en_passant_move[:target]) if en_passant_move[:flank] == to
+    end
   end
 
   def current_color_name
@@ -108,8 +122,6 @@ class ChessKit
   end
 
   def update_move_status(moving_piece, from, to)
-    board.find { |piece| piece.move_status == :rushed }&.mark_as_moved
-
     if moving_piece.is_a?(Pieces::Pawn) && Coordinate.distance_between(from, to) >= 2
       moving_piece.mark_as_rushed
     else
@@ -130,7 +142,7 @@ class ChessKit
       piece = Pieces::FACTORY[color][piece_type]
       all_positions.each do |position_notation|
         coord = Coordinate.from_notation(position_notation)
-        @board.add_to_cell(coord, piece.dup)
+        @board.add_to_cell_content(coord, piece.dup)
       end
     end
   end

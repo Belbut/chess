@@ -23,7 +23,7 @@ describe Board do
   before do
     known_board.matrix.each_with_index do |row, row_i|
       row.each_with_index do |_cell, column_i|
-        known_board.add_to_cell(Coordinate.new(column_i, row_i), KNOWN_BOARD[row_i][column_i])
+        known_board.add_to_cell_content(Coordinate.new(column_i, row_i), KNOWN_BOARD[row_i][column_i])
       end
     end
   end
@@ -94,18 +94,18 @@ describe Board do
     end
   end
 
-  describe '#lookup_cell' do
+  describe '#lookup_cell_content' do
     context 'when checking a cell ' do
       it 'is expected to check if the coordinate is valid' do
         expect(known_board).to receive(:check_coord).and_return(nil)
-        known_board.lookup_cell(coord_A1)
+        known_board.lookup_cell_content(coord_A1)
       end
 
       it 'is expected to return the object on the board cell' do
-        expect(known_board.lookup_cell(coord_A1)).to eq 'A1'
-        expect(known_board.lookup_cell(coord_B4)).to eq 'B4'
-        expect(known_board.lookup_cell(coord_D4)).to eq 'D4'
-        expect(known_board.lookup_cell(coord_E5)).to eq 'E5'
+        expect(known_board.lookup_cell_content(coord_A1)).to eq 'A1'
+        expect(known_board.lookup_cell_content(coord_B4)).to eq 'B4'
+        expect(known_board.lookup_cell_content(coord_D4)).to eq 'D4'
+        expect(known_board.lookup_cell_content(coord_E5)).to eq 'E5'
       end
     end
   end
@@ -145,31 +145,31 @@ describe Board do
     end
   end
 
-  describe '#add_to_cell' do
+  describe '#add_to_cell_content' do
     let(:rand_obj) { double('random_object') }
 
     context 'when targeting a empty cell' do
       it 'is expected to add one object to the cell selected' do
-        expect { empty_board.add_to_cell(coord_A1, rand_obj) }
-          .to change { empty_board.lookup_cell(coord_A1) }.from(nil).to(rand_obj)
+        expect { empty_board.add_to_cell_content(coord_A1, rand_obj) }
+          .to change { empty_board.lookup_cell_content(coord_A1) }.from(nil).to(rand_obj)
       end
 
       it 'is expected not to change any other cell' do
-        expect { empty_board.add_to_cell(coord_A1, rand_obj) }
+        expect { empty_board.add_to_cell_content(coord_A1, rand_obj) }
           .to(not_change { all_matrix_except.call(empty_board, coord_A1) })
       end
 
       it 'when doing multiples additions in a roll' do
-        expect { empty_board.add_to_cell(coord_A1, rand_obj) }
-          .to change { empty_board.lookup_cell(coord_A1) }.from(nil).to(rand_obj)
+        expect { empty_board.add_to_cell_content(coord_A1, rand_obj) }
+          .to change { empty_board.lookup_cell_content(coord_A1) }.from(nil).to(rand_obj)
           .and(not_change { all_matrix_except.call(empty_board, coord_A1) })
 
-        expect { empty_board.add_to_cell(coord_B4, rand_obj) }
-          .to change { empty_board.lookup_cell(coord_B4) }.from(nil).to(rand_obj)
+        expect { empty_board.add_to_cell_content(coord_B4, rand_obj) }
+          .to change { empty_board.lookup_cell_content(coord_B4) }.from(nil).to(rand_obj)
           .and(not_change { all_matrix_except.call(empty_board, coord_B4) })
 
-        expect { empty_board.add_to_cell(coord_D4, rand_obj) }
-          .to change { empty_board.lookup_cell(coord_D4) }.from(nil).to(rand_obj)
+        expect { empty_board.add_to_cell_content(coord_D4, rand_obj) }
+          .to change { empty_board.lookup_cell_content(coord_D4) }.from(nil).to(rand_obj)
           .and(not_change { all_matrix_except.call(empty_board, coord_D4) })
       end
     end
@@ -179,11 +179,11 @@ describe Board do
     context 'when targeting a occupied cell' do
       context 'cell on diagonal' do
         let(:cell_coord) { coord_A1 }
-        let!(:cell_content) { known_board.lookup_cell(cell_coord) }
+        let!(:cell_content) { known_board.lookup_cell_content(cell_coord) }
 
         it 'is expected to change cell content to nil' do
           expect { known_board.clear_cell(cell_coord) }
-            .to(change { known_board.lookup_cell(cell_coord) }.from(cell_content).to(nil))
+            .to(change { known_board.lookup_cell_content(cell_coord) }.from(cell_content).to(nil))
         end
 
         it 'is expected not to change any other cell content' do
@@ -198,11 +198,11 @@ describe Board do
 
       context 'cell not on diagonal' do
         let(:cell_coord) { coord_B4 }
-        let!(:cell_content) { known_board.lookup_cell(cell_coord) }
+        let!(:cell_content) { known_board.lookup_cell_content(cell_coord) }
 
         it 'is expected to change cell content to nil' do
           expect { known_board.clear_cell(cell_coord) }
-            .to(change { known_board.lookup_cell(cell_coord) }.from(cell_content).to(nil))
+            .to(change { known_board.lookup_cell_content(cell_coord) }.from(cell_content).to(nil))
         end
 
         it 'is expected not to change any other cell content' do
@@ -218,11 +218,11 @@ describe Board do
 
     context 'when targeting a empty cell' do
       let(:cell_coord) { coord_A1 }
-      let!(:cell_content) { empty_board.lookup_cell(cell_coord) }
+      let!(:cell_content) { empty_board.lookup_cell_content(cell_coord) }
 
       it 'is expected to keep cell nil' do
         expect { empty_board.clear_cell(cell_coord) }
-          .to(not_change { empty_board.lookup_cell(cell_coord) })
+          .to(not_change { empty_board.lookup_cell_content(cell_coord) })
       end
 
       it 'is expected not to change any other cell' do

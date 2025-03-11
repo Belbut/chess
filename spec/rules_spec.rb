@@ -24,7 +24,7 @@ describe Rules do
     end
 
     before do
-      board.add_to_cell(testing_position, team_piece)
+      board.add_to_cell_content(testing_position, team_piece)
     end
 
     context 'when no piece is attacking the position' do
@@ -37,17 +37,17 @@ describe Rules do
       end
       context 'the attacking paths are being blocked' do
         before do
-          board.add_to_cell(coord_D1, enemy_rook)
-          board.add_to_cell(coord_G1, enemy_bishop)
-          board.add_to_cell(coord_A7, enemy_queen)
+          board.add_to_cell_content(coord_D1, enemy_rook)
+          board.add_to_cell_content(coord_G1, enemy_bishop)
+          board.add_to_cell_content(coord_A7, enemy_queen)
         end
         context 'blocked by friendly piece' do
           let(:friendly_blocking_piece) { Pieces::FACTORY[team_color][:pawn] }
 
           before do
-            board.add_to_cell(coord_B6, friendly_blocking_piece)
-            board.add_to_cell(coord_F2, friendly_blocking_piece)
-            board.add_to_cell(coord_D3, friendly_blocking_piece)
+            board.add_to_cell_content(coord_B6, friendly_blocking_piece)
+            board.add_to_cell_content(coord_F2, friendly_blocking_piece)
+            board.add_to_cell_content(coord_D3, friendly_blocking_piece)
           end
 
           it '' do
@@ -59,9 +59,9 @@ describe Rules do
 
         context 'blocked by enemy piece' do
           before do
-            board.add_to_cell(coord_B6, enemy_blocking_piece)
-            board.add_to_cell(coord_F2, enemy_blocking_piece)
-            board.add_to_cell(coord_D3, enemy_blocking_piece)
+            board.add_to_cell_content(coord_B6, enemy_blocking_piece)
+            board.add_to_cell_content(coord_F2, enemy_blocking_piece)
+            board.add_to_cell_content(coord_D3, enemy_blocking_piece)
           end
 
           it '' do
@@ -77,7 +77,7 @@ describe Rules do
       context 'enemy pawn' do
         context 'by one' do
           before do
-            board.add_to_cell(coord_E5, enemy_pawn)
+            board.add_to_cell_content(coord_E5, enemy_pawn)
           end
 
           it '' do
@@ -88,7 +88,7 @@ describe Rules do
 
           context 'one attack position another one blocked' do
             before do
-              board.add_to_cell(coord_D5, enemy_pawn)
+              board.add_to_cell_content(coord_D5, enemy_pawn)
             end
 
             it '' do
@@ -101,8 +101,8 @@ describe Rules do
 
         context 'by two' do
           before do
-            board.add_to_cell(coord_E5, enemy_pawn)
-            board.add_to_cell(coord_C5, enemy_pawn)
+            board.add_to_cell_content(coord_E5, enemy_pawn)
+            board.add_to_cell_content(coord_C5, enemy_pawn)
           end
 
           it '' do
@@ -116,7 +116,7 @@ describe Rules do
       context 'enemy rooks' do
         context 'by one' do
           before do
-            board.add_to_cell(coord_D1, enemy_rook)
+            board.add_to_cell_content(coord_D1, enemy_rook)
           end
 
           it '' do
@@ -128,8 +128,8 @@ describe Rules do
 
         context 'by two' do
           before do
-            board.add_to_cell(coord_A4, enemy_rook)
-            board.add_to_cell(coord_H4, enemy_rook)
+            board.add_to_cell_content(coord_A4, enemy_rook)
+            board.add_to_cell_content(coord_H4, enemy_rook)
           end
 
           it '' do
@@ -144,7 +144,7 @@ describe Rules do
       context 'enemy knights' do
         context 'by one' do
           before do
-            board.add_to_cell(coord_B5, enemy_knight)
+            board.add_to_cell_content(coord_B5, enemy_knight)
           end
 
           it '' do
@@ -156,8 +156,8 @@ describe Rules do
 
         context 'by two' do
           before do
-            board.add_to_cell(coord_E2, enemy_knight)
-            board.add_to_cell(coord_F3, enemy_knight)
+            board.add_to_cell_content(coord_E2, enemy_knight)
+            board.add_to_cell_content(coord_F3, enemy_knight)
           end
 
           it '' do
@@ -171,7 +171,7 @@ describe Rules do
       context 'enemy bishops' do
         context 'by one' do
           before do
-            board.add_to_cell(coord_G1, enemy_bishop)
+            board.add_to_cell_content(coord_G1, enemy_bishop)
           end
 
           it '' do
@@ -183,8 +183,8 @@ describe Rules do
 
         context 'by two' do
           before do
-            board.add_to_cell(coord_A1, enemy_bishop)
-            board.add_to_cell(coord_A7, enemy_bishop)
+            board.add_to_cell_content(coord_A1, enemy_bishop)
+            board.add_to_cell_content(coord_A7, enemy_bishop)
           end
 
           it '' do
@@ -198,7 +198,7 @@ describe Rules do
       context 'enemy queen' do
         context 'by one' do
           before do
-            board.add_to_cell(coord_D3, enemy_queen)
+            board.add_to_cell_content(coord_D3, enemy_queen)
           end
 
           it '' do
@@ -210,8 +210,8 @@ describe Rules do
 
         context 'by two' do
           before do
-            board.add_to_cell(coord_E3, enemy_queen)
-            board.add_to_cell(coord_D5, enemy_queen)
+            board.add_to_cell_content(coord_E3, enemy_queen)
+            board.add_to_cell_content(coord_D5, enemy_queen)
           end
 
           it '' do
@@ -225,7 +225,7 @@ describe Rules do
       context 'enemy king' do
         context 'by one' do
           before do
-            board.add_to_cell(coord_D3, enemy_king)
+            board.add_to_cell_content(coord_D3, enemy_king)
           end
 
           it '' do
@@ -237,8 +237,8 @@ describe Rules do
 
         context 'by two' do
           before do
-            board.add_to_cell(coord_E3, enemy_king)
-            board.add_to_cell(coord_D5, enemy_king)
+            board.add_to_cell_content(coord_E3, enemy_king)
+            board.add_to_cell_content(coord_D5, enemy_king)
           end
 
           it '' do
@@ -257,7 +257,7 @@ describe Rules do
     end
 
     before do
-      board.add_to_cell(testing_position, team_piece)
+      board.add_to_cell_content(testing_position, team_piece)
     end
 
     context 'when no piece is attacking the position' do
@@ -270,15 +270,15 @@ describe Rules do
       end
       context 'the attacking paths are being blocked' do
         before do
-          board.add_to_cell(coord_D1, enemy_rook)
-          board.add_to_cell(coord_G1, enemy_bishop)
-          board.add_to_cell(coord_A7, enemy_queen)
+          board.add_to_cell_content(coord_D1, enemy_rook)
+          board.add_to_cell_content(coord_G1, enemy_bishop)
+          board.add_to_cell_content(coord_A7, enemy_queen)
         end
         context 'blocked by friendly piece' do
           before do
-            board.add_to_cell(coord_B6, friendly_blocking_piece)
-            board.add_to_cell(coord_F2, friendly_blocking_piece)
-            board.add_to_cell(coord_D3, friendly_blocking_piece)
+            board.add_to_cell_content(coord_B6, friendly_blocking_piece)
+            board.add_to_cell_content(coord_F2, friendly_blocking_piece)
+            board.add_to_cell_content(coord_D3, friendly_blocking_piece)
           end
 
           it '' do
@@ -290,9 +290,9 @@ describe Rules do
 
         context 'blocked by enemy piece' do
           before do
-            board.add_to_cell(coord_B6, enemy_blocking_piece)
-            board.add_to_cell(coord_F2, enemy_blocking_piece)
-            board.add_to_cell(coord_D3, enemy_blocking_piece)
+            board.add_to_cell_content(coord_B6, enemy_blocking_piece)
+            board.add_to_cell_content(coord_F2, enemy_blocking_piece)
+            board.add_to_cell_content(coord_D3, enemy_blocking_piece)
           end
 
           it '' do
@@ -308,7 +308,7 @@ describe Rules do
       context 'enemy pawn' do
         context 'by one' do
           before do
-            board.add_to_cell(coord_E5, enemy_pawn)
+            board.add_to_cell_content(coord_E5, enemy_pawn)
           end
 
           it '' do
@@ -319,7 +319,7 @@ describe Rules do
 
           context 'one attack position another one blocked' do
             before do
-              board.add_to_cell(coord_D5, enemy_pawn)
+              board.add_to_cell_content(coord_D5, enemy_pawn)
             end
 
             it '' do
@@ -332,8 +332,8 @@ describe Rules do
 
         context 'by two' do
           before do
-            board.add_to_cell(coord_E5, enemy_pawn)
-            board.add_to_cell(coord_C5, enemy_pawn)
+            board.add_to_cell_content(coord_E5, enemy_pawn)
+            board.add_to_cell_content(coord_C5, enemy_pawn)
           end
 
           it '' do
@@ -347,7 +347,7 @@ describe Rules do
       context 'enemy rooks' do
         context 'by one' do
           before do
-            board.add_to_cell(coord_D1, enemy_rook)
+            board.add_to_cell_content(coord_D1, enemy_rook)
           end
 
           it '' do
@@ -359,8 +359,8 @@ describe Rules do
 
         context 'by two' do
           before do
-            board.add_to_cell(coord_A4, enemy_rook)
-            board.add_to_cell(coord_H4, enemy_rook)
+            board.add_to_cell_content(coord_A4, enemy_rook)
+            board.add_to_cell_content(coord_H4, enemy_rook)
           end
 
           it '' do
@@ -375,7 +375,7 @@ describe Rules do
       context 'enemy knights' do
         context 'by one' do
           before do
-            board.add_to_cell(coord_B5, enemy_knight)
+            board.add_to_cell_content(coord_B5, enemy_knight)
           end
 
           it '' do
@@ -387,8 +387,8 @@ describe Rules do
 
         context 'by two' do
           before do
-            board.add_to_cell(coord_E2, enemy_knight)
-            board.add_to_cell(coord_F3, enemy_knight)
+            board.add_to_cell_content(coord_E2, enemy_knight)
+            board.add_to_cell_content(coord_F3, enemy_knight)
           end
 
           it '' do
@@ -402,7 +402,7 @@ describe Rules do
       context 'enemy bishops' do
         context 'by one' do
           before do
-            board.add_to_cell(coord_G1, enemy_bishop)
+            board.add_to_cell_content(coord_G1, enemy_bishop)
           end
 
           it '' do
@@ -414,8 +414,8 @@ describe Rules do
 
         context 'by two' do
           before do
-            board.add_to_cell(coord_A1, enemy_bishop)
-            board.add_to_cell(coord_A7, enemy_bishop)
+            board.add_to_cell_content(coord_A1, enemy_bishop)
+            board.add_to_cell_content(coord_A7, enemy_bishop)
           end
 
           it '' do
@@ -430,7 +430,7 @@ describe Rules do
       context 'enemy queen' do
         context 'by one' do
           before do
-            board.add_to_cell(coord_D3, enemy_queen)
+            board.add_to_cell_content(coord_D3, enemy_queen)
           end
 
           it '' do
@@ -442,8 +442,8 @@ describe Rules do
 
         context 'by two' do
           before do
-            board.add_to_cell(coord_E3, enemy_queen)
-            board.add_to_cell(coord_D5, enemy_queen)
+            board.add_to_cell_content(coord_E3, enemy_queen)
+            board.add_to_cell_content(coord_D5, enemy_queen)
           end
 
           it '' do
@@ -457,7 +457,7 @@ describe Rules do
       context 'enemy king' do
         context 'by one' do
           before do
-            board.add_to_cell(coord_D3, enemy_king)
+            board.add_to_cell_content(coord_D3, enemy_king)
           end
 
           it '' do
@@ -469,8 +469,8 @@ describe Rules do
 
         context 'by two' do
           before do
-            board.add_to_cell(coord_E3, enemy_king)
-            board.add_to_cell(coord_D5, enemy_king)
+            board.add_to_cell_content(coord_E3, enemy_king)
+            board.add_to_cell_content(coord_D5, enemy_king)
           end
 
           it '' do
@@ -491,7 +491,7 @@ describe Rules do
     context 'picking a pawn' do
       context 'in the middle of the board' do
         before do
-          board.add_to_cell(testing_position, team_pawn)
+          board.add_to_cell_content(testing_position, team_pawn)
         end
 
         context 'forward move' do
@@ -509,7 +509,7 @@ describe Rules do
             context 'blocked by' do
               context 'same color piece' do
                 it '' do
-                  board.add_to_cell(coord_D6, enemy_pawn)
+                  board.add_to_cell_content(coord_D6, enemy_pawn)
                   board_visualization
 
                   possible_paths = rules.available_paths_for_piece(testing_position)
@@ -518,7 +518,7 @@ describe Rules do
                 end
 
                 it '' do
-                  board.add_to_cell(coord_D5, enemy_pawn)
+                  board.add_to_cell_content(coord_D5, enemy_pawn)
 
                   board_visualization
 
@@ -530,7 +530,7 @@ describe Rules do
 
               context 'opponent color piece' do
                 it '' do
-                  board.add_to_cell(coord_D6, team_pawn)
+                  board.add_to_cell_content(coord_D6, team_pawn)
                   board_visualization
 
                   possible_paths = rules.available_paths_for_piece(testing_position)
@@ -539,7 +539,7 @@ describe Rules do
                 end
 
                 it '' do
-                  board.add_to_cell(coord_D5, team_pawn)
+                  board.add_to_cell_content(coord_D5, team_pawn)
 
                   board_visualization
 
@@ -569,7 +569,7 @@ describe Rules do
             context 'blocked by' do
               context 'same color piece' do
                 it '' do
-                  board.add_to_cell(coord_D5, enemy_pawn)
+                  board.add_to_cell_content(coord_D5, enemy_pawn)
 
                   board_visualization
 
@@ -581,7 +581,7 @@ describe Rules do
 
               context 'opponent color piece' do
                 it '' do
-                  board.add_to_cell(coord_D5, team_pawn)
+                  board.add_to_cell_content(coord_D5, team_pawn)
 
                   board_visualization
 
@@ -598,8 +598,8 @@ describe Rules do
           context 'normal take pattern' do
             context 'same color piece' do
               it '' do
-                board.add_to_cell(coord_E5, team_pawn)
-                board.add_to_cell(coord_C5, team_pawn)
+                board.add_to_cell_content(coord_E5, team_pawn)
+                board.add_to_cell_content(coord_C5, team_pawn)
 
                 board_visualization
 
@@ -611,8 +611,8 @@ describe Rules do
 
             context 'opponent color piece' do
               it '' do
-                board.add_to_cell(coord_E5, enemy_pawn)
-                board.add_to_cell(coord_C5, enemy_pawn)
+                board.add_to_cell_content(coord_E5, enemy_pawn)
+                board.add_to_cell_content(coord_C5, enemy_pawn)
 
                 board_visualization
                 puts board
@@ -631,8 +631,8 @@ describe Rules do
             end
 
             it '' do
-              board.add_to_cell(coord_E4, enemy_pawn)
-              board.add_to_cell(coord_C4, enemy_pawn)
+              board.add_to_cell_content(coord_E4, enemy_pawn)
+              board.add_to_cell_content(coord_C4, enemy_pawn)
 
               board_visualization
 
@@ -648,8 +648,8 @@ describe Rules do
               end
 
               it '' do
-                board.add_to_cell(coord_E4, enemy_pawn)
-                board.add_to_cell(coord_C4, enemy_pawn)
+                board.add_to_cell_content(coord_E4, enemy_pawn)
+                board.add_to_cell_content(coord_C4, enemy_pawn)
 
                 board_visualization
 
@@ -669,8 +669,8 @@ describe Rules do
 
             context 'the piece is already blocking the attack' do
               before do
-                board.add_to_cell(coord_D1, team_king)
-                board.add_to_cell(coord_D8, enemy_rook)
+                board.add_to_cell_content(coord_D1, team_king)
+                board.add_to_cell_content(coord_D8, enemy_rook)
               end
 
               it '' do
@@ -684,8 +684,8 @@ describe Rules do
 
             context 'the piece can move to block the attack' do
               before do
-                board.add_to_cell(coord_C3, team_king)
-                board.add_to_cell(coord_H8, enemy_bishop)
+                board.add_to_cell_content(coord_C3, team_king)
+                board.add_to_cell_content(coord_H8, enemy_bishop)
               end
               it '' do
                 board_visualization
@@ -702,7 +702,7 @@ describe Rules do
 
     context 'picking a rook' do
       before do
-        board.add_to_cell(testing_position, team_rook)
+        board.add_to_cell_content(testing_position, team_rook)
       end
       context 'from the middle of a empty board' do
         it '' do
@@ -720,10 +720,10 @@ describe Rules do
       context 'when the board has other pieces that limit the rook move' do
         context 'other pieces are from the same color' do
           before do
-            board.add_to_cell(coord_D7, team_pawn)
-            board.add_to_cell(coord_D3, team_pawn)
-            board.add_to_cell(coord_F4, team_pawn)
-            board.add_to_cell(coord_A4, team_pawn)
+            board.add_to_cell_content(coord_D7, team_pawn)
+            board.add_to_cell_content(coord_D3, team_pawn)
+            board.add_to_cell_content(coord_F4, team_pawn)
+            board.add_to_cell_content(coord_A4, team_pawn)
           end
 
           it '' do
@@ -739,10 +739,10 @@ describe Rules do
 
         context 'other pieces are from the opposite color' do
           before do
-            board.add_to_cell(coord_D7, enemy_pawn)
-            board.add_to_cell(coord_D3, enemy_pawn)
-            board.add_to_cell(coord_F4, enemy_pawn)
-            board.add_to_cell(coord_A4, enemy_pawn)
+            board.add_to_cell_content(coord_D7, enemy_pawn)
+            board.add_to_cell_content(coord_D3, enemy_pawn)
+            board.add_to_cell_content(coord_F4, enemy_pawn)
+            board.add_to_cell_content(coord_A4, enemy_pawn)
           end
 
           it '' do
@@ -757,13 +757,13 @@ describe Rules do
 
         context 'other pieces are attacking the king' do
           before do
-            board.add_to_cell(coord_D1, team_king)
+            board.add_to_cell_content(coord_D1, team_king)
             allow(Requirement).to receive(:move_is_safe_for_king).and_call_original
           end
 
           context 'the piece is already blocking the attack' do
             before do
-              board.add_to_cell(coord_D8, enemy_rook)
+              board.add_to_cell_content(coord_D8, enemy_rook)
             end
 
             it '' do
@@ -778,7 +778,7 @@ describe Rules do
 
           context 'the piece can move to block the attack' do
             before do
-              board.add_to_cell(coord_H5, enemy_bishop)
+              board.add_to_cell_content(coord_H5, enemy_bishop)
             end
             it '' do
               board_visualization
@@ -794,7 +794,7 @@ describe Rules do
 
     context 'picking a bishop' do
       before do
-        board.add_to_cell(testing_position, team_bishop)
+        board.add_to_cell_content(testing_position, team_bishop)
       end
       context 'from the middle of a empty board' do
         it '' do
@@ -810,10 +810,10 @@ describe Rules do
       context 'when the board has other pieces that limit the bishop move' do
         context 'other pieces are from the same color' do
           before do
-            board.add_to_cell(coord_G7, team_pawn)
-            board.add_to_cell(coord_C3, team_pawn)
-            board.add_to_cell(coord_F2, team_pawn)
-            board.add_to_cell(coord_A7, team_pawn)
+            board.add_to_cell_content(coord_G7, team_pawn)
+            board.add_to_cell_content(coord_C3, team_pawn)
+            board.add_to_cell_content(coord_F2, team_pawn)
+            board.add_to_cell_content(coord_A7, team_pawn)
           end
 
           it '' do
@@ -828,10 +828,10 @@ describe Rules do
 
         context 'other pieces are from opposite came color' do
           before do
-            board.add_to_cell(coord_G7, enemy_pawn)
-            board.add_to_cell(coord_C3, enemy_pawn)
-            board.add_to_cell(coord_F2, enemy_pawn)
-            board.add_to_cell(coord_A7, enemy_pawn)
+            board.add_to_cell_content(coord_G7, enemy_pawn)
+            board.add_to_cell_content(coord_C3, enemy_pawn)
+            board.add_to_cell_content(coord_F2, enemy_pawn)
+            board.add_to_cell_content(coord_A7, enemy_pawn)
           end
 
           it '' do
@@ -846,13 +846,13 @@ describe Rules do
 
         context 'other pieces are attacking the king' do
           before do
-            board.add_to_cell(coord_A1, team_king)
+            board.add_to_cell_content(coord_A1, team_king)
             allow(Requirement).to receive(:move_is_safe_for_king).and_call_original
           end
 
           context 'the piece is already blocking the attack' do
             before do
-              board.add_to_cell(coord_H8, enemy_queen)
+              board.add_to_cell_content(coord_H8, enemy_queen)
             end
 
             it '' do
@@ -867,7 +867,7 @@ describe Rules do
 
           context 'the piece can move to block the attack' do
             before do
-              board.add_to_cell(coord_H1, enemy_rook)
+              board.add_to_cell_content(coord_H1, enemy_rook)
             end
             it '' do
               board_visualization
@@ -885,7 +885,7 @@ describe Rules do
 
     context 'picking a queen' do
       before do
-        board.add_to_cell(testing_position, team_queen)
+        board.add_to_cell_content(testing_position, team_queen)
       end
       context 'from the middle of a empty board' do
         it '' do
@@ -903,14 +903,14 @@ describe Rules do
       context 'when the board has other pieces that limit the queen move' do
         context 'other pieces are from the same color' do
           before do
-            board.add_to_cell(coord_D7, team_pawn)
-            board.add_to_cell(coord_D3, team_pawn)
-            board.add_to_cell(coord_F4, team_pawn)
-            board.add_to_cell(coord_A4, team_pawn)
-            board.add_to_cell(coord_G7, team_pawn)
-            board.add_to_cell(coord_C3, team_pawn)
-            board.add_to_cell(coord_F2, team_pawn)
-            board.add_to_cell(coord_A7, team_pawn)
+            board.add_to_cell_content(coord_D7, team_pawn)
+            board.add_to_cell_content(coord_D3, team_pawn)
+            board.add_to_cell_content(coord_F4, team_pawn)
+            board.add_to_cell_content(coord_A4, team_pawn)
+            board.add_to_cell_content(coord_G7, team_pawn)
+            board.add_to_cell_content(coord_C3, team_pawn)
+            board.add_to_cell_content(coord_F2, team_pawn)
+            board.add_to_cell_content(coord_A7, team_pawn)
           end
 
           it '' do
@@ -925,14 +925,14 @@ describe Rules do
 
         context 'other pieces are from opposite came color' do
           before do
-            board.add_to_cell(coord_D7, enemy_pawn)
-            board.add_to_cell(coord_D3, enemy_pawn)
-            board.add_to_cell(coord_F4, enemy_pawn)
-            board.add_to_cell(coord_A4, enemy_pawn)
-            board.add_to_cell(coord_G7, enemy_pawn)
-            board.add_to_cell(coord_C3, enemy_pawn)
-            board.add_to_cell(coord_F2, enemy_pawn)
-            board.add_to_cell(coord_A7, enemy_pawn)
+            board.add_to_cell_content(coord_D7, enemy_pawn)
+            board.add_to_cell_content(coord_D3, enemy_pawn)
+            board.add_to_cell_content(coord_F4, enemy_pawn)
+            board.add_to_cell_content(coord_A4, enemy_pawn)
+            board.add_to_cell_content(coord_G7, enemy_pawn)
+            board.add_to_cell_content(coord_C3, enemy_pawn)
+            board.add_to_cell_content(coord_F2, enemy_pawn)
+            board.add_to_cell_content(coord_A7, enemy_pawn)
           end
 
           it '' do
@@ -947,13 +947,13 @@ describe Rules do
 
         context 'other pieces are attacking the king' do
           before do
-            board.add_to_cell(coord_D1, team_king)
+            board.add_to_cell_content(coord_D1, team_king)
             allow(Requirement).to receive(:move_is_safe_for_king).and_call_original
           end
 
           context 'the piece is already blocking the attack' do
             before do
-              board.add_to_cell(coord_D8, enemy_rook)
+              board.add_to_cell_content(coord_D8, enemy_rook)
             end
 
             it '' do
@@ -968,7 +968,7 @@ describe Rules do
 
           context 'the piece can move to block the attack' do
             before do
-              board.add_to_cell(coord_H5, enemy_bishop)
+              board.add_to_cell_content(coord_H5, enemy_bishop)
             end
             it '' do
               board_visualization
@@ -984,19 +984,19 @@ describe Rules do
 
     context 'picking a knight' do
       before do
-        board.add_to_cell(testing_position, team_knight)
+        board.add_to_cell_content(testing_position, team_knight)
       end
 
       context 'that is boxed in all around' do
         before do
-          board.add_to_cell(coord_C3, enemy_rook)
-          board.add_to_cell(coord_D3, enemy_rook)
-          board.add_to_cell(coord_E3, enemy_rook)
-          board.add_to_cell(coord_C4, enemy_rook)
-          board.add_to_cell(coord_E4, team_rook)
-          board.add_to_cell(coord_C5, team_rook)
-          board.add_to_cell(coord_D5, team_rook)
-          board.add_to_cell(coord_E5, team_rook)
+          board.add_to_cell_content(coord_C3, enemy_rook)
+          board.add_to_cell_content(coord_D3, enemy_rook)
+          board.add_to_cell_content(coord_E3, enemy_rook)
+          board.add_to_cell_content(coord_C4, enemy_rook)
+          board.add_to_cell_content(coord_E4, team_rook)
+          board.add_to_cell_content(coord_C5, team_rook)
+          board.add_to_cell_content(coord_D5, team_rook)
+          board.add_to_cell_content(coord_E5, team_rook)
         end
 
         it '' do
@@ -1012,14 +1012,14 @@ describe Rules do
       context 'when the board has other pieces that limit the knight move' do
         context 'other pieces are from the same color' do
           before do
-            board.add_to_cell(coord_F5, team_pawn)
-            board.add_to_cell(coord_F3, team_pawn)
-            board.add_to_cell(coord_E6, team_pawn)
-            board.add_to_cell(coord_E2, team_pawn)
-            board.add_to_cell(coord_C6, team_pawn)
-            board.add_to_cell(coord_C2, team_pawn)
-            board.add_to_cell(coord_B5, team_pawn)
-            board.add_to_cell(coord_B3, team_pawn)
+            board.add_to_cell_content(coord_F5, team_pawn)
+            board.add_to_cell_content(coord_F3, team_pawn)
+            board.add_to_cell_content(coord_E6, team_pawn)
+            board.add_to_cell_content(coord_E2, team_pawn)
+            board.add_to_cell_content(coord_C6, team_pawn)
+            board.add_to_cell_content(coord_C2, team_pawn)
+            board.add_to_cell_content(coord_B5, team_pawn)
+            board.add_to_cell_content(coord_B3, team_pawn)
           end
 
           it '' do
@@ -1033,14 +1033,14 @@ describe Rules do
 
         context 'other pieces are from the opposite color' do
           before do
-            board.add_to_cell(coord_F5, enemy_pawn)
-            board.add_to_cell(coord_F3, enemy_pawn)
-            board.add_to_cell(coord_E6, enemy_pawn)
-            board.add_to_cell(coord_E2, enemy_pawn)
-            board.add_to_cell(coord_C6, enemy_pawn)
-            board.add_to_cell(coord_C2, enemy_pawn)
-            board.add_to_cell(coord_B5, enemy_pawn)
-            board.add_to_cell(coord_B3, enemy_pawn)
+            board.add_to_cell_content(coord_F5, enemy_pawn)
+            board.add_to_cell_content(coord_F3, enemy_pawn)
+            board.add_to_cell_content(coord_E6, enemy_pawn)
+            board.add_to_cell_content(coord_E2, enemy_pawn)
+            board.add_to_cell_content(coord_C6, enemy_pawn)
+            board.add_to_cell_content(coord_C2, enemy_pawn)
+            board.add_to_cell_content(coord_B5, enemy_pawn)
+            board.add_to_cell_content(coord_B3, enemy_pawn)
           end
 
           it '' do
@@ -1055,13 +1055,13 @@ describe Rules do
 
         context 'other pieces are attacking the king' do
           before do
-            board.add_to_cell(coord_D1, team_king)
+            board.add_to_cell_content(coord_D1, team_king)
             allow(Requirement).to receive(:move_is_safe_for_king).and_call_original
           end
 
           context 'the piece is already blocking the attack' do
             before do
-              board.add_to_cell(coord_D8, enemy_rook)
+              board.add_to_cell_content(coord_D8, enemy_rook)
             end
 
             it '' do
@@ -1075,7 +1075,7 @@ describe Rules do
 
           context 'the piece can move to block the attack' do
             before do
-              board.add_to_cell(coord_H5, enemy_bishop)
+              board.add_to_cell_content(coord_H5, enemy_bishop)
             end
             it '' do
               board_visualization
@@ -1097,7 +1097,7 @@ describe Rules do
       context 'from the middle of a board' do
         context 'with no movement restriction' do
           before do
-            board.add_to_cell(testing_position, team_king)
+            board.add_to_cell_content(testing_position, team_king)
           end
 
           it '' do
@@ -1114,8 +1114,8 @@ describe Rules do
 
         context 'with restricted movement' do
           before do
-            board.add_to_cell(testing_position, team_king)
-            board.add_to_cell(coord_E1, enemy_rook)
+            board.add_to_cell_content(testing_position, team_king)
+            board.add_to_cell_content(coord_E1, enemy_rook)
           end
 
           it '' do
@@ -1135,8 +1135,8 @@ describe Rules do
         let(:castle_team_rook) { team_rook.clone }
 
         before do
-          board.add_to_cell(coord_E1, castle_team_king)
-          board.add_to_cell(coord_A1, castle_team_rook)
+          board.add_to_cell_content(coord_E1, castle_team_king)
+          board.add_to_cell_content(coord_A1, castle_team_rook)
         end
 
         context 'can castle' do
@@ -1183,7 +1183,7 @@ describe Rules do
           context 'any cell involved are under attack' do
             context 'king targeted' do
               before do
-                board.add_to_cell(coord_E8, enemy_rook)
+                board.add_to_cell_content(coord_E8, enemy_rook)
               end
               it '' do
                 board_visualization
@@ -1196,7 +1196,7 @@ describe Rules do
             end
             context 'row targeted' do
               before do
-                board.add_to_cell(coord_C8, enemy_rook)
+                board.add_to_cell_content(coord_C8, enemy_rook)
               end
               it '' do
                 board_visualization
@@ -1210,7 +1210,7 @@ describe Rules do
           end
           context 'one of the cells are not empty' do
             before do
-              board.add_to_cell(coord_C1, team_bishop)
+              board.add_to_cell_content(coord_C1, team_bishop)
             end
             it '' do
               board_visualization
@@ -1227,12 +1227,12 @@ describe Rules do
     end
   end
 
-  describe '#available_flanks_for_en_passant' do
+  describe '#possible_flanks_for_en_passant' do
     before do
       allow(Requirement).to receive(:move_is_safe_for_king).and_return(proc { true })
-      board.add_to_cell(testing_position, team_pawn)
-      board.add_to_cell(coord_E4, enemy_pawn)
-      board.add_to_cell(coord_C4, enemy_pawn)
+      board.add_to_cell_content(testing_position, team_pawn)
+      board.add_to_cell_content(coord_E4, enemy_pawn)
+      board.add_to_cell_content(coord_C4, enemy_pawn)
     end
     context 'with flank exposed' do
       before do
@@ -1242,7 +1242,7 @@ describe Rules do
       it '' do
         board_visualization
 
-        possible_flanks = rules.available_flanks_for_en_passant(testing_position)
+        possible_flanks = rules.possible_flanks_for_en_passant(testing_position)
 
         expect(possible_flanks).to eq([{ flank: coord_C5, target: coord_C4 }, { flank: coord_E5, target: coord_E4 }])
       end
@@ -1256,7 +1256,7 @@ describe Rules do
       it '' do
         board_visualization
 
-        possible_flanks = rules.available_flanks_for_en_passant(testing_position)
+        possible_flanks = rules.possible_flanks_for_en_passant(testing_position)
 
         expect(possible_flanks).to eq([])
       end

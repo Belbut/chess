@@ -5,6 +5,8 @@ require_relative './chess_kit'
 require_relative './rules'
 
 class Game
+  attr_reader :chess_kit
+
   SKIP = true
   def initialize
     SKIP || Interface.game_greeting
@@ -46,11 +48,7 @@ class Game
     Interface.display_chess_board(@chess_kit)
   end
 
-  def game_should_end
-    :black if false
-    :white if false
-    :draw if false
-  end
+  def game_should_end; end
 end
 
 # Chess is a Game

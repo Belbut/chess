@@ -22,7 +22,7 @@ module FEN
     return unless fen_data[:en_passant_notation] != '-'
 
     position_of_en_passant = FEN.position_of_en_passant(current_color, en_passant_notation)
-    chess_kit.board.lookup_cell(position_of_en_passant).mark_as_rushed
+    chess_kit.board.lookup_cell_content(position_of_en_passant).mark_as_rushed
   end
 
   ROOK_CASTLING_POSITIONS = {
@@ -45,7 +45,7 @@ module FEN
   def self.assign_rook_status(chess_kit, moved_rooks_codes)
     moved_rooks_codes.each do |rook_code|
       rook_coord = Coordinate.from_notation(ROOK_CASTLING_POSITIONS[rook_code])
-      rook = chess_kit.board.lookup_cell(rook_coord)
+      rook = chess_kit.board.lookup_cell_content(rook_coord)
       rook.mark_as_moved if rook.is_a?(Pieces::Rook)
     end
   end
@@ -120,18 +120,18 @@ module FEN
 
   def self.castling_notation(board)
     result = ''
-    white_king = board.lookup_cell(Coordinate.from_notation('E1'))
+    white_king = board.lookup_cell_content(Coordinate.from_notation('E1'))
     if white_king.is_a?(Pieces::King) && white_king.move_status == :unmoved
-      king_side_rook = board.lookup_cell(Coordinate.from_notation('H1'))
-      queen_side_rook = board.lookup_cell(Coordinate.from_notation('A1'))
+      king_side_rook = board.lookup_cell_content(Coordinate.from_notation('H1'))
+      queen_side_rook = board.lookup_cell_content(Coordinate.from_notation('A1'))
       result.concat('K') if king_side_rook.is_a?(Pieces::Rook) && king_side_rook.move_status == :unmoved
       result.concat('Q') if queen_side_rook.is_a?(Pieces::Rook) && queen_side_rook.move_status == :unmoved
     end
 
-    black_king = board.lookup_cell(Coordinate.from_notation('E8'))
+    black_king = board.lookup_cell_content(Coordinate.from_notation('E8'))
     if black_king.is_a?(Pieces::King) && black_king.move_status == :unmoved
-      king_side_rook = board.lookup_cell(Coordinate.from_notation('H8'))
-      queen_side_rook = board.lookup_cell(Coordinate.from_notation('A8'))
+      king_side_rook = board.lookup_cell_content(Coordinate.from_notation('H8'))
+      queen_side_rook = board.lookup_cell_content(Coordinate.from_notation('A8'))
       result.concat('k') if king_side_rook.is_a?(Pieces::Rook) && king_side_rook.move_status == :unmoved
       result.concat('q') if queen_side_rook.is_a?(Pieces::Rook) && queen_side_rook.move_status == :unmoved
     end
@@ -148,7 +148,7 @@ module FEN
     rushed_pawn_position = find_position_rushed_pawn(board)
 
     unless rushed_pawn_position.nil?
-      color = board.lookup_cell(rushed_pawn_position).color
+      color = board.lookup_cell_content(rushed_pawn_position).color
 
       pawn_lagging_direction = color == :white ? -1 : +1
       pawn_lagging_position = Coordinate.new(rushed_pawn_position.x, rushed_pawn_position.y + pawn_lagging_direction)

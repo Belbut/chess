@@ -33,8 +33,8 @@ describe ChessKit do
         def verify_positions_match_piece(positions, piece_color, piece_type)
           positions.each do |cell_notation|
             cell = Coordinate.from_notation(cell_notation)
-            expect(board.lookup_cell(cell).color).to be piece_color
-            expect(board.lookup_cell(cell).type).to be piece_type
+            expect(board.lookup_cell_content(cell).color).to be piece_color
+            expect(board.lookup_cell_content(cell).type).to be piece_type
           end
         end
 
@@ -441,8 +441,8 @@ describe ChessKit do
           let(:testing_no_white_castle) { described_class.from_fen(fen_no_white_castle) }
 
           it 'is expected to both rook move status to be set to moved' do
-            queen_rook = testing_no_white_castle.board.lookup_cell(coord_A1)
-            king_rook = testing_no_white_castle.board.lookup_cell(coord_H1)
+            queen_rook = testing_no_white_castle.board.lookup_cell_content(coord_A1)
+            king_rook = testing_no_white_castle.board.lookup_cell_content(coord_H1)
 
             expect(queen_rook).to be_a(Pieces::Rook).and have_attributes(move_status: :moved)
             expect(king_rook).to be_a(Pieces::Rook).and have_attributes(move_status: :moved)
@@ -454,8 +454,8 @@ describe ChessKit do
           let(:testing_no_black_castle) { described_class.from_fen(fen_no_black_castle) }
 
           it 'is expected to both rook move status to be set to moved' do
-            queen_rook = testing_no_black_castle.board.lookup_cell(coord_A8)
-            king_rook = testing_no_black_castle.board.lookup_cell(coord_H8)
+            queen_rook = testing_no_black_castle.board.lookup_cell_content(coord_A8)
+            king_rook = testing_no_black_castle.board.lookup_cell_content(coord_H8)
 
             expect(queen_rook).to be_a(Pieces::Rook).and have_attributes(move_status: :moved)
             expect(king_rook).to be_a(Pieces::Rook).and have_attributes(move_status: :moved)
@@ -484,10 +484,11 @@ describe ChessKit do
     let(:pawn_rush_move) { chess_kit.make_move(coord_A2, coord_A4) }
     let(:knight_move) { chess_kit.make_move(coord_B1, coord_C3) }
     let(:king_bad_move) { chess_kit.make_move(coord_E1, coord_F1) }
+
     context 'does it move the selected piece from x to y' do
       it 'removes the piece on x position' do
         expect { pawn_move }.to(change do
-          chess_kit.board.lookup_cell(coord_A2)
+          chess_kit.board.lookup_cell_content(coord_A2)
         end.from(Pieces::Pawn).to(nil))
       end
       context 'the same piece is inserted on y position' do
@@ -499,14 +500,14 @@ describe ChessKit do
             chess_kit.board.clear_cell(coord_D2)
 
             expect { chess_kit.make_move(coord_D1, coord_D7) }.to(change do
-              chess_kit.board.lookup_cell(coord_D7)
+              chess_kit.board.lookup_cell_content(coord_D7)
             end.from(Pieces::Pawn).to(Pieces::Queen))
           end
         end
 
         it 'if the y position was empty' do
           expect { pawn_move }.to(change do
-            chess_kit.board.lookup_cell(coord_A3)
+            chess_kit.board.lookup_cell_content(coord_A3)
           end.from(nil).to(Pieces::Pawn))
         end
       end
@@ -515,7 +516,7 @@ describe ChessKit do
         context 'piece move status' do
           context 'correctly distinguishes pawn moves' do
             it 'when it rushes' do
-              pawn = chess_kit.board.lookup_cell(coord_H2)
+              pawn = chess_kit.board.lookup_cell_content(coord_H2)
 
               expect { chess_kit.make_move(coord_H2, coord_H4) }.to(change do
                 pawn.move_status
@@ -523,7 +524,7 @@ describe ChessKit do
             end
 
             it 'when it makes a normal move' do
-              pawn = chess_kit.board.lookup_cell(coord_H2)
+              pawn = chess_kit.board.lookup_cell_content(coord_H2)
 
               expect { chess_kit.make_move(coord_H2, coord_H3) }.to(change do
                 pawn.move_status
@@ -533,7 +534,7 @@ describe ChessKit do
             it 'when it takes' do
               puts board
 
-              pawn = chess_kit.board.lookup_cell(coord_D2)
+              pawn = chess_kit.board.lookup_cell_content(coord_D2)
               chess_kit.make_move(coord_D2, coord_D4)
               chess_kit.make_move(coord_E7, coord_E5)
 
@@ -546,14 +547,14 @@ describe ChessKit do
 
           context 'all other moves' do
             it 'pawn normal move' do
-              pawn = chess_kit.board.lookup_cell(coord_H2)
+              pawn = chess_kit.board.lookup_cell_content(coord_H2)
 
               expect { chess_kit.make_move(coord_H2, coord_H3) }.to(change do
                 pawn.move_status
               end.from(:unmoved).to(:moved))
             end
             it 'noble pice move' do
-              rook = chess_kit.board.lookup_cell(coord_H1)
+              rook = chess_kit.board.lookup_cell_content(coord_H1)
 
               expect { chess_kit.make_move(coord_H1, coord_H5) }.to(change do
                 rook.move_status
@@ -563,7 +564,7 @@ describe ChessKit do
 
           context 'does it rest rushed pawns between turns' do
             it '' do
-              testing_pawn = chess_kit.board.lookup_cell(coord_A2)
+              testing_pawn = chess_kit.board.lookup_cell_content(coord_A2)
 
               expect { chess_kit.make_move(coord_A2, coord_A4) }.to(change do
                 testing_pawn.move_status

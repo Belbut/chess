@@ -67,7 +67,7 @@ class Board
         if char.to_i.zero?
           target_coord = Coordinate.new(column_pointer, row_index)
           target_piece = FEN.algebraic_notation_to_piece(char)
-          board.add_to_cell(target_coord, target_piece)
+          board.add_to_cell_content(target_coord, target_piece)
           column_pointer += 1
         else
           column_pointer += char.to_i
@@ -93,15 +93,18 @@ class Board
     n
   end
 
-  def check_coord(coord)
-    raise ArgumentError, "The Coordinate doesn't respond to :x , :y" unless valid_coord?(coord)
-    raise RangeError, "The Coordinate isn't inside the bounds of the board" unless inside_board?(coord)
-  end
-
   def lookup_cell(coord)
     check_coord(coord)
 
-    contents[coord.y][coord.x]
+    @matrix[coord.y][coord.x].dup
+  end
+
+  def lookup_cell_content(coord)
+    lookup_cell(coord).content
+  end
+
+  def lookup_cell_state(coord)
+    lookup_cell(coord).state
   end
 
   def find(object = nil, &block)
@@ -110,14 +113,14 @@ class Board
     position = if object
                  find_position_of(object)
                elsif block_given?
-                 find_position_of do |cell|
-                   cell.is_a?(Unit) && block.call(cell)
+                 find_position_of do |cell_content|
+                   cell_content.is_a?(Unit) && block.call(cell_content)
                  end
                else
                  raise ArgumentError, 'Must provide either an object or a block'
                end
 
-    lookup_cell(position) unless position.nil?
+    lookup_cell_content(position) unless position.nil?
   end
 
   def find_position_of(object = nil, &block)
@@ -138,10 +141,10 @@ class Board
 
     result = []
     contents.each_with_index do |row, yy|
-      row.each_with_index do |cell, xx|
+      row.each_with_index do |cell_content, xx|
         if block_given?
-          result.append(Coordinate.new(xx, yy)) if yield(cell)
-        elsif cell == object
+          result.append(Coordinate.new(xx, yy)) if yield(cell_content)
+        elsif cell_content == object
           result.append(Coordinate.new(xx, yy))
         end
       end
@@ -150,13 +153,13 @@ class Board
     result
   end
 
-  def add_to_cell(coord, object)
-    raise ArgumentError, "Cell already occupied at #{coord}" unless lookup_cell(coord).nil?
+  def add_to_cell_content(coord, object)
+    raise ArgumentError, "Cell already occupied at #{coord}" unless lookup_cell_content(coord).nil?
 
-    add_to_cell!(coord, object)
+    add_to_cell_content!(coord, object)
   end
 
-  def add_to_cell!(coord, object)
+  def add_to_cell_content!(coord, object)
     check_coord(coord)
 
     matrix[coord.y][coord.x].content = object
@@ -166,7 +169,7 @@ class Board
     check_coord(coord)
 
     old_obj = contents[coord.y][coord.x]
-    add_to_cell!(coord, nil)
+    add_to_cell_content!(coord, nil)
 
     old_obj
   end
@@ -174,7 +177,7 @@ class Board
   def add_to_cell_state(coord, state)
     check_coord(coord)
 
-    allowed_states = %i[picked capturable movable]
+    allowed_states = %i[picked capturable movable flankable]
     unless allowed_states.include?(state)
       raise ArgumentError, 'Invalid action. Allowed states are :picked, :capturable, :movable.'
     end
@@ -190,14 +193,14 @@ class Board
   end
 
   def remove_all_cell_states
-    @matrix.each { |row| row.each(&:reset_state)}
+    @matrix.each { |row| row.each(&:reset_state) }
   end
 
   def move_piece(from, to)
-    moving_piece = lookup_cell(from)
+    moving_piece = lookup_cell_content(from)
 
     clear_cell(from)
-    add_to_cell!(to, moving_piece)
+    add_to_cell_content!(to, moving_piece)
   end
 
   def board_height
@@ -206,6 +209,11 @@ class Board
 
   def board_width
     matrix.transpose.size
+  end
+
+  def check_coord(coord)
+    raise ArgumentError, "The Coordinate doesn't respond to :x , :y" unless valid_coord?(coord)
+    raise RangeError, "The Coordinate isn't inside the bounds of the board" unless inside_board?(coord)
   end
 
   def inside_board?(coord)

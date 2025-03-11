@@ -17,7 +17,7 @@ module Requirement
   # all
   def self.parent_move_was_not_a_kill(board, team_color)
     lambda { |parent_cord, _target_cord|
-      parent_unit = board.lookup_cell(parent_cord)
+      parent_unit = board.lookup_cell_content(parent_cord)
 
       parent_unit.nil? || parent_unit.color == team_color
     }
@@ -26,7 +26,7 @@ module Requirement
   # all
   def self.target_is_no_friendly_kill(board, team_color)
     lambda { |_, target_cord|
-      target_unit = board.lookup_cell(target_cord)
+      target_unit = board.lookup_cell_content(target_cord)
 
       target_unit.nil? || team_color != target_unit.color
     }
@@ -37,7 +37,7 @@ module Requirement
       rules_clone = rules.deep_clone
 
       moving_piece = rules_clone.board.clear_cell(board_cord)
-      rules_clone.board.add_to_cell!(testing_move_cord, moving_piece)
+      rules_clone.board.add_to_cell_content!(testing_move_cord, moving_piece)
       king_cord = rules_clone.board.find_position_of(Pieces::FACTORY[team_color][:king])
 
       king_is_safe = rules_clone.attackers_coordinates_to_position(king_cord, team_color).empty?
@@ -49,7 +49,7 @@ module Requirement
   # The king and the rook involved must not have moved before.
   def self.piece_not_moved(board)
     lambda { |parent_cord, _ = nil|
-      parent_unit = board.lookup_cell(parent_cord)
+      parent_unit = board.lookup_cell_content(parent_cord)
 
       return false if parent_unit.nil?
 
@@ -60,7 +60,7 @@ module Requirement
   # The squares between the king and the rook must be empty.
   def self.empty_row_between(board)
     lambda { |initial_cord, final_cord|
-      coord_between(initial_cord, final_cord) { |target_cord| board.lookup_cell(target_cord).nil? }
+      coord_between(initial_cord, final_cord) { |target_cord| board.lookup_cell_content(target_cord).nil? }
     }
   end
 
@@ -76,7 +76,7 @@ module Requirement
 
   def self.empty_column_between(board)
     lambda { |initial_cord, final_cord|
-      coord_between(initial_cord, final_cord) { |target_cord| board.lookup_cell(target_cord).nil? }
+      coord_between(initial_cord, final_cord) { |target_cord| board.lookup_cell_content(target_cord).nil? }
     }
   end
 
@@ -140,13 +140,13 @@ module Requirement
   end
 
   def self.king_castle_conditions(board, parent_cord)
-    king = board.lookup_cell(parent_cord)
+    king = board.lookup_cell_content(parent_cord)
 
     king.is_a?(Pieces::King) && king.unmoved?
   end
 
   def self.rook_castle_condition(board, rook_cord)
-    rook = board.lookup_cell(rook_cord)
+    rook = board.lookup_cell_content(rook_cord)
 
     rook.is_a?(Pieces::Rook) && rook.unmoved?
   end
@@ -154,7 +154,7 @@ module Requirement
   # pawn
   def self.target_move_is_empty(board)
     lambda { |_, target_cord|
-      target_unit = board.lookup_cell(target_cord)
+      target_unit = board.lookup_cell_content(target_cord)
 
       target_unit.nil?
     }
@@ -163,7 +163,7 @@ module Requirement
   # pawn
   def self.target_move_is_kill(board, team_color)
     lambda { |_, target_cord|
-      target_unit = board.lookup_cell(target_cord)
+      target_unit = board.lookup_cell_content(target_cord)
 
       return false if target_unit.nil?
 
@@ -174,7 +174,7 @@ module Requirement
   # pawn
   def self.target_move_is_flank_kill(board, team_color)
     lambda { |parent_cord, target_cord|
-      rushed_flank = board.lookup_cell(Coordinate.new(target_cord.x, parent_cord.y))
+      rushed_flank = board.lookup_cell_content(Coordinate.new(target_cord.x, parent_cord.y))
 
       return false if rushed_flank.nil?
 

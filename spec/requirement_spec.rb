@@ -64,7 +64,7 @@ describe Requirement do
 
     context 'when there is a piece of the same team at the parent coordinate' do
       before do
-        board_with_pieces.add_to_cell(testing_position, white_piece)
+        board_with_pieces.add_to_cell_content(testing_position, white_piece)
       end
 
       it 'returns true' do
@@ -74,7 +74,7 @@ describe Requirement do
 
     context 'when there is a piece of the opposite team at the parent coordinate' do
       before do
-        board_with_pieces.add_to_cell(testing_position, black_piece)
+        board_with_pieces.add_to_cell_content(testing_position, black_piece)
       end
 
       it 'returns false' do
@@ -101,7 +101,7 @@ describe Requirement do
     context 'when the target cord are occupied by' do
       context 'the same color pieces' do
         before do
-          board_with_pieces.add_to_cell(coord_D5, white_piece)
+          board_with_pieces.add_to_cell_content(coord_D5, white_piece)
         end
 
         it 'is expected to return false' do
@@ -111,7 +111,7 @@ describe Requirement do
 
       context 'different color pieces' do
         before do
-          board_with_pieces.add_to_cell(coord_D5, black_piece)
+          board_with_pieces.add_to_cell_content(coord_D5, black_piece)
         end
 
         it 'is expected to return true' do
@@ -136,7 +136,7 @@ describe Requirement do
         let(:unmoved_piece) { instance_double(Unit, move_status: :unmoved) }
 
         before do
-          board_with_piece.add_to_cell(testing_position, unmoved_piece)
+          board_with_piece.add_to_cell_content(testing_position, unmoved_piece)
         end
 
         it 'is expected to return false' do
@@ -148,7 +148,7 @@ describe Requirement do
         let(:moved_piece) { instance_double(Unit, move_status: :Symbol) }
 
         before do
-          board_with_piece.add_to_cell(testing_position, moved_piece)
+          board_with_piece.add_to_cell_content(testing_position, moved_piece)
         end
 
         it 'is expected to return false' do
@@ -173,7 +173,7 @@ describe Requirement do
     context 'when there is no piece between the to coords' do
       let(:not_related_cell) { instance_double(Coordinate, x: 4, y: 0) }
       before do
-        board_with_pieces.add_to_cell(not_related_cell, piece)
+        board_with_pieces.add_to_cell_content(not_related_cell, piece)
       end
       it '' do
         expect(row_between_requirement.call(initial_coord, final_coord)).to eq(true)
@@ -184,7 +184,7 @@ describe Requirement do
       let(:middle_cell) { instance_double(Coordinate, x: 1, y: 0) }
 
       before do
-        board_with_pieces.add_to_cell(middle_cell, piece)
+        board_with_pieces.add_to_cell_content(middle_cell, piece)
       end
       it '' do
         expect(row_between_requirement.call(initial_coord, final_coord)).to eq(false)
@@ -205,7 +205,7 @@ describe Requirement do
 
     context 'when the target is a empty cell' do
       before do
-        board_with_pieces.add_to_cell(coord_D4, white_piece)
+        board_with_pieces.add_to_cell_content(coord_D4, white_piece)
       end
 
       it 'is expected to return false' do
@@ -216,8 +216,8 @@ describe Requirement do
     context 'when the parent and target cord are occupied by' do
       context 'the same color pieces' do
         before do
-          board_with_pieces.add_to_cell(coord_D4, white_piece)
-          board_with_pieces.add_to_cell(coord_D5, white_piece)
+          board_with_pieces.add_to_cell_content(coord_D4, white_piece)
+          board_with_pieces.add_to_cell_content(coord_D5, white_piece)
         end
 
         it 'is expected to return false' do
@@ -227,8 +227,8 @@ describe Requirement do
 
       context 'different color pieces' do
         before do
-          board_with_pieces.add_to_cell(coord_D4, white_piece)
-          board_with_pieces.add_to_cell(coord_D5, black_piece)
+          board_with_pieces.add_to_cell_content(coord_D4, white_piece)
+          board_with_pieces.add_to_cell_content(coord_D5, black_piece)
         end
 
         it 'is expected to return true' do
@@ -253,7 +253,7 @@ describe Requirement do
     let(:white_piece) { instance_double(Unit, color: :white) }
 
     before do
-      board_with_pieces.add_to_cell(piece_cord, white_piece)
+      board_with_pieces.add_to_cell_content(piece_cord, white_piece)
     end
 
     context 'when there is no rushed piece' do
@@ -268,24 +268,24 @@ describe Requirement do
         let(:black_piece_not_rushed) { instance_double(Unit, color: :black, move_status: :not_rushed) }
 
         it '' do
-          board_with_pieces.add_to_cell(right_rushed_cord, black_piece_not_rushed)
+          board_with_pieces.add_to_cell_content(right_rushed_cord, black_piece_not_rushed)
           expect(target_move_is_flank_kill_requirement.call(piece_cord, right_target_cord)).to eq(false)
         end
 
         it '' do
-          board_with_pieces.add_to_cell(left_rushed_cord, black_piece_not_rushed)
+          board_with_pieces.add_to_cell_content(left_rushed_cord, black_piece_not_rushed)
           expect(target_move_is_flank_kill_requirement.call(piece_cord, left_target_cord)).to eq(false)
         end
       end
 
       context 'when it\'s the same color' do
         it '' do
-          board_with_pieces.add_to_cell(left_rushed_cord, white_piece)
+          board_with_pieces.add_to_cell_content(left_rushed_cord, white_piece)
           expect(target_move_is_flank_kill_requirement.call(piece_cord, left_target_cord)).to eq(false)
         end
 
         it '' do
-          board_with_pieces.add_to_cell(right_rushed_cord, white_piece)
+          board_with_pieces.add_to_cell_content(right_rushed_cord, white_piece)
           expect(target_move_is_flank_kill_requirement.call(piece_cord, right_target_cord)).to eq(false)
         end
       end
@@ -294,11 +294,11 @@ describe Requirement do
         let(:black_piece_rushed) { instance_double(Unit, color: :black, move_status: :rushed) }
 
         it do
-          board_with_pieces.add_to_cell(right_rushed_cord, black_piece_rushed)
+          board_with_pieces.add_to_cell_content(right_rushed_cord, black_piece_rushed)
           expect(target_move_is_flank_kill_requirement.call(piece_cord, right_target_cord)).to eq(true)
         end
         it do
-          board_with_pieces.add_to_cell(left_rushed_cord, black_piece_rushed)
+          board_with_pieces.add_to_cell_content(left_rushed_cord, black_piece_rushed)
           expect(target_move_is_flank_kill_requirement.call(piece_cord, left_target_cord)).to eq(true)
         end
       end

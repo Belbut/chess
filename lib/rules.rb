@@ -34,7 +34,7 @@ class Rules
   end
 
   def available_paths_for_piece(from_position)
-    piece = @board.lookup_cell(from_position)
+    piece = @board.lookup_cell_content(from_position)
     rules = self
     team_color = piece.color
     safe_king_requirement = Requirement.move_is_safe_for_king(rules, team_color)
@@ -46,6 +46,18 @@ class Rules
         safe_king_requirement.call(from_position, possible_cord)
       end
     end.reject(&:empty?)
+  end
+
+  def possible_flanks_for_en_passant(from_position)
+    piece = @board.lookup_cell_content(from_position)
+    return [] unless piece.is_a?(Pieces::Pawn)
+
+    position_of_en_passant_flanks = possible_movement_paths_to_position(from_position, piece.color, :pawn,
+                                                                        move_type: :en_passant).flatten
+
+    position_of_en_passant_flanks.map do |flank_coord|
+      { flank: flank_coord, target: target_coord(piece.color, flank_coord) }
+    end
   end
 
   private
@@ -74,11 +86,19 @@ class Rules
     enemy_piece = Pieces::FACTORY[opposite_color(team_color)][piece_type]
 
     possible_movement_paths_to_position(position, team_color, piece_type, move_type: :attack).find_all do |path|
-      board.lookup_cell(path.last) == enemy_piece
+      board.lookup_cell_content(path.last) == enemy_piece
     end
   end
 
   def opposite_color(team_color)
     { white: :black, black: :white }[team_color]
+  end
+
+  def target_coord(piece_color, flank_coord)
+    color_direction = { white: -1, black: 1 }
+    xx = flank_coord.x
+    yy = flank_coord.y + color_direction[piece_color]
+
+    Coordinate.new(xx, yy)
   end
 end
