@@ -48,46 +48,42 @@ class ChessKit
 
   def make_move(from, to)
     moving_piece = board.lookup_cell_content(from)
-    target_cell = board.lookup_cell(to)
+    target = board.lookup_cell_content(to)
 
-    validate_move(moving_piece, target_cell)
+    validate_move(moving_piece, target)
 
-    process_move_effects(moving_piece, target_cell, from, to)
+    process_move_effects(moving_piece, target, from, to)
     board.move_piece(from, to)
   end
 
-  def validate_move(moving_piece, target_cell)
-    target = target_cell.content
-    if target.is_a?(Unit) && moving_piece.color == (target.color)
-      return raise ArgumentError, 'The target cell is the same color'
+  private
+
+  def validate_move(moving_piece, target)
+    unless piece_belongs_to_current_player?(moving_piece)
+      raise ArgumentError, 'The moving piece does not belong to the current player'
     end
 
-    return if piece_belongs_to_current_player?(moving_piece)
+    return unless target.is_a?(Unit) && piece_belongs_to_current_player?(target)
 
-    raise ArgumentError,
-          'The moving piece is not from the current player'
+    raise ArgumentError, 'The target cell is the same color'
   end
 
   def piece_belongs_to_current_player?(piece)
     piece.color == current_color_name
   end
 
-  def current_player_owns_piece_at?(target_coord)
-    target = board.lookup_cell_content(target_coord)
+  def process_move_effects(moving_piece, target, from, to)
+    process_special_move_cases(moving_piece, from, to)
 
-    target.is_a?(Unit) && piece_belongs_to_current_player?(target)
+    update_trackers(moving_piece, target, from, to)
   end
 
-  def process_move_effects(moving_piece, target_cell, from, to)
-    remove_flanked_piece(moving_piece, from, to)
-    board.find { |piece| piece.move_status == :rushed }&.mark_as_moved
-    update_current_color
-    update_full_move_count
-    update_half_move_count(moving_piece, target_cell)
-    special_move_cases(moving_piece, from, to)
+  def process_special_move_cases(moving_piece, from, to)
+    process_en_passant(moving_piece, from, to)
+    process_castle(moving_piece, from, to)
   end
 
-  def remove_flanked_piece(moving_piece, from, to)
+  def process_en_passant(moving_piece, from, to)
     return unless moving_piece.is_a?(Pieces::Pawn)
 
     rules = Rules.new(board)
@@ -98,15 +94,39 @@ class ChessKit
     end
   end
 
-  def current_color_name
-    case current_color
-    when :w then :white
-    when :b then :black
-    else raise "Invalid color: #{current_color}"
-    end
+  def process_castle(moving_piece, from, to)
+    return unless move_is_castle(moving_piece, from, to)
+
+    rook_coord = Requirement.rook_position_of_castle(from, to)
+    rook_target_coord = Requirement.rook_target_position_of_castle(from, to)
+
+    rook = board.lookup_cell_content(rook_coord)
+    raise "Rook not found at #{rook_coord}" unless rook
+
+    board.move_piece(rook_coord, rook_target_coord)
+    rook.mark_as_moved
   end
 
-  private
+  def move_is_castle(moving_piece, from, to)
+    moving_piece.is_a?(Pieces::King) && Coordinate.distance_between(from, to) >= 2
+  end
+
+  def update_trackers(moving_piece, target, from, to)
+    update_move_status(moving_piece, from, to)
+    update_current_color
+    update_full_move_count
+    update_half_move_count(moving_piece, target)
+  end
+
+  def update_move_status(moving_piece, from, to)
+    board.find { |piece| piece.move_status == :rushed }&.mark_as_moved
+
+    if moving_piece.is_a?(Pieces::Pawn) && Coordinate.distance_between(from, to) >= 2
+      moving_piece.mark_as_rushed
+    else
+      moving_piece.mark_as_moved
+    end
+  end
 
   def update_current_color
     @current_color = @current_color == :w ? :b : :w
@@ -116,25 +136,9 @@ class ChessKit
     @full_move_count += 1 if @current_color == :w
   end
 
-  def update_half_move_count(moving_piece, target_cell)
+  def update_half_move_count(moving_piece, target)
     @half_move_count += 1
-    @half_move_count = 0 if moving_piece.is_a?(Pieces::Pawn) || !target_cell.nil?
-  end
-
-  def special_move_cases(moving_piece, from, to)
-    if moving_piece.is_a?(Pieces::King) && Coordinate.distance_between(from, to) >= 2
-      rook_coord = Requirement.rook_position_of_castle(from, to)
-      rook_target_coord = Requirement.rook_target_position_of_castle(from, to)
-      rook = board.lookup_cell_content(rook_coord)
-      board.move_piece(rook_coord, rook_target_coord)
-      rook.mark_as_moved
-    end
-
-    if moving_piece.is_a?(Pieces::Pawn) && Coordinate.distance_between(from, to) >= 2
-      moving_piece.mark_as_rushed
-    else
-      moving_piece.mark_as_moved
-    end
+    @half_move_count = 0 if moving_piece.is_a?(Pieces::Pawn) || !target.nil?
   end
 
   def reset_half_move_count
@@ -152,6 +156,14 @@ class ChessKit
         coord = Coordinate.from_notation(position_notation)
         @board.add_to_cell_content(coord, piece.dup)
       end
+    end
+  end
+
+  def current_color_name
+    case current_color
+    when :w then :white
+    when :b then :black
+    else raise "Invalid color: #{current_color}"
     end
   end
 end
