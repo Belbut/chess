@@ -12,8 +12,11 @@ EXPECTED_FEN_WHITE_KNIGHT_NORMAL_TAKE = 'rnbqkbnr/ppp1pppp/8/8/4N3/8/PPPP1PPP/R1
 
 EXPECTED_FEN_WHITE_PAWN_EN_PASSANT_TAKE = 'rnbqkbnr/ppp1p1pp/5P2/3p4/8/8/PPPP1PPP/RNBQKBNR b KQkq - 0 3'
 
-EXPECTED_FEN_WHITE_QUEEN_SIDE_CASTLE = '-'
-EXPECTED_FEN_WHITE_KING_SIDE_CASTLE = '-'
+EXPECTED_FEN_WHITE_QUEEN_SIDE_CASTLE = 'r1b1k2r/pppn1ppp/4pn2/q7/1b1P4/2N1BP2/PPPQ2PP/2KR1BNR b kq - 5 8'
+EXPECTED_FEN_WHITE_KING_SIDE_CASTLE = 'rnbqkb1r/pp2pppp/2p2n2/3p4/8/5NP1/PPPPPPBP/RNBQ1RK1 b kq - 1 4'
+
+EXPECTED_FEN_BLACK_QUEEN_SIDE_CASTLE = '2kr1bnr/ppp1pppp/2nqb3/3p4/8/PPPPP3/5PPP/RNBQKBNR w KQ - 1 6'
+EXPECTED_FEN_BLACK_KING_SIDE_CASTLE = 'r1bq1rk1/ppppbppp/2n2n2/4p3/4P3/2NP1N2/PPP1KPPP/R1BQ1B1R w - - 3 6'
 
 describe Game do
   include TestingUtil
@@ -77,17 +80,86 @@ describe Game do
                 moves_stack.append([coord_C7, coord_C6])
               end
 
-              it 'O-O f1 to g1' do
+              it 'O-O e1 to g1' do
                 moves_stack.append([coord_E1, coord_G1])
+                setup_game(moves_stack)
+
+                game.play
+                expect(game.chess_kit.to_fen).to eq EXPECTED_FEN_WHITE_KING_SIDE_CASTLE
+              end
+            end
+            context 'black player' do
+              before do
+                moves_stack.append([coord_E2, coord_E4])
+                moves_stack.append([coord_E7, coord_E5])
+                moves_stack.append([coord_G1, coord_F3])
+                moves_stack.append([coord_B8, coord_C6])
+                moves_stack.append([coord_B1, coord_C3])
+                moves_stack.append([coord_G8, coord_F6])
+                moves_stack.append([coord_D2, coord_D3])
+                moves_stack.append([coord_F8, coord_E7])
+                moves_stack.append([coord_E1, coord_E2])
+              end
+
+              it 'O-O e8 to g8' do
+                moves_stack.append([coord_E8, coord_G8])
+                setup_game(moves_stack)
+
+                game.play
+                expect(game.chess_kit.to_fen).to eq EXPECTED_FEN_BLACK_KING_SIDE_CASTLE
+              end
+            end
+          end
+
+          context 'queen side' do
+            context 'white player' do
+              before do
+                moves_stack.append([coord_E2, coord_E4])
+                moves_stack.append([coord_D7, coord_D5])
+                moves_stack.append([coord_E4, coord_D5])
+                moves_stack.append([coord_D8, coord_D5])
+                moves_stack.append([coord_B1, coord_C3])
+                moves_stack.append([coord_D5, coord_A5])
+                moves_stack.append([coord_D2, coord_D4])
+                moves_stack.append([coord_G8, coord_F6])
+                moves_stack.append([coord_F2, coord_F3])
+                moves_stack.append([coord_E7, coord_E6])
+                moves_stack.append([coord_C1, coord_E3])
+                moves_stack.append([coord_F8, coord_B4])
+                moves_stack.append([coord_D1, coord_D2])
+                moves_stack.append([coord_B8, coord_D7])
+              end
+
+              it 'O-O-O e1 to c1' do
+                moves_stack.append([coord_E1, coord_C1])
                 setup_game(moves_stack)
 
                 game.play
                 expect(game.chess_kit.to_fen).to eq EXPECTED_FEN_WHITE_QUEEN_SIDE_CASTLE
               end
             end
-          end
 
-          context 'queen side' do
+            context 'black player' do
+              before do
+                moves_stack.append([coord_A2, coord_A3])
+                moves_stack.append([coord_B8, coord_C6])
+                moves_stack.append([coord_B2, coord_B3])
+                moves_stack.append([coord_D7, coord_D5])
+                moves_stack.append([coord_C2, coord_C3])
+                moves_stack.append([coord_C8, coord_E6])
+                moves_stack.append([coord_D2, coord_D3])
+                moves_stack.append([coord_D8, coord_D6])
+                moves_stack.append([coord_E2, coord_E3])
+              end
+
+              it 'O-O-O e8 to c8' do
+                moves_stack.append([coord_E8, coord_C8])
+                setup_game(moves_stack)
+
+                game.play
+                expect(game.chess_kit.to_fen).to eq EXPECTED_FEN_BLACK_QUEEN_SIDE_CASTLE
+              end
+            end
           end
         end
       end

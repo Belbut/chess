@@ -84,7 +84,7 @@ class ChessKit
     update_current_color
     update_full_move_count
     update_half_move_count(moving_piece, target_cell)
-    update_move_status(moving_piece, from, to)
+    special_move_cases(moving_piece, from, to)
   end
 
   def remove_flanked_piece(moving_piece, from, to)
@@ -121,7 +121,15 @@ class ChessKit
     @half_move_count = 0 if moving_piece.is_a?(Pieces::Pawn) || !target_cell.nil?
   end
 
-  def update_move_status(moving_piece, from, to)
+  def special_move_cases(moving_piece, from, to)
+    if moving_piece.is_a?(Pieces::King) && Coordinate.distance_between(from, to) >= 2
+      rook_coord = Requirement.rook_position_of_castle(from, to)
+      rook_target_coord = Requirement.rook_target_position_of_castle(from, to)
+      rook = board.lookup_cell_content(rook_coord)
+      board.move_piece(rook_coord, rook_target_coord)
+      rook.mark_as_moved
+    end
+
     if moving_piece.is_a?(Pieces::Pawn) && Coordinate.distance_between(from, to) >= 2
       moving_piece.mark_as_rushed
     else

@@ -115,12 +115,14 @@ module Requirement
   # The king does not move to a square that is attacked by an enemy piece during the castling move, i.e., you may not castle and end the move with the king in check.
   # All squares between the rook and king before the castling move are empty.
   # The King and rook must occupy the same rank (or row).
-  RIGHT_CASTLE_ROOK_COLUMN = 7
-  LEFT_CASTLE_ROOK_COLUMN = 0
+  KING_SIDE_CASTLE_ROOK_COLUMN = 7
+  KING_SIDE_CASTLE_ROOK_TARGET_COLUMN = 5
+  QUEEN_SIDE_CASTLE_ROOK_COLUMN = 0
+  QUEEN_SIDE_CASTLE_ROOK_TARGET_COLUMN = 3
 
   def self.can_castle(board, team_color)
     lambda { |parent_cord, target_cord|
-      rook_cord = rook_position_from_castle_direction(parent_cord, target_cord)
+      rook_cord = rook_position_of_castle(parent_cord, target_cord)
 
       return false unless king_castle_conditions(board, parent_cord)
       return false unless rook_castle_condition(board, rook_cord)
@@ -132,11 +134,18 @@ module Requirement
     }
   end
 
-  def self.rook_position_from_castle_direction(parent_cord, target_cord)
-    rook_column = target_cord.x > parent_cord.x ? RIGHT_CASTLE_ROOK_COLUMN : LEFT_CASTLE_ROOK_COLUMN
+  def self.rook_position_of_castle(parent_cord, target_cord)
+    rook_column = target_cord.x > parent_cord.x ? KING_SIDE_CASTLE_ROOK_COLUMN : QUEEN_SIDE_CASTLE_ROOK_COLUMN
     rook_row = parent_cord.y
 
     Coordinate.new(rook_column, rook_row)
+  end
+
+  def self.rook_target_position_of_castle(parent_cord, target_cord)
+    rook_target_column = target_cord.x > parent_cord.x ? KING_SIDE_CASTLE_ROOK_TARGET_COLUMN : QUEEN_SIDE_CASTLE_ROOK_TARGET_COLUMN
+    rook_row = parent_cord.y
+
+    Coordinate.new(rook_target_column, rook_row)
   end
 
   def self.king_castle_conditions(board, parent_cord)

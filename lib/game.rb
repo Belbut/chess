@@ -45,6 +45,7 @@ class Game
     from, to = Interface.get_round_moves(@chess_kit, @rules)
 
     @chess_kit.make_move(from, to)
+
     Interface.display_chess_board(@chess_kit)
   end
 
