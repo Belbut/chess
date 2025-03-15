@@ -9,6 +9,8 @@ class Game
 
   SKIP = true
   def initialize
+    @history = []
+
     SKIP || Interface.game_greeting
     SKIP || case Interface.load_or_new_game
             when :new_game
@@ -41,49 +43,56 @@ class Game
 
   private
 
+  def player_name_from_color(color)
+    case color
+    when :white
+      @white_player
+    when :black
+      @black_player
+    end
+  end
+
   def game_round
     from, to = Interface.get_round_moves(@chess_kit, @rules)
 
     @chess_kit.make_move(from, to)
+    @history.append([from.to_notation, to.to_notation])
 
     Interface.display_chess_board(@chess_kit)
   end
 
-  def game_should_end; end
-end
+  def game_should_end
+    return true if checkmate_condition || draw_condition
 
-# Chess is a Game
-# This game is basically 2 Player 1 ChessKit 1 set of Rules and a Interface for the terminal.
-#   The Player is a simple object with a name.
-#   The ChessKit is basically:
-#     1 Board of 8x8
-#     and 32 Pieces
-#       this pieces are either white or black
-#       there is 6 different types of pieces
-#         rook, knight, bishop, queen, king, pawn
-#   The set of Rules were we need to define
-#      how pieces move
-#        on move event change move state unmoved -> moved // pawn : unmoved -> rushed/moved
-#        each one moves differently
-#          only knights are not obstructed by other pieces
-#          king and rook - have a special move (castle)
-#          pawn - has a lot of special cases for move
-#            - first move of game
-#            - en passant
-#            - doesn't move the same way as it kills
-#            - if it reaches the last row transforms into another piece
-#      what makes a check
-#        limits the moves to save the king
-#      what makes a check-mate
-#   The Interface
-#     should prompt for player set up
-#     new game / load_game
-#     state the status of the game
-#       -and FEN number
-#     should present the board and pieces
-#     should prompt for select piece// surrender // draw //  save game
-#       - present the piece move options on board
-#       - prompt for move
-#       - send move to change board status
-#     present game winner // draw
-#
+    false
+  end
+
+  def draw_condition
+    #   Stalemate – The player to move has no legal moves but is not in check, leading to a draw.
+    #   Threefold Repetition – If the same position occurs three times with the same player to move, either player can claim a draw.
+    #   Fifty-Move Rule – If no pawn has moved and no piece has been captured in the last 50 moves by both players, a draw can be claimed.
+    #   Insufficient Material – If neither player has enough pieces to checkmate the opponent (e.g., king vs. king, or king and knight vs. king), the game is declared a draw.
+  end
+
+  def checkmate_condition
+    all_player_pieces_positions = @chess_kit.board.find_all_positions_of do |cell|
+      cell.is_a?(Unit) && cell.color == @chess_kit.current_color_name
+    end
+
+    return false if all_player_pieces_positions.any? do |piece_position|
+      @rules.available_paths_for_piece(piece_position).any?
+    end
+
+    checkmate_message
+    true
+  end
+
+  def checkmate_message
+    current_player_color = @chess_kit.current_color_name
+    winner_color = ChessKit.opposite_color(current_player_color)
+
+    winner_name = player_name_from_color(winner_color)
+
+    Interface.checkmate(current_player_color, winner_name)
+  end
+end

@@ -56,6 +56,28 @@ class ChessKit
     board.move_piece(from, to)
   end
 
+  def current_color_name
+    case current_color
+    when :w then :white
+    when :b then :black
+    else raise "Invalid color: #{current_color}"
+    end
+  end
+
+  def opponent_color_name
+    opposite_color(current_color_name)
+  end
+
+  def current_player_owns_piece_at?(target_coord)
+    target = board.lookup_cell_content(target_coord)
+
+    target.is_a?(Unit) && piece_belongs_to_current_player?(target)
+  end
+
+  def self.opposite_color(team_color)
+    { white: :black, black: :white }[team_color]
+  end
+
   private
 
   def validate_move(moving_piece, target)
@@ -156,14 +178,6 @@ class ChessKit
         coord = Coordinate.from_notation(position_notation)
         @board.add_to_cell_content(coord, piece.dup)
       end
-    end
-  end
-
-  def current_color_name
-    case current_color
-    when :w then :white
-    when :b then :black
-    else raise "Invalid color: #{current_color}"
     end
   end
 end

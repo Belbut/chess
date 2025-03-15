@@ -60,6 +60,10 @@ class Rules
     end
   end
 
+  def opposite_color(team_color)
+    { white: :black, black: :white }[team_color]
+  end
+
   private
 
   def paths_to_position_by_piece(position, team_color, piece_type)
@@ -83,15 +87,12 @@ class Rules
   end
 
   def attack_paths_from_pieces(position, team_color, piece_type)
-    enemy_piece = Pieces::FACTORY[opposite_color(team_color)][piece_type]
+    enemy_color = ChessKit.opposite_color(team_color)
+    enemy_piece = Pieces::FACTORY[enemy_color][piece_type]
 
     possible_movement_paths_to_position(position, team_color, piece_type, move_type: :attack).find_all do |path|
       board.lookup_cell_content(path.last) == enemy_piece
     end
-  end
-
-  def opposite_color(team_color)
-    { white: :black, black: :white }[team_color]
   end
 
   def target_coord(piece_color, flank_coord)

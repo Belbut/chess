@@ -21,7 +21,7 @@ EXPECTED_FEN_BLACK_KING_SIDE_CASTLE = 'r1bq1rk1/ppppbppp/2n2n2/4p3/4P3/2NP1N2/PP
 describe Game do
   include TestingUtil
 
-  def setup_game(arg)
+  def setup_game(arg, force_end: true)
     round_moves = []
     game_should_end_stack = []
 
@@ -34,7 +34,7 @@ describe Game do
     game_should_end_stack.append(true)
 
     allow(Interface).to receive(:get_round_moves).and_return(*round_moves)
-    allow(game).to receive(:game_should_end).and_return(*game_should_end_stack)
+    allow(game).to receive(:game_should_end).and_return(*game_should_end_stack) if force_end
   end
 
   subject(:game) { described_class.new }
@@ -45,169 +45,206 @@ describe Game do
     allow(Interface).to receive(:display_chess_board)
   end
 
-  context 'from new game state' do
-    describe '#play' do
-      context 'do pieces move' do
-        context 'first moves' do
-          context 'pawn' do
-            it 'e2 to e4' do
-              moves_stack.append([coord_E2, coord_E4])
+  describe '#play' do
+    context 'do pieces move' do
+      context 'first moves' do
+        context 'pawn' do
+          it 'e2 to e4' do
+            moves_stack.append([coord_E2, coord_E4])
+            setup_game(moves_stack)
+
+            game.play
+            expect(game.chess_kit.to_fen).to eq EXPECTED_FEN_WHITE_PAWN_FIRST_MOVE
+          end
+        end
+        context 'knight' do
+          it 'b1 to c3' do
+            moves_stack.append([coord_B1, coord_C3])
+            setup_game(moves_stack)
+
+            game.play
+            expect(game.chess_kit.to_fen).to eq EXPECTED_FEN_WHITE_KNIGHT_FIRST_MOVE
+          end
+        end
+      end
+
+      context 'castle move pattern' do
+        context 'king side' do
+          context 'white player' do
+            before do
+              moves_stack.append([coord_G1, coord_F3])
+              moves_stack.append([coord_D7, coord_D5])
+              moves_stack.append([coord_G2, coord_G3])
+              moves_stack.append([coord_G8, coord_F6])
+              moves_stack.append([coord_F1, coord_G2])
+              moves_stack.append([coord_C7, coord_C6])
+            end
+
+            it 'O-O e1 to g1' do
+              moves_stack.append([coord_E1, coord_G1])
               setup_game(moves_stack)
 
               game.play
-              expect(game.chess_kit.to_fen).to eq EXPECTED_FEN_WHITE_PAWN_FIRST_MOVE
+              expect(game.chess_kit.to_fen).to eq EXPECTED_FEN_WHITE_KING_SIDE_CASTLE
             end
           end
-          context 'knight' do
-            it 'b1 to c3' do
+          context 'black player' do
+            before do
+              moves_stack.append([coord_E2, coord_E4])
+              moves_stack.append([coord_E7, coord_E5])
+              moves_stack.append([coord_G1, coord_F3])
+              moves_stack.append([coord_B8, coord_C6])
               moves_stack.append([coord_B1, coord_C3])
+              moves_stack.append([coord_G8, coord_F6])
+              moves_stack.append([coord_D2, coord_D3])
+              moves_stack.append([coord_F8, coord_E7])
+              moves_stack.append([coord_E1, coord_E2])
+            end
+
+            it 'O-O e8 to g8' do
+              moves_stack.append([coord_E8, coord_G8])
               setup_game(moves_stack)
 
               game.play
-              expect(game.chess_kit.to_fen).to eq EXPECTED_FEN_WHITE_KNIGHT_FIRST_MOVE
+              expect(game.chess_kit.to_fen).to eq EXPECTED_FEN_BLACK_KING_SIDE_CASTLE
             end
           end
         end
-        context 'castle move pattern' do
-          context 'king side' do
-            context 'white player' do
-              before do
-                moves_stack.append([coord_G1, coord_F3])
-                moves_stack.append([coord_D7, coord_D5])
-                moves_stack.append([coord_G2, coord_G3])
-                moves_stack.append([coord_G8, coord_F6])
-                moves_stack.append([coord_F1, coord_G2])
-                moves_stack.append([coord_C7, coord_C6])
-              end
 
-              it 'O-O e1 to g1' do
-                moves_stack.append([coord_E1, coord_G1])
-                setup_game(moves_stack)
-
-                game.play
-                expect(game.chess_kit.to_fen).to eq EXPECTED_FEN_WHITE_KING_SIDE_CASTLE
-              end
+        context 'queen side' do
+          context 'white player' do
+            before do
+              moves_stack.append([coord_E2, coord_E4])
+              moves_stack.append([coord_D7, coord_D5])
+              moves_stack.append([coord_E4, coord_D5])
+              moves_stack.append([coord_D8, coord_D5])
+              moves_stack.append([coord_B1, coord_C3])
+              moves_stack.append([coord_D5, coord_A5])
+              moves_stack.append([coord_D2, coord_D4])
+              moves_stack.append([coord_G8, coord_F6])
+              moves_stack.append([coord_F2, coord_F3])
+              moves_stack.append([coord_E7, coord_E6])
+              moves_stack.append([coord_C1, coord_E3])
+              moves_stack.append([coord_F8, coord_B4])
+              moves_stack.append([coord_D1, coord_D2])
+              moves_stack.append([coord_B8, coord_D7])
             end
-            context 'black player' do
-              before do
-                moves_stack.append([coord_E2, coord_E4])
-                moves_stack.append([coord_E7, coord_E5])
-                moves_stack.append([coord_G1, coord_F3])
-                moves_stack.append([coord_B8, coord_C6])
-                moves_stack.append([coord_B1, coord_C3])
-                moves_stack.append([coord_G8, coord_F6])
-                moves_stack.append([coord_D2, coord_D3])
-                moves_stack.append([coord_F8, coord_E7])
-                moves_stack.append([coord_E1, coord_E2])
-              end
 
-              it 'O-O e8 to g8' do
-                moves_stack.append([coord_E8, coord_G8])
-                setup_game(moves_stack)
+            it 'O-O-O e1 to c1' do
+              moves_stack.append([coord_E1, coord_C1])
+              setup_game(moves_stack)
 
-                game.play
-                expect(game.chess_kit.to_fen).to eq EXPECTED_FEN_BLACK_KING_SIDE_CASTLE
-              end
+              game.play
+              expect(game.chess_kit.to_fen).to eq EXPECTED_FEN_WHITE_QUEEN_SIDE_CASTLE
             end
           end
 
-          context 'queen side' do
-            context 'white player' do
-              before do
-                moves_stack.append([coord_E2, coord_E4])
-                moves_stack.append([coord_D7, coord_D5])
-                moves_stack.append([coord_E4, coord_D5])
-                moves_stack.append([coord_D8, coord_D5])
-                moves_stack.append([coord_B1, coord_C3])
-                moves_stack.append([coord_D5, coord_A5])
-                moves_stack.append([coord_D2, coord_D4])
-                moves_stack.append([coord_G8, coord_F6])
-                moves_stack.append([coord_F2, coord_F3])
-                moves_stack.append([coord_E7, coord_E6])
-                moves_stack.append([coord_C1, coord_E3])
-                moves_stack.append([coord_F8, coord_B4])
-                moves_stack.append([coord_D1, coord_D2])
-                moves_stack.append([coord_B8, coord_D7])
-              end
-
-              it 'O-O-O e1 to c1' do
-                moves_stack.append([coord_E1, coord_C1])
-                setup_game(moves_stack)
-
-                game.play
-                expect(game.chess_kit.to_fen).to eq EXPECTED_FEN_WHITE_QUEEN_SIDE_CASTLE
-              end
+          context 'black player' do
+            before do
+              moves_stack.append([coord_A2, coord_A3])
+              moves_stack.append([coord_B8, coord_C6])
+              moves_stack.append([coord_B2, coord_B3])
+              moves_stack.append([coord_D7, coord_D5])
+              moves_stack.append([coord_C2, coord_C3])
+              moves_stack.append([coord_C8, coord_E6])
+              moves_stack.append([coord_D2, coord_D3])
+              moves_stack.append([coord_D8, coord_D6])
+              moves_stack.append([coord_E2, coord_E3])
             end
 
-            context 'black player' do
-              before do
-                moves_stack.append([coord_A2, coord_A3])
-                moves_stack.append([coord_B8, coord_C6])
-                moves_stack.append([coord_B2, coord_B3])
-                moves_stack.append([coord_D7, coord_D5])
-                moves_stack.append([coord_C2, coord_C3])
-                moves_stack.append([coord_C8, coord_E6])
-                moves_stack.append([coord_D2, coord_D3])
-                moves_stack.append([coord_D8, coord_D6])
-                moves_stack.append([coord_E2, coord_E3])
-              end
+            it 'O-O-O e8 to c8' do
+              moves_stack.append([coord_E8, coord_C8])
+              setup_game(moves_stack)
 
-              it 'O-O-O e8 to c8' do
-                moves_stack.append([coord_E8, coord_C8])
-                setup_game(moves_stack)
-
-                game.play
-                expect(game.chess_kit.to_fen).to eq EXPECTED_FEN_BLACK_QUEEN_SIDE_CASTLE
-              end
+              game.play
+              expect(game.chess_kit.to_fen).to eq EXPECTED_FEN_BLACK_QUEEN_SIDE_CASTLE
             end
           end
         end
       end
-      context 'is the take movement working' do
-        context 'white piece take' do
-          before do
-            moves_stack.append([coord_E2, coord_E4])
-            moves_stack.append([coord_D7, coord_D5])
-          end
+    end
 
-          it 'e4 to d5' do
-            moves_stack.append([coord_E4, coord_D5])
-            setup_game(moves_stack)
-
-            game.play
-            expect(game.chess_kit.to_fen).to eq EXPECTED_FEN_WHITE_PAWN_NORMAL_TAKE
-          end
+    context 'is the take movement working' do
+      context 'white piece take' do
+        before do
+          moves_stack.append([coord_E2, coord_E4])
+          moves_stack.append([coord_D7, coord_D5])
         end
-        context 'black piece take' do
-          before do
-            moves_stack.append([coord_E2, coord_E4])
-            moves_stack.append([coord_D7, coord_D5])
-            moves_stack.append([coord_B1, coord_C3])
-          end
 
-          it 'd5 to e4' do
-            moves_stack.append([coord_D5, coord_E4])
-            setup_game(moves_stack)
+        it 'e4 to d5' do
+          moves_stack.append([coord_E4, coord_D5])
+          setup_game(moves_stack)
 
-            game.play
-            expect(game.chess_kit.to_fen).to eq EXPECTED_FEN_BLACK_PAWN_NORMAL_TAKE
-          end
+          game.play
+          expect(game.chess_kit.to_fen).to eq EXPECTED_FEN_WHITE_PAWN_NORMAL_TAKE
         end
-        context 'white en passant' do
-          before do
-            moves_stack.append([coord_E2, coord_E4])
-            moves_stack.append([coord_D7, coord_D5])
-            moves_stack.append([coord_E4, coord_E5])
-            moves_stack.append([coord_F7, coord_F5])
-          end
+      end
+      context 'black piece take' do
+        before do
+          moves_stack.append([coord_E2, coord_E4])
+          moves_stack.append([coord_D7, coord_D5])
+          moves_stack.append([coord_B1, coord_C3])
+        end
 
-          it 'd5 to e4' do
-            moves_stack.append([coord_E5, coord_F6])
-            setup_game(moves_stack)
+        it 'd5 to e4' do
+          moves_stack.append([coord_D5, coord_E4])
+          setup_game(moves_stack)
 
-            game.play
-            expect(game.chess_kit.to_fen).to eq EXPECTED_FEN_WHITE_PAWN_EN_PASSANT_TAKE
-          end
+          game.play
+          expect(game.chess_kit.to_fen).to eq EXPECTED_FEN_BLACK_PAWN_NORMAL_TAKE
+        end
+      end
+      context 'white en passant' do
+        before do
+          moves_stack.append([coord_E2, coord_E4])
+          moves_stack.append([coord_D7, coord_D5])
+          moves_stack.append([coord_E4, coord_E5])
+          moves_stack.append([coord_F7, coord_F5])
+        end
+
+        it 'd5 to e4' do
+          moves_stack.append([coord_E5, coord_F6])
+          setup_game(moves_stack)
+
+          game.play
+          expect(game.chess_kit.to_fen).to eq EXPECTED_FEN_WHITE_PAWN_EN_PASSANT_TAKE
+        end
+      end
+    end
+
+    context 'does the game end when it should' do
+      before do
+        allow(Interface).to receive(:checkmate)
+      end
+      context 'in case of a checkmate' do
+        before do
+          moves_stack.append([coord_F2, coord_F3])
+          moves_stack.append([coord_E7, coord_E5])
+          moves_stack.append([coord_G2, coord_G4])
+        end
+
+        it 'ends game when checkmate' do
+          moves_stack.append([coord_D8, coord_H4])
+          setup_game(moves_stack, force_end: false)
+
+          game.play
+          expect(game.send(:checkmate_condition)).to eq true
+        end
+      end
+
+      context 'in case of a check' do
+        before do
+          moves_stack.append([coord_F2, coord_F4])
+          moves_stack.append([coord_E7, coord_E5])
+          moves_stack.append([coord_F4, coord_E5])
+        end
+
+        it "doesn't end the game" do
+          moves_stack.append([coord_D8, coord_H4])
+          setup_game(moves_stack)
+
+          game.play
+          expect(game.send(:checkmate_condition)).to eq false
         end
       end
     end

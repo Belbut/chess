@@ -144,6 +144,12 @@ module Interface
     prompt_for_coordinate_notation
   end
 
+  def self.checkmate(current_player_color, winner_name)
+    puts "The #{current_player_color} is checkmated!"
+
+    puts "Congratulations #{winner_name}"
+  end
+
   module Output
     require 'rainbow'
 
