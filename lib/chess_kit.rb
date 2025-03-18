@@ -65,7 +65,7 @@ class ChessKit
   end
 
   def opponent_color_name
-    opposite_color(current_color_name)
+    self.class.opposite_color(current_color_name)
   end
 
   def current_player_owns_piece_at?(target_coord)

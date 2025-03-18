@@ -150,6 +150,10 @@ module Interface
     puts "Congratulations #{winner_name}"
   end
 
+  def self.check_message
+    puts 'Check!'
+  end
+
   module Output
     require 'rainbow'
 

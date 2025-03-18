@@ -212,12 +212,28 @@ describe Game do
       end
     end
 
-    context 'does the game end when it should' do
+    context 'does it identify a check' do
       before do
-        allow(Interface).to receive(:checkmate)
+        moves_stack.append([coord_F2, coord_F4])
+        moves_stack.append([coord_E7, coord_E5])
+        moves_stack.append([coord_F4, coord_E5])
       end
+
+      it "doesn't end the game" do
+        moves_stack.append([coord_D8, coord_H4])
+        setup_game(moves_stack)
+
+        game.play
+        expect(game.send(:checkmate_condition?)).to eq false
+        expect(game.send(:check_condition?)).to eq true
+      end
+    end
+
+    context 'does the game end when it should' do
       context 'in case of a checkmate' do
         before do
+          allow(Interface).to receive(:checkmate)
+
           moves_stack.append([coord_F2, coord_F3])
           moves_stack.append([coord_E7, coord_E5])
           moves_stack.append([coord_G2, coord_G4])
@@ -228,23 +244,26 @@ describe Game do
           setup_game(moves_stack, force_end: false)
 
           game.play
-          expect(game.send(:checkmate_condition)).to eq true
+          expect(game.send(:checkmate_condition?)).to eq true
+          expect(game.send(:check_condition?)).to eq true
         end
       end
 
-      context 'in case of a check' do
+      context 'in case of a a draw' do
         before do
-          moves_stack.append([coord_F2, coord_F4])
-          moves_stack.append([coord_E7, coord_E5])
-          moves_stack.append([coord_F4, coord_E5])
+          allow(Interface).to receive(:draw_message)
         end
 
-        it "doesn't end the game" do
-          moves_stack.append([coord_D8, coord_H4])
-          setup_game(moves_stack)
+        context 'Stalemate' do
+        end
 
-          game.play
-          expect(game.send(:checkmate_condition)).to eq false
+        context 'Threefold Repetition' do
+        end
+
+        context 'Fifty Move Rules' do
+        end
+
+        context 'Insufficient Material' do
         end
       end
     end

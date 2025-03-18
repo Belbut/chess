@@ -123,6 +123,20 @@ class Board
     lookup_cell_content(position) unless position.nil?
   end
 
+  def find_all(object = nil, &block)
+    all_positions = if object
+                      find_all_positions_of(object)
+                    elsif block_given?
+                      find_all_positions_of do |cell_content|
+                        cell_content.is_a?(Unit) && block.call(cell_content)
+                      end
+                    else
+                      raise ArgumentError, 'Must provide either an object or a block'
+                    end
+
+    all_positions.map { |position| lookup_cell_content(position) }
+  end
+
   def find_position_of(object = nil, &block)
     raise ArgumentError, 'Provide either an object or a block, not both' if object && block
 
