@@ -157,7 +157,7 @@ class Board
     contents.each_with_index do |row, yy|
       row.each_with_index do |cell_content, xx|
         if block_given?
-          result.append(Coordinate.new(xx, yy)) if yield(cell_content)
+          result.append(Coordinate.new(xx, yy)) if cell_content.is_a?(Unit) && yield(cell_content)
         elsif cell_content == object
           result.append(Coordinate.new(xx, yy))
         end

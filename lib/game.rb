@@ -34,7 +34,6 @@ class Game
   def play
     loop do
       game_round
-      insufficient_material?
 
       break if game_should_end
     end
@@ -141,7 +140,7 @@ class Game
 
   def any_legal_moves?
     all_player_pieces_positions = @chess_kit.board.find_all_positions_of do |cell|
-      cell.is_a?(Unit) && cell.color == @chess_kit.current_color_name
+      cell.color == @chess_kit.current_color_name
     end
 
     return true if all_player_pieces_positions.any? do |piece_position|

@@ -251,19 +251,175 @@ describe Game do
 
       context 'in case of a a draw' do
         before do
-          allow(Interface).to receive(:draw_message)
+          # allow(Interface).to receive(:draw_message)
         end
 
         context 'Stalemate' do
+          let(:stalemate_game) { ChessKit.from_fen('8/8/8/8/8/7k/7p/7K w - - 0 1') }
+          before do
+            game.instance_variable_set(:@chess_kit, stalemate_game)
+            game.instance_variable_set(:@rules, Rules.new(game.chess_kit.board))
+          end
+
+          it 'ends game in stalemate' do
+            expect(game.send(:stalemate_condition?)).to eq true
+            expect(game.send(:draw_condition?)).to eq true
+            expect(game.send(:game_should_end)).to eq true
+          end
+        end
+      end
+
+      context 'Threefold Repetition' do
+        let(:threefold_repetition) { ChessKit.from_fen('3q1bk1/8/8/8/8/8/3B4/2QK4 b KQ - 0 12') }
+        before do
+          game.instance_variable_set(:@chess_kit, threefold_repetition)
+          game.instance_variable_set(:@rules, Rules.new(game.chess_kit.board))
         end
 
-        context 'Threefold Repetition' do
+        it 'ends game because of threefold repetition' do
+          moves_stack.append([coord_G8, coord_H8])
+          moves_stack.append([coord_D1, coord_E1])
+          moves_stack.append([coord_H8, coord_G8])
+          moves_stack.append([coord_E1, coord_D1])
+          moves_stack.append([coord_G8, coord_H8])
+          moves_stack.append([coord_D1, coord_E1])
+          moves_stack.append([coord_H8, coord_G8])
+          moves_stack.append([coord_E1, coord_D1])
+          moves_stack.append([coord_G8, coord_H8])
+
+          setup_game(moves_stack)
+          game.play
+
+          expect(game.send(:threefold_condition?)).to eq true
+          expect(game.send(:draw_condition?)).to eq true
+          expect(game.send(:game_should_end)).to eq true
+        end
+      end
+
+      context 'Fifty Move Rules' do
+        let(:fifty_move_game) do
+          ChessKit.from_fen('2rq1rk1/8/2n1bn2/2pp4/3P1B2/2PB1N2/8/R3K2R w KQ - 100 170')
         end
 
-        context 'Fifty Move Rules' do
+        before do
+          game.instance_variable_set(:@chess_kit, fifty_move_game)
+          game.instance_variable_set(:@rules, Rules.new(game.chess_kit.board))
         end
 
-        context 'Insufficient Material' do
+        it 'ends game in fifty_move' do
+          expect(game.send(:fifty_move_condition?)).to eq true
+          expect(game.send(:draw_condition?)).to eq true
+          expect(game.send(:game_should_end)).to eq true
+        end
+      end
+
+      context 'Insufficient Material' do
+        let(:insufficient_material) { ChessKit.from_fen(case_fen) }
+
+        context ' king vs king' do
+          let(:case_fen) { '6k1/8/8/8/8/8/8/4K3 b - - 0 12' }
+
+          before do
+            game.instance_variable_set(:@chess_kit, insufficient_material)
+            game.instance_variable_set(:@rules, Rules.new(game.chess_kit.board))
+          end
+
+          it 'ends game because of lack of material' do
+            expect(game.send(:insufficient_material?)).to eq true
+            expect(game.send(:draw_condition?)).to eq true
+            expect(game.send(:game_should_end)).to eq true
+          end
+        end
+
+        context ' king & bishop vs king' do
+          let(:case_fen) { '6k1/7b/8/8/8/8/8/4K3 b - - 0 12' }
+
+          before do
+            game.instance_variable_set(:@chess_kit, insufficient_material)
+            game.instance_variable_set(:@rules, Rules.new(game.chess_kit.board))
+          end
+
+          it 'ends game because of lack of material' do
+            expect(game.send(:insufficient_material?)).to eq true
+            expect(game.send(:draw_condition?)).to eq true
+            expect(game.send(:game_should_end)).to eq true
+          end
+        end
+
+        context ' king  vs king & bishop' do
+          let(:case_fen) { '6k1/8/8/8/8/8/7B/4K3 b - - 0 12' }
+
+          before do
+            game.instance_variable_set(:@chess_kit, insufficient_material)
+            game.instance_variable_set(:@rules, Rules.new(game.chess_kit.board))
+          end
+
+          it 'ends game because of lack of material' do
+            expect(game.send(:insufficient_material?)).to eq true
+            expect(game.send(:draw_condition?)).to eq true
+            expect(game.send(:game_should_end)).to eq true
+          end
+        end
+
+        context ' king & knight vs king' do
+          let(:case_fen) { '6k1/8/8/8/8/8/7n/4K3 b - - 0 12' }
+
+          before do
+            game.instance_variable_set(:@chess_kit, insufficient_material)
+            game.instance_variable_set(:@rules, Rules.new(game.chess_kit.board))
+          end
+
+          it 'ends game because of lack of material' do
+            expect(game.send(:insufficient_material?)).to eq true
+            expect(game.send(:draw_condition?)).to eq true
+            expect(game.send(:game_should_end)).to eq true
+          end
+        end
+
+        context ' king vs king & knight ' do
+          let(:case_fen) { '6k1/8/8/8/8/8/7N/4K3 b - - 0 12' }
+
+          before do
+            game.instance_variable_set(:@chess_kit, insufficient_material)
+            game.instance_variable_set(:@rules, Rules.new(game.chess_kit.board))
+          end
+
+          it 'ends game because of lack of material' do
+            expect(game.send(:insufficient_material?)).to eq true
+            expect(game.send(:draw_condition?)).to eq true
+            expect(game.send(:game_should_end)).to eq true
+          end
+        end
+
+        context ' king & bishop vs king bishop' do
+          context 'light cell bishops' do
+            let(:case_fen) { '6k1/5b2/8/8/8/8/2B5/4K3 w - - 0 12' }
+
+            before do
+              game.instance_variable_set(:@chess_kit, insufficient_material)
+              game.instance_variable_set(:@rules, Rules.new(game.chess_kit.board))
+            end
+
+            it 'ends game because of lack of material' do
+              expect(game.send(:insufficient_material?)).to eq true
+              expect(game.send(:draw_condition?)).to eq true
+              expect(game.send(:game_should_end)).to eq true
+            end
+          end
+          context 'dark cell bishops' do
+            let(:case_fen) { '5bk1/8/8/8/8/8/3B4/4K3 b KQ - 0 12chess' }
+
+            before do
+              game.instance_variable_set(:@chess_kit, insufficient_material)
+              game.instance_variable_set(:@rules, Rules.new(game.chess_kit.board))
+            end
+
+            it 'ends game because of lack of material' do
+              expect(game.send(:insufficient_material?)).to eq true
+              expect(game.send(:draw_condition?)).to eq true
+              expect(game.send(:game_should_end)).to eq true
+            end
+          end
         end
       end
     end
