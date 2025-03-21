@@ -64,8 +64,8 @@ module Requirement
     }
   end
 
-  def self.safe_row_between(board, team_color)
-    rules = Rules.new(board)
+  def self.safe_row_between(chess_kit, team_color)
+    rules = Rules.new(chess_kit)
 
     lambda { |initial_cord, final_cord|
       coord_between(initial_cord, final_cord, mode: :inclusive) do |target_cord|
@@ -120,14 +120,15 @@ module Requirement
   QUEEN_SIDE_CASTLE_ROOK_COLUMN = 0
   QUEEN_SIDE_CASTLE_ROOK_TARGET_COLUMN = 3
 
-  def self.can_castle(board, team_color)
+  def self.can_castle(chess_kit, team_color)
     lambda { |parent_cord, target_cord|
       rook_cord = rook_position_of_castle(parent_cord, target_cord)
+      board = chess_kit.board
 
       return false unless king_castle_conditions(board, parent_cord)
       return false unless rook_castle_condition(board, rook_cord)
 
-      return false unless safe_row_between(board, team_color).call(parent_cord, rook_cord)
+      return false unless safe_row_between(chess_kit, team_color).call(parent_cord, rook_cord)
       return false unless empty_row_between(board).call(parent_cord, rook_cord)
 
       true

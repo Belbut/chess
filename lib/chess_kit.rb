@@ -43,7 +43,7 @@ class ChessKit
 
   def deep_clone
     board_cloned = board.deep_clone
-    new(board_cloned, current_color, half_move_count, full_move_count)
+    ChessKit.new(board_cloned, current_color, half_move_count, full_move_count)
   end
 
   def make_move(from, to)
@@ -108,7 +108,7 @@ class ChessKit
   def process_en_passant(moving_piece, from, to)
     return unless moving_piece.is_a?(Pieces::Pawn)
 
-    rules = Rules.new(board)
+    rules = Rules.new(self)
     possible_en_passant = rules.possible_flanks_for_en_passant(from)
 
     possible_en_passant.each do |en_passant_move|

@@ -103,6 +103,6 @@ module PatternFactory
 
   def king_castle_move_pattern(piece_color)
     PatternRules.new([[-2, 0], [2, 0]], Requirement.target_is_inside_board(board),
-                     Requirement.can_castle(board, piece_color))
+                     Requirement.can_castle(chess_kit, piece_color))
   end
 end

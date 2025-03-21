@@ -7,4 +7,13 @@ class Player
     @color = color
     @name = Interface.prompt_for_name(color)
   end
+
+  def self.name_from_color(game, color)
+    case color
+    when :white
+      game.white_player
+    when :black
+      game.black_player
+    end
+  end
 end

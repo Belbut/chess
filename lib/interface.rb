@@ -154,6 +154,10 @@ module Interface
     puts 'Check!'
   end
 
+  def self.draw_message(draw_reason)
+    puts "Because of #{draw_reason}, the game ended in a draw!"
+  end
+
   module Output
     require 'rainbow'
 
