@@ -233,7 +233,7 @@ describe Game do
     context 'does the game end when it should' do
       context 'in case of a checkmate' do
         before do
-          allow(Interface).to receive(:checkmate)
+          allow(Interface).to receive(:checkmate_message)
 
           moves_stack.append([coord_F2, coord_F3])
           moves_stack.append([coord_E7, coord_E5])

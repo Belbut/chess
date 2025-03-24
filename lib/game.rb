@@ -41,7 +41,7 @@ class Game
 
   def game_should_end(history = [])
     if @rules.checkmate_condition? || @rules.draw_condition?(history)
-      end_game_message
+      Interface.end_game_message(self)
       return true
     end
 
@@ -58,22 +58,5 @@ class Game
     @history.append({ move: (from.to_notation + to.to_notation), fen: @chess_kit.to_fen })
 
     Interface.display_chess_board(@chess_kit)
-  end
-
-  def end_game_message
-    if @rules.game_state == :checkmate
-      checkmate_message
-    else
-      Interface.draw_message(@rules.game_state)
-    end
-  end
-
-  def checkmate_message
-    current_player_color = @chess_kit.current_color_name
-    winner_color = ChessKit.opposite_color(current_player_color)
-
-    winner_name = Player.name_from_color(self, winner_color)
-
-    Interface.checkmate(current_player_color, winner_name)
   end
 end

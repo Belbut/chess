@@ -136,6 +136,16 @@ module Interface
     end
   end
 
+  def self.end_game_message(game)
+    game_state = game.rules.game_state
+
+    if game_state == :checkmate
+      Interface.checkmate_message(game)
+    else
+      Interface.draw_message(game_state)
+    end
+  end
+
   def self.prompt_for_coordinate_notation
     Coordinate.from_notation(prompt_standardized_input(no_constrains: true))
   rescue ArgumentError => e
@@ -144,7 +154,16 @@ module Interface
     prompt_for_coordinate_notation
   end
 
-  def self.checkmate(current_player_color, winner_name)
+  def self.checkmate_message(game)
+    current_player_color = game.chess_kit.current_color
+    winner_color = ChessKit.opposite_color(current_player_color)
+
+    winner_name = Player.name_from_color(game, winner_color)
+
+    announce_result(current_player_color, winner_name)
+  end
+
+  def self.announce_result(current_player_color, winner_name)
     puts "The #{current_player_color} is checkmated!"
 
     puts "Congratulations #{winner_name}"
