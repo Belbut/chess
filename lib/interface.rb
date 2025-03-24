@@ -44,14 +44,19 @@ module Interface
     puts "Turn ##{chess_kit.full_move_count}: #{chess_kit.current_color_name.capitalize} move:"
 
     move_from = get_piece_to_pick_up(chess_kit, rules)
-    display_possible_moves(move_from, chess_kit, rules)
+    display_possible_moves_on_board(move_from, chess_kit, rules)
 
     move_to = get_target_cell(rules, move_from)
-    clean_cell_states(chess_kit) # needed after the display_possible_moves
-    [move_from, move_to]
+    clean_cell_states(chess_kit) # needed after the display_possible_moves_on_board
+
+    if move_to == :change
+      get_round_moves(chess_kit, rules)
+    else
+      [move_from, move_to]
+    end
   end
 
-  def self.display_possible_moves(move_from, chess_kit, rules)
+  def self.display_possible_moves_on_board(move_from, chess_kit, rules)
     possible_moves_from = rules.available_paths_for_piece(move_from).flatten
 
     chess_kit.board.add_to_cell_state(move_from, :picked)
@@ -100,10 +105,22 @@ module Interface
     loop do
       move_to = prompt_for_coordinate_notation
 
+      return :change if move_to == :change
       return move_to if possible_moves_from.include?(move_to)
 
       puts "The target move #{move_to.to_notation} is not possible, pick another !!!!!!!or pick another piece:"
     end
+  end
+
+  def self.prompt_for_coordinate_notation
+    player_input = prompt_standardized_input(['change'], no_constrains: true)
+    return :change if player_input == 'change'
+
+    Coordinate.from_notation(player_input)
+  rescue ArgumentError, RangeError => e
+    puts e
+    puts "Chose again, (e.g., 'e2' for the piece at e2)"
+    prompt_for_coordinate_notation
   end
 
   def self.display_chess_board(chess_kit)
@@ -144,14 +161,6 @@ module Interface
     else
       Interface.draw_message(game_state)
     end
-  end
-
-  def self.prompt_for_coordinate_notation
-    Coordinate.from_notation(prompt_standardized_input(no_constrains: true))
-  rescue ArgumentError => e
-    puts e
-    puts "Chose again, (e.g., 'e2' for the piece at e2)"
-    prompt_for_coordinate_notation
   end
 
   def self.checkmate_message(game)
