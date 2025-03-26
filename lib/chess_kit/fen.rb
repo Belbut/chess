@@ -21,7 +21,7 @@ module FEN
   def self.update_en_passant_rights(chess_kit, fen_data)
     return unless fen_data[:en_passant_notation] != '-'
 
-    position_of_en_passant = FEN.position_of_en_passant(current_color, en_passant_notation)
+    position_of_en_passant = FEN.position_of_en_passant(fen_data[:current_color], fen_data[:en_passant_notation])
     chess_kit.board.lookup_cell_content(position_of_en_passant).mark_as_rushed
   end
 
@@ -159,9 +159,9 @@ module FEN
     result
   end
 
-  def position_of_en_passant(current_color, notation)
+  def self.position_of_en_passant(current_color, notation)
     pawn_flank_position = Coordinate.from_notation(notation)
-    pawn_rushed_direction = current_color == :w ? 1 : -1
+    pawn_rushed_direction = current_color == :w ? -1 : +1
 
     Coordinate.new(pawn_flank_position.x, pawn_flank_position.y + pawn_rushed_direction)
   end
