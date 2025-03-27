@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
-require_relative './player'
-require_relative './chess_kit'
-require_relative './rules'
+require_relative 'chess_kit'
+require_relative 'chess_kit/board'
+require_relative 'chess_kit/pieces'
+require_relative 'game'
+require_relative 'rules'
 
 class Game
   attr_reader :chess_kit, :rules, :history, :white_player, :black_player
@@ -19,6 +21,23 @@ class Game
               load_last_game
             end
     new_game
+  end
+
+  def init_with(data)
+    @history = data['history']
+    current_fen = @history.last[:fen]
+    @chess_kit = ChessKit.from_fen(current_fen)
+    @rules = Rules.new(@chess_kit)
+  end
+
+  def encode_with(coder)
+    coder['history'] = @history
+  end
+
+  def save
+    File.open('database.yml', 'w') do |file|
+      file.write(YAML.dump(self))
+    end
   end
 
   def new_game
@@ -52,7 +71,7 @@ class Game
   private
 
   def game_round
-    from, to = Interface.get_round_moves(@chess_kit, @rules)
+    from, to = Interface.get_round_moves(self)
 
     @chess_kit.make_move(from, to)
     @history.append({ move: (from.to_notation + to.to_notation), fen: @chess_kit.to_fen })

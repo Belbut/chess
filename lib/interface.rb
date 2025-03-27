@@ -38,19 +38,29 @@ module Interface
     end
   end
 
-  def self.get_round_moves(chess_kit, rules)
+  def self.get_round_moves(game)
+    chess_kit = game.chess_kit
+    rules = game.rules
+
     display_chess_board(chess_kit)
 
     puts "Turn ##{chess_kit.full_move_count}: #{chess_kit.current_color_name.capitalize} move:"
 
     move_from = get_piece_to_pick_up(chess_kit, rules)
+    if move_from == :save
+      puts 'Saving the present game ...'
+      game.save
+      sleep(2)
+      return get_round_moves(game)
+    end
+
     display_possible_moves_on_board(move_from, chess_kit, rules)
 
     move_to = get_target_cell(rules, move_from)
     clean_cell_states(chess_kit) # needed after the display_possible_moves_on_board
 
     if move_to == :change
-      get_round_moves(chess_kit, rules)
+      get_round_moves(game)
     else
       [move_from, move_to]
     end
@@ -84,9 +94,18 @@ module Interface
 
   def self.get_piece_to_pick_up(chess_kit, rules)
     puts "Select a piece to move (e.g., 'e2' for the piece at e2):"
+    puts "or you can change save the present game by typing 'save' or quit by typing 'quit'"
 
     loop do
-      move_from = prompt_for_coordinate_notation
+      move_from = prompt_piece_to_pickup
+
+      return :quit if move_from == :quit
+      return :save if move_from == :save
+
+      unless chess_kit.board.inside_board?(move_from)
+        puts "The #{move_from.to_notation} isn't inside the board, pick another"
+        next
+      end
 
       unless chess_kit.current_player_owns_piece_at?(move_from)
         puts "The cell #{move_from.to_notation} doesn't have your piece, pick again"
@@ -103,7 +122,7 @@ module Interface
 
     puts "Enter the destination square (e.g., 'e4') or type 'change' to pick a different piece:"
     loop do
-      move_to = prompt_for_coordinate_notation
+      move_to = prompt_target_cell
 
       return :change if move_to == :change
       return move_to if possible_moves_from.include?(move_to)
@@ -112,15 +131,27 @@ module Interface
     end
   end
 
-  def self.prompt_for_coordinate_notation
+  def self.prompt_target_cell
     player_input = prompt_standardized_input(['change'], no_constrains: true)
     return :change if player_input == 'change'
 
+    prompt_for_coordinate_notation(player_input) { prompt_target_cell }
+  end
+
+  def self.prompt_piece_to_pickup
+    player_input = prompt_standardized_input(%w[save load], no_constrains: true)
+    return :save if player_input == 'save'
+    return :load if player_input == 'load'
+
+    prompt_for_coordinate_notation(player_input) { prompt_piece_to_pickup }
+  end
+
+  def self.prompt_for_coordinate_notation(player_input)
     Coordinate.from_notation(player_input)
   rescue ArgumentError, RangeError => e
     puts e
     puts "Chose again, (e.g., 'e2' for the piece at e2)"
-    prompt_for_coordinate_notation
+    yield
   end
 
   def self.display_chess_board(chess_kit)

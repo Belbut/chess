@@ -12,7 +12,7 @@ class Coordinate
   end
 
   def ==(other)
-    x == other.x && y == other.y
+    other.is_a?(Coordinate) && x == other.x && y == other.y
   end
 
   def <=>(other)
