@@ -24,6 +24,13 @@ module Interface
     puts 'First lets create each players'
   end
 
+  def self.load_match_intro(chess_kit)
+    puts 'Lets continue the last saved game'
+    puts 'This is the state of the game when you saved:'
+    display_chess_board(chess_kit)
+    puts 'Now decide who will be playing with each color, this is a great opportunity if you want to change sides'
+  end
+
   def self.load_or_new_game
     puts 'Would you like to load a saved game or play a new one? (new/load)'
     response = prompt_standardized_input(%w[new load])
@@ -52,6 +59,12 @@ module Interface
       game.save
       sleep(2)
       return get_round_moves(game)
+    end
+
+    if move_from == :quit
+      puts 'You decided to surrender.'
+      game.rules.game_state = :surrender
+      throw :surrender
     end
 
     display_possible_moves_on_board(move_from, chess_kit, rules)
@@ -94,7 +107,7 @@ module Interface
 
   def self.get_piece_to_pick_up(chess_kit, rules)
     puts "Select a piece to move (e.g., 'e2' for the piece at e2):"
-    puts "or you can change save the present game by typing 'save' or quit by typing 'quit'"
+    puts "or you can 'save' or 'quit' the game"
 
     loop do
       move_from = prompt_piece_to_pickup
@@ -139,9 +152,9 @@ module Interface
   end
 
   def self.prompt_piece_to_pickup
-    player_input = prompt_standardized_input(%w[save load], no_constrains: true)
+    player_input = prompt_standardized_input(%w[save quit], no_constrains: true)
     return :save if player_input == 'save'
-    return :load if player_input == 'load'
+    return :quit if player_input == 'quit'
 
     prompt_for_coordinate_notation(player_input) { prompt_piece_to_pickup }
   end
@@ -189,22 +202,28 @@ module Interface
 
     if game_state == :checkmate
       Interface.checkmate_message(game)
+    elsif game_state == :surrender
+      Interface.surrender_message(game)
     else
       Interface.draw_message(game_state)
     end
   end
 
   def self.checkmate_message(game)
-    current_player_color = game.chess_kit.current_color
-    winner_color = ChessKit.opposite_color(current_player_color)
+    current_player_color_name = game.chess_kit.current_color_name
+    puts "The #{current_player_color_name} is checkmated!"
 
-    winner_name = Player.name_from_color(game, winner_color)
-
-    announce_result(current_player_color, winner_name)
+    announce_winner(game)
   end
 
-  def self.announce_result(current_player_color, winner_name)
-    puts "The #{current_player_color} is checkmated!"
+  def self.surrender_message(game)
+    announce_winner(game)
+  end
+
+  def self.announce_winner(game)
+    current_player_color_name = game.chess_kit.current_color_name
+    winner_color_name = ChessKit.opposite_color(current_player_color_name)
+    winner_name = Player.name_from_color(game, winner_color_name)
 
     puts "Congratulations #{winner_name}"
   end

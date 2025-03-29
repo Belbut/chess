@@ -11,9 +11,9 @@ class Player
   def self.name_from_color(game, color)
     case color
     when :white
-      game.white_player
+      game.white_player.name
     when :black
-      game.black_player
+      game.black_player.name
     end
   end
 end
