@@ -19,7 +19,7 @@ PIECE_RENDERED = { white: { pawn: "\e[38;5;231m ♟ \e[0m",
                             king: "\e[30m ♚ \e[0m" } }.freeze
 
 describe Interface do
-  describe Interface::Output do
+  describe Interface::Output::Visualizer do
     describe '.render_piece' do
       let(:unit_dbl) { instance_double(Unit) }
       before do

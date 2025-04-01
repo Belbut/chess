@@ -11,7 +11,7 @@ describe Rules do
     include TestingUtil
 
     subject(:rules) { Rules.new(chess_kit) }
-    let(:chess_kit) { ChessKit.new_game }
+    let(:chess_kit) { ChessKit.new_match }
     let(:board) { chess_kit.board }
 
     before do

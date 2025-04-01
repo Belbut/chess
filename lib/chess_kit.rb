@@ -17,7 +17,7 @@ class ChessKit
     @full_move_count = full_move_count
   end
 
-  def self.new_game
+  def self.new_match
     chess_kit = new(Board.new(BOARD_SIZE[:rows], BOARD_SIZE[:columns]), :w, 0, 1)
     chess_kit.place_initial_pieces
 
@@ -34,7 +34,7 @@ class ChessKit
   end
 
   def to_s
-    Interface::Output.render_game(board)
+    Interface::Output::Visualizer.render_game(board)
   end
 
   def to_fen
@@ -76,6 +76,10 @@ class ChessKit
 
   def self.opposite_color(team_color)
     { white: :black, black: :white }[team_color]
+  end
+
+  def clean_cell_states
+    board.remove_all_cell_states
   end
 
   private

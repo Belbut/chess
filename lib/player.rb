@@ -5,7 +5,7 @@ class Player
 
   def initialize(color)
     @color = color
-    @name = Interface.prompt_for_name(color)
+    @name = Interface::Input.prompt_for_name(color)
   end
 
   def self.name_from_color(game, color)

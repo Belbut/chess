@@ -7,7 +7,7 @@ describe Player do
   subject(:player) { described_class.new(:player_color) }
 
   before do
-    allow(Interface).to receive(:prompt_for_name)
+    allow(Interface::Input).to receive(:prompt_for_name)
   end
 
   describe '#color' do
@@ -18,7 +18,7 @@ describe Player do
 
   describe '#name' do
     before do
-      allow(Interface).to receive(:prompt_for_name).and_return('John')
+      allow(Interface::Input).to receive(:prompt_for_name).and_return('John')
     end
     it 'returns player name' do
       expect(player.name).to eq('John')

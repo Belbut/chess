@@ -23,7 +23,7 @@ class Board
   end
 
   def to_s
-    Interface::Output.render_game(self)
+    Interface::Output::Visualizer.render_game(self)
   end
 
   def ==(other)

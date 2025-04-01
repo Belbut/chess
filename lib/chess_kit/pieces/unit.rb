@@ -10,7 +10,7 @@ class Unit
   end
 
   def to_s
-    Interface::Output.render_piece(self)
+    Interface::Output::Visualizer.render_piece(self)
   end
 
   def ==(other)

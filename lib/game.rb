@@ -14,12 +14,12 @@ class Game
   def initialize
     @history = []
 
-    Interface.game_greeting
-    case Interface.load_or_new_game
-    when :new_game
-      new_game
-    when :load_game
-      load_last_game
+    Interface::Output.game_greeting
+    case Interface::Input::FlowHandler.load_or_new_match
+    when :new_match
+      new_match
+    when :load_match
+      load_last_match
     end
   end
 
@@ -42,22 +42,23 @@ class Game
     @rules = Rules.new(@chess_kit)
   end
 
-  def new_game
-    Interface.new_match_intro
+  def new_match
+    @chess_kit = ChessKit.new_match
+    @rules = Rules.new(@chess_kit)
+
+    Interface::Output.new_match_intro(@chess_kit)
     @white_player = Player.new(:white)
     @black_player = Player.new(:black)
-    puts("\nGame setup complete. \"#{@white_player.name}\" will play as White, and \"#{@black_player.name}\" will play as Black.")
-
-    @chess_kit = ChessKit.new_game
-    @rules = Rules.new(@chess_kit)
+    Interface::Output.players_created_intro(@white_player.name, @black_player.name)
   end
 
-  def load_last_game
+  def load_last_match
     self.load
-    Interface.load_match_intro(@chess_kit)
+
+    Interface::Output.load_match_intro(@chess_kit)
     @white_player = Player.new(:white)
     @black_player = Player.new(:black)
-    puts("\nGame setup complete. \"#{@white_player.name}\" will play as White, and \"#{@black_player.name}\" will play as Black.")
+    Interface::Output.players_created_intro(@white_player.name, @black_player.name)
   end
 
   def play
@@ -68,24 +69,26 @@ class Game
     end
   end
 
+  private
+
   def game_should_end(history = [])
     if @rules.checkmate_condition? || @rules.draw_condition?(history) || @rules.game_state == :surrender
-      Interface.end_game_message(self)
+      Interface::Output.end_game_message(self)
       return true
     end
 
-    Interface.check_message if @rules.check_condition?
+    Interface::Output.check_message if @rules.check_condition?
     false
   end
 
   def game_round
     catch(:surrender) do
-      from, to = Interface.get_round_moves(self)
+      from, to = Interface::Input::FlowHandler.get_round_moves(self)
 
       @chess_kit.make_move(from, to)
       @history.append({ move: (from.to_notation + to.to_notation), fen: @chess_kit.to_fen })
 
-      Interface.display_chess_board(@chess_kit)
+      Interface::Output::Visualizer.display_game(@chess_kit)
     end
   end
 end

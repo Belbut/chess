@@ -21,6 +21,15 @@ EXPECTED_FEN_BLACK_KING_SIDE_CASTLE = 'r1bq1rk1/ppppbppp/2n2n2/4p3/4P3/2NP1N2/PP
 describe Game do
   include TestingUtil
 
+  before do
+    allow(Interface::Output).to receive(:game_greeting)
+    allow(Interface::Output::Visualizer).to receive(:display_game)
+    allow(Interface::Input::FlowHandler).to receive(:load_or_new_match).and_return(:new_match)
+    allow(Interface::Input).to receive(:prompt_for_name)
+    allow(Interface::Output).to receive(:new_match_intro)
+    allow(Interface::Output).to receive(:players_created_intro)
+  end
+
   def setup_game(arg, force_end: true)
     round_moves = []
     game_should_end_stack = []
@@ -33,18 +42,13 @@ describe Game do
     game_should_end_stack.pop
     game_should_end_stack.append(true)
 
-    allow(Interface).to receive(:get_round_moves).and_return(*round_moves)
+    allow(Interface::Input::FlowHandler).to receive(:get_round_moves).and_return(*round_moves)
     allow(game).to receive(:game_should_end).and_return(*game_should_end_stack) if force_end
   end
 
   subject(:game) { described_class.new }
   let(:moves_stack) { [] }
   let(:rules) { game.rules }
-
-  before do
-    allow(Interface).to receive(:game_greeting)
-    allow(Interface).to receive(:display_chess_board)
-  end
 
   describe '#play' do
     context 'do pieces move' do
@@ -233,7 +237,7 @@ describe Game do
     context 'does the game end when it should' do
       context 'in case of a checkmate' do
         before do
-          allow(Interface).to receive(:checkmate_message)
+          allow(Interface::Output).to receive(:checkmate_message)
 
           moves_stack.append([coord_F2, coord_F3])
           moves_stack.append([coord_E7, coord_E5])
@@ -252,7 +256,7 @@ describe Game do
 
       context 'in case of a a draw' do
         before do
-          allow(Interface).to receive(:draw_message)
+          allow(Interface::Output).to receive(:draw_message)
         end
 
         context 'Stalemate' do
