@@ -50,17 +50,16 @@ module Interface
         end
       end
 
-      def self.get_round_moves(game)
+      def self.get_round_moves(game, type_of_player)
         chess_kit = game.chess_kit
-        rules = game.rules
 
         Interface::Output::Visualizer.display_game(chess_kit)
         puts "Turn ##{chess_kit.full_move_count}: #{chess_kit.current_color_name.capitalize} move:"
 
-        human_player_round(game)
+        type_of_player == :human ? human_play_round(game) : computer_play_round(game)
       end
 
-      def self.human_player_round(game)
+      def self.human_play_round(game)
         chess_kit = game.chess_kit
         rules = game.rules
 
@@ -70,10 +69,23 @@ module Interface
         chess_kit.clean_cell_states # needed after the display_possible_moves_on_board
 
         if move_to == :change
-          get_round_moves(game)
+          get_round_moves(game, :human)
         else
           [move_from, move_to]
         end
+      end
+
+      def self.computer_play_round(game)
+        chess_kit = game.chess_kit
+        rules = game.rules
+        puts 'The computer is thinking...'
+        sleep(1)
+        computer = { move_from: Coordinate.from_notation('a1'), move_to: Coordinate.from_notation('a3') } # get this from computer stockfish
+        Interface::Output::Visualizer.display_possible_moves_on_board(computer[:move_from], chess_kit, rules)
+        sleep(1.5)
+        chess_kit.clean_cell_states # needed after the display_possible_moves_on_board
+
+        [computer[:move_from], computer[:move_to]]
       end
 
       def self.determine_initial_move(game)

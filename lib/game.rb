@@ -83,12 +83,16 @@ class Game
 
   def game_round
     catch(:surrender) do
-      from, to = Interface::Input::FlowHandler.get_round_moves(self)
+      from, to = Interface::Input::FlowHandler.get_round_moves(self, current_player.type)
 
       @chess_kit.make_move(from, to)
       @history.append({ move: (from.to_notation + to.to_notation), fen: @chess_kit.to_fen })
 
       Interface::Output::Visualizer.display_game(@chess_kit)
     end
+  end
+
+  def current_player
+    Player.from_color(self, @chess_kit.current_color_name)
   end
 end
