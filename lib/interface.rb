@@ -78,14 +78,14 @@ module Interface
       def self.computer_play_round(game)
         chess_kit = game.chess_kit
         rules = game.rules
-        puts 'The computer is thinking...'
-        sleep(1)
-        computer = { move_from: Coordinate.from_notation('a1'), move_to: Coordinate.from_notation('a3') } # get this from computer stockfish
-        Interface::Output::Visualizer.display_possible_moves_on_board(computer[:move_from], chess_kit, rules)
+        puts 'The computer is calculating...'
+        engine_answer = game.stockfish_engine.prompt_for_move(chess_kit.to_fen)
+        Interface::Output::Visualizer.display_possible_moves_on_board(engine_answer[:move_from], chess_kit, rules)
+        puts "The computer picked: #{engine_answer[:move_from].to_notation}"
         sleep(1.5)
         chess_kit.clean_cell_states # needed after the display_possible_moves_on_board
 
-        [computer[:move_from], computer[:move_to]]
+        [engine_answer[:move_from], engine_answer[:move_to]]
       end
 
       def self.determine_initial_move(game)

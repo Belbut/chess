@@ -5,9 +5,10 @@ require 'yaml'
 require_relative 'chess_kit'
 require_relative 'rules'
 require_relative 'player'
+require_relative 'stockfish_engine'
 
 class Game
-  attr_reader :chess_kit, :rules, :history, :white_player, :black_player
+  attr_reader :chess_kit, :rules, :history, :white_player, :black_player, :stockfish_engine
 
   FILE_WITH_SAVED_GAME = './database.yml'
 
@@ -21,6 +22,8 @@ class Game
     when :load_match
       load_last_match
     end
+
+    config_computer_chess_engine
   end
 
   def encode_with(coder)
@@ -94,5 +97,11 @@ class Game
 
   def current_player
     Player.from_color(self, @chess_kit.current_color_name)
+  end
+
+  def config_computer_chess_engine
+    return unless [@white_player, @black_player].any? { |player| player.type == :computer }
+
+    @stockfish_engine = StockfishEngine.new
   end
 end
