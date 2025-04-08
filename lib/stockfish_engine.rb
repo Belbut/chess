@@ -1,13 +1,12 @@
 require_relative 'chess_kit/coordinate'
 class StockfishEngine
-  RELATIVE_DIR = '../engine/stockfish/src/stockfish'
+  DIR = '/usr/games/stockfish'
+
 
   attr_reader :engine
 
   def initialize
-    dir = File.join(__dir__, RELATIVE_DIR)
-
-    @engine = IO.popen(dir, mode: 'r+')
+    @engine = IO.popen(DIR, mode: 'r+')
     @all_stdout = []
     @engine.puts('uci')
     ready?
